@@ -14,7 +14,7 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 esac done
 
 # DEFAULTS:
-[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git" && repobranch="i3"
+[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git" && repobranch="archi3"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/vladdoster/VARBS/master/i3/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
@@ -155,12 +155,6 @@ finalize(){ \
 	}
 
 ### THE ACTUAL SCRIPT ###
-
-### This is how everything happens in an intuitive format and order.
-
-# Check if user is root on Arch distro. Install dialog.
-pacman -Syu --noconfirm --needed dialog ||  error "Are you sure you're running this as the root user? Are you sure you're using an Arch-based distro? ;-) Are you sure you have an internet connection? Are you sure your Arch keyring is updated?"
-
 # Welcome user.
 welcomemsg || error "User exited."
 
