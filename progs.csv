@@ -3,6 +3,7 @@
 ,xorg-server,"is the graphical server."
 ,xorg-xwininfo,"allows querying information about windows."
 ,xorg-xinit,"starts the graphical server."
+,xorg-xkill,"kill zombie windows."
 ,sxhkd,"binds key."
 ,ttf-inconsolata,"is the monospace font of LARBS."
 ,ttf-linux-libertine,"provides the sans and serif fonts for LARBS."
