@@ -105,8 +105,8 @@ pipinstall() { \
 	}
 
 setgitglobal() { \
-	git config user.name "Vlad Doster"
-	git config user.email "mvdoster@gmail.com"
+	git config --global user.name "Vlad Doster"
+	git config --global user.email "mvdoster@gmail.com"
 	}
 
 installationloop() { \
