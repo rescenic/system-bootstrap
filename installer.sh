@@ -1,5 +1,4 @@
-#!/bin/sh
-# Vlad's Auto Rice Boostrapping Script (VARBS)
+#!/usr/bin/env bash
 # License: GNU GPLv3
 
 ### OPTIONS AND VARIABLES ###

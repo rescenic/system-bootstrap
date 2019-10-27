@@ -1,9 +1,4 @@
-#!/bin/bash
-
-#This is a lazy script I have for auto-installing Arch.
-#It's not officially part of LARBS, but I use it for testing.
-#DO NOT RUN THIS YOURSELF because Step 1 is it reformatting /dev/sda WITHOUT confirmation,
-#which means RIP in peace qq your data unless you've already backed up all of your drive.
+#!/usr/bin/env bash
 
 pacman -S --noconfirm dialog || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
