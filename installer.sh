@@ -105,6 +105,7 @@ pipinstall() { \
 	}
 
 setgitglobal() { \
+  mkdir $HOME/github || echo "github folder already exists"
 	git config --global user.name "Vlad Doster"
 	git config --global user.email "mvdoster@gmail.com"
 	}
