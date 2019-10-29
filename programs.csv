@@ -25,6 +25,7 @@
 ,mpd,"is a lightweight music daemon."
 ,mpv,"is the patrician's choice video player."
 ,ncmpcpp,"a ncurses interface for music with multiple formats and a powerful tag editor."
+,neomutt, "A mail client"
 ,neovim,"an tidier vim with some useful features"
 ,networkmanager,"does exactly what it sounds like."
 ,ntfs-3g,"allows accessing NTFS partitions."
