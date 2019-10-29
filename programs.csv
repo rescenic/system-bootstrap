@@ -59,6 +59,7 @@
 ,zathura,"is a pdf viewer with vim-like bindings."
 ,zathura-djvu,"gives zathura the ability to read .djvu files."
 ,zathura-pdf-mupdf,"allows mupdf pdf compatibility in zathura."
+A,code, "Visual studio code."
 A,discord, "A program to connect gamers."
 A,google-chrome-stable,"is the only program on LARBS your girlfriend has ever heard of."
 A,gtk-theme-arc-gruvbox-git,"gives the dark GTK theme used in LARBS."
