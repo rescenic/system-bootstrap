@@ -1,4 +1,5 @@
 #TAG,NAME IN REPO (or git url),PURPOSE
+A,nerd-fonts-source-code-pro, "A font for programming."
 ,alsa-utils,"is an audio interface for ALSA."
 ,arandr,"is a UI for screen adjustment."
 ,atool,"manages and gives information about archives."
