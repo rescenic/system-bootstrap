@@ -42,6 +42,7 @@
 ,socat,"is a socket utility."
 ,sxhkd,"binds keys."
 ,sxiv,"is a minimalist image viewer."
+,tldr,"Community effort to simplify man pages with practical examples."
 ,tmux,"is a terminal multiplexer and the dropdown window in LARBS."
 ,tree,"lists directory contents like trees. Used by vifm."
 ,ttf-inconsolata,"is the monospace font of LARBS."
