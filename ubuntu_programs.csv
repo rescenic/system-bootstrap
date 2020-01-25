@@ -21,6 +21,8 @@ G,https://github.com/lukesmithxyz/st.git,"is my custom build of suckless's termi
 ,dmenu
 ,S,spotify
 ,xbacklight
+,polybar
+,i3lock-color
 ,xinit
 ,xorg
 ,xorg-utils

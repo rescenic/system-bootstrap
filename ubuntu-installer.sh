@@ -131,24 +131,10 @@ systembeepoff() { dialog --infobox "Getting rid of that retarded error beep soun
         rmmod pcspkr
         echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
-installi3gaps(){ \
-	apt install -y libxcb1-dev libxcb-keysyms1-dev libpango1.0-dev libxcb-util0-dev libxcb-icccm4-dev libyajl-dev libstartup-notification0-dev libxcb-randr0-dev libev-dev libxcb-cursor-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev autoconf libxcb-xrm0 libxcb-xrm-dev automake
-	cd /tmp || error
-
-	# clone the repository
-	git clone https://www.github.com/Airblader/i3 i3-gaps
-	cd i3-gaps || error
-
-	# compile & install
-	autoreconf --force --install
-	rm -rf build/
-	mkdir -p build && cd build/
-
-	# Disabling sanitizers is important for release versions!
-	# The prefix and sysconfdir are, obviously, dependent on the distribution.
-	../configure --prefix=/usr --sysconfdir=/etc --disable-sanitizers
-	make || error "couldnt make i3 gaps"
-	make install || error "couldnt make install i3 gaps"
+installi3ppas(){ \
+	add-apt-repository ppa:kgilmer/speed-ricer --yes
+	add-apt-repository ppa:codejamninja/jam-os --yes
+	apt-get update
 }
 
 
@@ -180,8 +166,7 @@ adduserandpass || error "Error adding username and/or password."
 
 dialog --title "LARBS Installation" --infobox "Installing \`git\` for installing other software." 5 70
 installpkg git
-add-apt-repository ppa:codejamninja/jam-os --yes || error "adding i3-gaps PPA"
-apt update || error "couldnt update apt"
+installi3ppas || error "adding i3 ppas"
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
 newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
