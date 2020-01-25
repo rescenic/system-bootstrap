@@ -17,7 +17,7 @@ esac done
 
 ### FUNCTIONS ###
 
-grepseq="\"^[PGU]*,\""
+grepseq="\"^[GUSB]*,\""
       
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
