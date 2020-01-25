@@ -21,10 +21,7 @@ esac done
 
 ### FUNCTIONS ###
 
-if type xbps-install >/dev/null 2>&1; then
-	installpkg(){ xbps-install -y "$1" >/dev/null 2>&1 ;}
-	grepseq="\"^[PGV]*,\""
-elif type apt >/dev/null 2>&1; then
+if type apt >/dev/null 2>&1; then
 	installpkg(){ apt-get install -y "$1" >/dev/null 2>&1 ;}
 	grepseq="\"^[PGU]*,\""
 else
