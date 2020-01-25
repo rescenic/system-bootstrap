@@ -16,9 +16,9 @@ S,discord
 S,pycharm-professional
 U,https://dl.google.comx/linux/direct/google-chrome-stable_current_amd64.deb
 ,unclutter
-dmenu
-S,spotify
-xbacklight
-xinit
-xorg
-xorg-utils
+,dmenu
+,S,spotify
+,xbacklight
+,xinit
+,xorg
+,xorg-utils
