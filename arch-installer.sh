@@ -217,12 +217,6 @@ newperms "%wheel ALL=(ALL) ALL #LARBS
 # Make zsh the default shell for the user
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 
-# dbus UUID must be generated for Artix runit
-dbus-uuidgen > /var/lib/dbus/machine-id
-
-# Let LARBS know the WM it's supposed to run.
-echo "$edition" > "/home/$name/.local/share/larbs/wm"; chown "$name:wheel" "/home/$name/.local/share/larbs/wm"
-
 # Last message! Install complete!
 finalize
 clear
