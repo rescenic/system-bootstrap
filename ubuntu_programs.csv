@@ -1,28 +1,30 @@
 #TAG,NAME IN REPO (or git url),PURPOSE
-,alsa-utils
-,arandr
-,atool
-,bc
-B,fzf,
-,calcurse
-,docker
-,docker-compose
-,dunst
-,ffmpeg
-,highlight
-,maim
-S,code
-S,discord
-S,pycharm-professional
-U,https://dl.google.comx/linux/direct/google-chrome-stable_current_amd64.deb
+,alsa-utils,"Sound controller"
+,arandr,
+,atool,
+,bc,
+B,fzf,"Fuzzy search program"
+,calcurse, "Calculator"
+,docker, "Container program"
+,docker-compose, "Orchestrate docker containers"
+,dunst, "Notification program"
+,snapd,"Program to help install GUI programs"
+,ffmpeg,
+,highlight,
+,maim,
+S,code,
+S,discord,
+S,pycharm-professional,
+U,https://dl.google.comx/linux/direct/google-chrome-stable_current_amd64.deb,
 G,https://github.com/lukesmithxyz/dmenu.git,"runs commands and provides a UI for selection."
 G,https://github.com/lukesmithxyz/st.git,"is my custom build of suckless's terminal emulator."
-,unclutter
-,dmenu
-,S,spotify
-,xbacklight
-,polybar
-,i3lock-color
-,xinit
-,xorg
-,xorg-utils
+,unclutter,"Remove mouse when inactive"
+,dmenu,"A way to launch programs"
+,S,spotify,"How I listen to music"
+,xbacklight,
+,polybar,"Statusbar for i3"
+,i3lock-color,"A nice lockscreen"
+,zsh,"My favorite shell"
+,xinit,
+,xorg,
+,xorg-utils,

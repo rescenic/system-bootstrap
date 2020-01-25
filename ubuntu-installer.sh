@@ -17,7 +17,7 @@ esac done
 
 ### FUNCTIONS ###
 
-grepseq="\"^[GUSB]*,\""
+grepseq="\"^[BGSU]*,\""
       
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
@@ -85,10 +85,14 @@ gitmakeinstall() { \
         make install >/dev/null 2>&1
         cd /tmp || return ;}
 	
-installbrew() { sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+installbrew() { 
+        dialog --title "LARBS Installation" --infobox "Installing LinuxBrew" 5 70
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
 	PATH="/home/linuxbrew/.linuxbrew/bin:$PATH" ;}	
 
-installpkg(){ apt-get install -y "$1" >/dev/null 2>&1 ;}
+installpkg(){ 
+	dialog --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total) from APT. $1 $2" 5 70
+	apt-get install -y "$1" >/dev/null 2>&1 ;}
 
 maininstall() { # Installs all needed programs from main repo.
         dialog --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
@@ -115,7 +119,6 @@ installationloop() { \
                 esac
         done < /tmp/progs.csv ;}
 
-
 putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriting conflicts
         dialog --infobox "Downloading and installing config files..." 4 60
         [ -z "$3" ] && branch="master" || branch="$repobranch"
@@ -126,17 +129,19 @@ putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriti
         sudo -u "$name" cp -rfT "$dir/gitrepo" "$2"
         }
 
-
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
         rmmod pcspkr
         echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
-installi3ppas(){ \
-	add-apt-repository ppa:kgilmer/speed-ricer --yes
-	add-apt-repository ppa:codejamninja/jam-os --yes
-	apt-get update
-}
+installi3ppas() {
+	dialog --title "LARBS Installation" --infobox "Installing i3 PPAs" 5 70
+	add-apt-repository ppa:kgilmer/speed-ricer --yes >/dev/null 2>&1
+	add-apt-repository ppa:codejamninja/jam-os --yes >/dev/null 2>&1
+	apt-get update >/dev/null 2>&1 ;}
 
+finalize(){ \
+	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
+	}
 
 ### THE ACTUAL SCRIPT ###
 
@@ -161,12 +166,10 @@ preinstallmsg || error "User exited."
 
 adduserandpass || error "Error adding username and/or password."
 
-# Refresh Arch keyrings.
-# refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
-
 dialog --title "LARBS Installation" --infobox "Installing \`git\` for installing other software." 5 70
 installpkg git
 installi3ppas || error "adding i3 ppas"
+installbrew || error "adding LinuxBrew" # Do this first to avoid errors in programs.csv install
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
 newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
@@ -175,17 +178,14 @@ newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
 # installs each needed program the way required. Be sure to run this only after
 # the user has been created and has priviledges to run sudo without a password
 # and all build dependencies are installed.
-installbrew # Do this first to avoid errors in programs.csv install
-installationloop
-
-installi3gaps || error "installing i3-gaps"
+installationloop || error "installation loop"
 
 # Install the dotfiles in the user's home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 
 # Most important command! Get rid of the beep!
-systembeepoff
+# systembeepoff
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
