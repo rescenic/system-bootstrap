@@ -15,6 +15,8 @@ S,code
 S,discord
 S,pycharm-professional
 U,https://dl.google.comx/linux/direct/google-chrome-stable_current_amd64.deb
+G,https://github.com/lukesmithxyz/dmenu.git,"runs commands and provides a UI for selection."
+G,https://github.com/lukesmithxyz/st.git,"is my custom build of suckless's terminal emulator."
 ,unclutter
 ,dmenu
 ,S,spotify
