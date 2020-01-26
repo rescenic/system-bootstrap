@@ -33,9 +33,13 @@ timedatectl set-ntp true
 # ----------------------------
 cat <<EOF | fdisk $drive
 d
+
 d
+
 d
+
 d
+
 n # create new partition
 p
 1
