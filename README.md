@@ -1,5 +1,4 @@
-# Luke's Auto-Rice Bootstraping Scripts (LARBS)
-
+# Bootstraping Scripts (LARBS)
 
 ## Installation:
 
@@ -26,8 +25,8 @@ programs).
 
 ## Customization
 
-By default, LARBS uses the programs [here in progs.csv](progs.csv) and installs
-[my dotfiles repo (voidrice) here](https://github.com/lukesmithxyz/voidrice),
+By default, LARBS uses the programs [here in programs.csv](programs.csv) and installs
+[my dotfiles repo) here](https://github.com/vladdoster/dotfiles),
 but you can easily change this by either modifying the default variables at the
 beginning of the script or giving the script one of these options:
 
@@ -36,7 +35,7 @@ beginning of the script or giving the script one of these options:
 - `-a`: a custom AUR helper (must be able to install with `-S` unless you
   change the relevant line in the script
 
-### The `progs.csv` list
+### The `programs.csv` list
 
 LARBS will parse the given programs list and install all given programs. Note
 that the programs file must be a three column `.csv`.
