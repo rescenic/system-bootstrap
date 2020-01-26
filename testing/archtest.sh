@@ -5,13 +5,14 @@
 #DO NOT RUN THIS YOURSELF because Step 1 is it reformatting /dev/sda WITHOUT confirmation,
 #which means RIP in peace qq your data unless you've already backed up all of your drive.
 
+# This is single place to change drive prefix for whole script
 drive=/dev/nvme0n1
 
 pacman -Sy --noconfirm dialog || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script that is very rough around the edges.\n\nOnly run this script if you're a big-brane who doesn't mind deleting your entire /dev/sda drive.\n\nThis script is only really for me so I can autoinstall Arch.\n\nt. Luke"  15 60 || exit
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire /dev/sda and reinstall Arch.\n\nTo stop this script, press no."  10 60 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  10 60 || exit
 
 dialog --no-cancel --inputbox "Enter a name for your computer." 10 60 2> comp
 
@@ -23,26 +24,39 @@ IFS=' ' read -ra SIZE <<< $(cat psize)
 
 re='^[0-9]+$'
 if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]] ; then
-    SIZE=(12 25);
+    SIZE=(12 50);
 fi
 
 timedatectl set-ntp true
-
+# PARTITIONS
+# Assuming there are no partitons yet!
+# ----------------------------
 cat <<EOF | fdisk $drive
-g
+g # create gpt partiton table
+# SYSTEM PARTITION
+n # create new partition
+1 # create partition 1
+\n # start at default sector with simulated `enter`
++1G # size of where arch will be installed, could be smaller
+# SWAP
 n
-p
-+200M
-n
-p
+2
+\n
 +${SIZE[0]}G
+# ROOT
 n
-p
+3
+\n
 +${SIZE[1]}G
+# HOME
 n
-p
+4
+\n
+\n
+# Write to disk
 w
 EOF
+# ----------------------------
 partprobe
 
 yes | mkfs.ext4 ${drive}p4
