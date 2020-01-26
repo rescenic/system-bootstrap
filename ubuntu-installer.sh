@@ -139,6 +139,17 @@ installi3ppas() {
 	add-apt-repository ppa:codejamninja/jam-os --yes >/dev/null 2>&1
 	apt-get update >/dev/null 2>&1 ;}
 
+installxwallpaper() {
+        dialog --title "LARBS Installation" --infobox "Installing Xwallpaper" 5 70
+	git clone https://github.com/stoeckmann/xwallpaper.git
+	cd xwallpaper || error "cd into xwallpaper"
+	./autogen.sh
+	./configure
+	make
+	make install
+	cd .. && rm -r xwallpaper
+	}
+
 finalize(){ \
 	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
 	}
@@ -170,6 +181,7 @@ dialog --title "LARBS Installation" --infobox "Installing \`git\` for installing
 installpkg git
 installi3ppas || error "adding i3 ppas"
 installbrew || error "adding LinuxBrew" # Do this first to avoid errors in programs.csv install
+installxwallpaper || error "installing xwallpaper"
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
 newperms "%sudo ALL=(ALL) NOPASSWD: ALL"
