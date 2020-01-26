@@ -11,7 +11,7 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 esac done
 
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git"
-[ -z "$progsfile" ] && progsfile="https://github.com/vladdoster/dotfile-installer/master/ubuntu_programs.csv"
+[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/ubuntu_programs.csv"
 [ -z "$repobranch" ] && repobranch="master"
 
 
@@ -55,8 +55,8 @@ preinstallmsg() { \
 adduserandpass() { \
         # Adds user `$name` with password $pass1.
         dialog --infobox "Adding user \"$name\"..." 4 50
-        useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 ||
-        usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
+        useradd -m -g sudo -s /bin/bash "$name" >/dev/null 2>&1 ||
+        usermod -a -G sudo "$name" && mkdir -p /home/"$name" && chown "$name":sudo /home/"$name"
         echo "$name:$pass1" | chpasswd
         unset pass1 pass2 ;}
 
@@ -123,8 +123,8 @@ putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriti
         dialog --infobox "Downloading and installing config files..." 4 60
         [ -z "$3" ] && branch="master" || branch="$repobranch"
         dir=$(mktemp -d)
-        [ ! -d "$2" ] && mkdir -p "$2" && chown -R "$name:wheel" "$2"
-        chown -R "$name:wheel" "$dir"
+        [ ! -d "$2" ] && mkdir -p "$2" && chown -R "$name:sudo" "$2"
+        chown -R "$name:sudo" "$dir"
         sudo -u "$name" git clone -b "$branch" --depth 1 "$1" "$dir/gitrepo" >/dev/null 2>&1 &&
         sudo -u "$name" cp -rfT "$dir/gitrepo" "$2"
         }
@@ -172,7 +172,7 @@ installi3ppas || error "adding i3 ppas"
 installbrew || error "adding LinuxBrew" # Do this first to avoid errors in programs.csv install
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
-newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
+newperms "%sudo ALL=(ALL) NOPASSWD: ALL"
 
 # The command that does all the installing. Reads the progs.csv file and
 # installs each needed program the way required. Be sure to run this only after
@@ -189,8 +189,8 @@ rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
-newperms "%wheel ALL=(ALL) ALL #LARBS
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm"
+newperms "%sudo ALL=(ALL) ALL #LARBS
+%sudo ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/loadkeys"
 
 # Make zsh the default shell for the user
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
