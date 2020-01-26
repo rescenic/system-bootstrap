@@ -32,30 +32,30 @@ timedatectl set-ntp true
 # Assuming there are no partitons yet!
 # ----------------------------
 cat <<EOF | fdisk $drive
-    d
-    d
-    d
-    d
-    n # create new partition
-    p
-    
-    +1G # size of where arch will be installed, could be smaller
-    n # SWAP
-    p
-    
-    
-    +${SIZE[0]}G
-    n
-    p
-    
-    
-    +${SIZE[1]}G
-    n # HOME
-    p
-    
-    
-    
-    w # Write to disk
+d
+d
+d
+d
+n # create new partition
+p
+
++1G # size of where arch will be installed, could be smaller
+n # SWAP
+p
+
+
++${SIZE[0]}G
+n
+p
+
+
++${SIZE[1]}G
+n # HOME
+p
+
+
+
+w # Write to disk
 EOF
 # ----------------------------
 partprobe
