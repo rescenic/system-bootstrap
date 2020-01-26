@@ -32,7 +32,10 @@ timedatectl set-ntp true
 # Assuming there are no partitons yet!
 # ----------------------------
 cat <<EOF | fdisk $drive
-    o
+    d
+    d
+    d
+    d
     n # create new partition
     p
     
