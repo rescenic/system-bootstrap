@@ -143,7 +143,7 @@ systembeepoff() { dialog --infobox "Getting rid of that retarded error beep soun
 
 installi3ppas() {
 	dialog --title "LARBS Installation" --infobox "Installing i3 PPAs" 5 70
-	add-apt-repository ppa:kgilmer/regolith-unstable --yes >/dev/null 2>&1
+	add-apt-repository ppa:kgilmer/speed-ricer --yes >/dev/null 2>&1
 	add-apt-repository ppa:codejamninja/jam-os --yes >/dev/null 2>&1
 	apt-get update >/dev/null 2>&1 ;}
 
