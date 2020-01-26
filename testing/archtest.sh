@@ -39,7 +39,6 @@ cat <<EOF | fdisk $drive
     n # create new partition
     p
     
-    
     +1G # size of where arch will be installed, could be smaller
     n # SWAP
     p
