@@ -27,4 +27,4 @@ S,spotify,"How I listen to music"
 ,zsh,"My favorite shell"
 ,xinit,
 ,xorg,
-,xorg-utils,
+,x11-utils,
