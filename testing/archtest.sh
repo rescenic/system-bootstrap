@@ -32,15 +32,6 @@ timedatectl set-ntp true
 # Assuming there are no partitons yet!
 # ----------------------------
 cat <<EOF | fdisk $drive
-d
-
-d
-
-d
-
-d
-
-w
 n
 p
 
