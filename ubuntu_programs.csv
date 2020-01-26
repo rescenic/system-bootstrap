@@ -20,7 +20,7 @@ G,https://github.com/lukesmithxyz/dmenu.git,"runs commands and provides a UI for
 G,https://github.com/lukesmithxyz/st.git,"is my custom build of suckless's terminal emulator."
 ,unclutter,"Remove mouse when inactive"
 ,dmenu,"A way to launch programs"
-,S,spotify,"How I listen to music"
+S,spotify,"How I listen to music"
 ,xbacklight,
 ,polybar,"Statusbar for i3"
 ,i3lock-color,"A nice lockscreen"
