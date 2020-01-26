@@ -29,7 +29,7 @@ fi
 timedatectl set-ntp true
 
 cat <<EOF | fdisk $drive
-o
+g
 n
 p
 +200M
