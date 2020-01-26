@@ -35,24 +35,24 @@ cat <<EOF | fdisk $drive
     o
     n # create new partition
     p
-    1 # create partition 1
-    \n # start at default sector with simulated `enter`
+    
+    
     +1G # size of where arch will be installed, could be smaller
     n # SWAP
     p
-    2
-    \n
+    
+    
     +${SIZE[0]}G
     n
     p
-    3 # ROOT
-    \n
+    
+    
     +${SIZE[1]}G
     n # HOME
     p
-    4
-    \n
-    \n
+    
+    
+    
     w # Write to disk
 EOF
 # ----------------------------
