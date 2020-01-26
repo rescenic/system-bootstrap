@@ -34,28 +34,23 @@ timedatectl set-ntp true
 cat <<EOF | fdisk $drive
     o
     g # create gpt partiton table
-    # SYSTEM PARTITION
     n # create new partition
     1 # create partition 1
     \n # start at default sector with simulated `enter`
     +1G # size of where arch will be installed, could be smaller
-    # SWAP
-    n
+    n # SWAP
     2
     \n
     +${SIZE[0]}G
-    # ROOT
     n
-    3
+    3 # ROOT
     \n
     +${SIZE[1]}G
-    # HOME
-    n
+    n # HOME
     4
     \n
     \n
-    # Write to disk
-    w
+    w # Write to disk
 EOF
 # ----------------------------
 partprobe
