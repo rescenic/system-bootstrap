@@ -37,6 +37,7 @@ S,spotify,"How I listen to music"
 ,zathura,"PDF viewer"
 ,xserver-xorg,
 ,xcape,
+,xutils-dev,"X Window System utility programs for development"
 ,unclutter-xfixes,
 ,urlscan,"parses URLs in the terminal allowing keyboard-based selection."
 
