@@ -40,11 +40,11 @@ d
 
 d
 
-n # create new partition
+n
 p
 1
-+1G # size of where arch will be installed, could be smaller
-n # SWAP
++1G
+n
 p
 
 
@@ -54,12 +54,12 @@ p
 
 
 +${SIZE[1]}G
-n # HOME
+n
 p
 
 
 
-w # Write to disk
+w
 EOF
 # ----------------------------
 partprobe
