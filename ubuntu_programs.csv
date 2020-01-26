@@ -27,7 +27,7 @@ S,spotify,"How I listen to music"
 ,zsh,"My favorite shell"
 ,xinit,
 #,xcompmgr,"Program to do the stuffs"
-,sxhkd,"Program to rebind keys"
+#,sxhkd,"Program to rebind keys"
 ,xorg,
 ,x11-utils,
 ,i3-gaps,

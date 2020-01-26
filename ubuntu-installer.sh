@@ -51,7 +51,14 @@ preinstallmsg() { \
         dialog --title "Let's get this party started!" --yes-label "Let's go!" --no-label "No, nevermind!" --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 13 60 || { clear; exit; }
         }
 
-addgdmxsession() { ln -s /home/$name/.xinitrc /home/$name/.Xsession ;}
+addgdmxsession() { \
+	softlink=/home/$name/.Xsession
+        # -L returns true if the "file" exists and is a symbolic link 
+	if [ ! -L $softlink ]; then
+	  echo "=> File doesn't exist"
+	  ln -s /home/$name/.xinitrc /home/$name/.Xsession
+	fi
+	}
 
 adduserandpass() { \
         # Adds user `$name` with password $pass1.
@@ -142,12 +149,12 @@ installi3ppas() {
 
 installxwallpaper() {
         dialog --title "LARBS Installation" --infobox "Installing Xwallpaper" 5 70
-	git clone https://github.com/stoeckmann/xwallpaper.git
+	git clone https://github.com/stoeckmann/xwallpaper.git >/dev/null 2>&1
 	cd xwallpaper || error "cd into xwallpaper"
-	./autogen.sh
-	./configure
-	make
-	make install
+	./autogen.sh >/dev/null 2>&1
+	./configure >/dev/null 2>&1
+	make >/dev/null 2>&1
+	make install >/dev/null 2>&1 
 	cd .. && rm -r xwallpaper
 	}
 
