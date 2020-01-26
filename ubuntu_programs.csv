@@ -26,7 +26,15 @@ S,spotify,"How I listen to music"
 ,i3lock-color,"A nice lockscreen"
 ,zsh,"My favorite shell"
 ,xinit,
-,xcompmgr,"Program to do the stuffs"
+#,xcompmgr,"Program to do the stuffs"
 ,sxhkd,"Program to rebind keys"
 ,xorg,
 ,x11-utils,
+,i3-gaps,
+,arc-theme,"gives the dark GTK theme used in LARBS."
+,zathura,"PDF viewer"
+,xserver-xorg,
+,xcape,
+,unclutter-xfixes,
+,urlscan,"parses URLs in the terminal allowing keyboard-based selection."
+

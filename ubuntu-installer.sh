@@ -51,6 +51,7 @@ preinstallmsg() { \
         dialog --title "Let's get this party started!" --yes-label "Let's go!" --no-label "No, nevermind!" --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 13 60 || { clear; exit; }
         }
 
+addgdmxsession() { ln -s /home/$name/.xinitrc /home/$name/.Xsession ;}
 
 adduserandpass() { \
         # Adds user `$name` with password $pass1.
@@ -135,7 +136,7 @@ systembeepoff() { dialog --infobox "Getting rid of that retarded error beep soun
 
 installi3ppas() {
 	dialog --title "LARBS Installation" --infobox "Installing i3 PPAs" 5 70
-	add-apt-repository ppa:kgilmer/speed-ricer --yes >/dev/null 2>&1
+	add-apt-repository ppa:kgilmer/regolith-unstable --yes >/dev/null 2>&1
 	add-apt-repository ppa:codejamninja/jam-os --yes >/dev/null 2>&1
 	apt-get update >/dev/null 2>&1 ;}
 
@@ -182,6 +183,7 @@ installpkg git
 installi3ppas || error "adding i3 ppas"
 installbrew || error "adding LinuxBrew" # Do this first to avoid errors in programs.csv install
 installxwallpaper || error "installing xwallpaper"
+addgdmxsession || error "adding xsession for gdm"
 # Allow user to run sudo without password. Since AUR programs must be installed
 # in a fakeroot environment, this is required for all builds with AUR.
 newperms "%sudo ALL=(ALL) NOPASSWD: ALL"
