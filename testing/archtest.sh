@@ -33,8 +33,6 @@ timedatectl set-ntp true
 # ----------------------------
 cat <<EOF | fdisk $drive
     o
-    g # create gpt partiton table
-    w
     n # create new partition
     1 # create partition 1
     \n # start at default sector with simulated `enter`
