@@ -11,7 +11,7 @@ B,fzf,"Fuzzy search program"
 ,snapd,"Program to help install GUI programs"
 ,ffmpeg,
 ,highlight,
-,maim,
+,maim,"Take screenshots"
 S,code,
 S,discord,
 S,pycharm-professional,
@@ -21,7 +21,7 @@ G,https://github.com/lukesmithxyz/st.git,"is my custom build of suckless's termi
 ,unclutter,"Remove mouse when inactive"
 ,dmenu,"A way to launch programs"
 S,spotify,"How I listen to music"
-,xbacklight,
+,xbacklight,"Change backlight in Xorg"
 ,polybar,"Statusbar for i3"
 ,i3lock-color,"A nice lockscreen"
 ,zsh,"My favorite shell"
