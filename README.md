@@ -1,33 +1,34 @@
-# Luke's Auto-Rice Bootstraping Scripts (LARBS)
-
+# Bootstraping Scripts
 
 ## Installation:
 
 On an Arch based distribution as root, run the following:
-
 ```
-curl -LO larbs.xyz/larbs.sh
-sh larbs.sh
+sh arch-installer.sh
+```
+On an Ubuntu distribution as root, run the following:
+```
+sh ubuntu-installer.sh
 ```
 
 That's it.
 
-## What is LARBS?
+## What is this?
 
-LARBS is a script that autoinstalls and autoconfigures a fully-functioning
+A script that autoinstalls and autoconfigures a fully-functioning
 and minimal terminal-and-vim-based Arch Linux environment.
 
-LARBS was originally intended to be run on a fresh install of Arch Linux, and
+Originally intended to be run on a fresh install of Arch Linux, and
 provides you with a fully configured diving-board for work or more
-customization. But LARBS also works on already configured systems *and* other
+customization. Also works on already configured systems *and* other
 Arch-based distros such as Manjaro, Antergos and Parabola (although Parabola,
 which uses slightly different repositories might miss one or two minor
 programs).
 
 ## Customization
 
-By default, LARBS uses the programs [here in progs.csv](progs.csv) and installs
-[my dotfiles repo (voidrice) here](https://github.com/lukesmithxyz/voidrice),
+By default, it uses the programs [here in programs.csv](programs.csv) and installs
+[my dotfiles repo) here](https://github.com/vladdoster/dotfiles),
 but you can easily change this by either modifying the default variables at the
 beginning of the script or giving the script one of these options:
 
@@ -36,9 +37,9 @@ beginning of the script or giving the script one of these options:
 - `-a`: a custom AUR helper (must be able to install with `-S` unless you
   change the relevant line in the script
 
-### The `progs.csv` list
+### The `programs.csv` list
 
-LARBS will parse the given programs list and install all given programs. Note
+Parses the given programs list and install all given programs. Note
 that the programs file must be a three column `.csv`.
 
 The first column is a "tag" that determines how the program is installed, ""
@@ -52,7 +53,7 @@ this information in a grammatical sentence. It also doubles as documentation
 for people who read the csv or who want to install my dotfiles manually.
 
 Depending on your own build, you may want to tactically order the programs in
-your programs file. LARBS will install from the top to the bottom.
+your programs file. Installs from top to bottom.
 
 If you include commas in your program descriptions, be sure to include double quotes around the whole description to ensure correct parsing.
 
@@ -67,7 +68,7 @@ which commands to run to install it. You can easily add new methods of
 installations and tags as well.
 
 Note that programs from the AUR can only be built by a non-root user. What
-LARBS does to bypass this by default is to temporarily allow the newly created
+it does to bypass this by default is to temporarily allow the newly created
 user to use `sudo` without a password (so the user won't be prompted for a
 password multiple times in installation). This is done ad-hocly, but
 effectively with the `newperms` function. At the end of installation,
