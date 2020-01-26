@@ -5,6 +5,8 @@
 #DO NOT RUN THIS YOURSELF because Step 1 is it reformatting /dev/sda WITHOUT confirmation,
 #which means RIP in peace qq your data unless you've already backed up all of your drive.
 
+drive=/dev/nvme0n1
+
 pacman -Sy --noconfirm dialog || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script that is very rough around the edges.\n\nOnly run this script if you're a big-brane who doesn't mind deleting your entire /dev/sda drive.\n\nThis script is only really for me so I can autoinstall Arch.\n\nt. Luke"  15 60 || exit
@@ -26,7 +28,7 @@ fi
 
 timedatectl set-ntp true
 
-cat <<EOF | fdisk /dev/sda
+cat <<EOF | fdisk $drive
 o
 n
 p
@@ -43,16 +45,16 @@ w
 EOF
 partprobe
 
-yes | mkfs.ext4 /dev/sda4
-yes | mkfs.ext4 /dev/sda3
-yes | mkfs.ext4 /dev/sda1
-mkswap /dev/sda2
-swapon /dev/sda2
-mount /dev/sda3 /mnt
+yes | mkfs.ext4 ${drive}p4
+yes | mkfs.ext4 ${drive}p3
+yes | mkfs.ext4 ${drive}p1
+mkswap ${drive}p2
+swapon ${drive}p2
+mount ${drive}p3 /mnt
 mkdir -p /mnt/boot
-mount /dev/sda1 /mnt/boot
+mount ${drive}p1 /mnt/boot
 mkdir -p /mnt/home
-mount /dev/sda4 /mnt/home
+mount ${drive}p4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
