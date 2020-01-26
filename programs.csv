@@ -12,7 +12,6 @@
 ,gnome-keyring,"serves as the system keyring."
 ,highlight,"can highlight code output."
 ,i3-gaps,"is the main graphical user interface and window manager."
-,i3blocks,"is the status bar."
 ,i3lock-color,"is the screen lock."
 ,imagemagick,"is a terminal image-manipulator providing some convenient shortcuts and the lockscreen in LARBS."
 ,libnotify,"allows desktop notifications."
