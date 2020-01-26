@@ -38,7 +38,7 @@ d
 d
 n # create new partition
 p
-
+\r
 +1G # size of where arch will be installed, could be smaller
 n # SWAP
 p
