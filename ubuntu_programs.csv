@@ -30,7 +30,9 @@ S,spotify,"How I listen to music"
 #,sxhkd,"Program to rebind keys"
 ,xorg,
 ,x11-utils,
-,i3-gaps,
+,i3-gaps-wm,"Improved dynamic tiling window manager"
+,i3-gaps-wm-dbg,"Debugging symbols for the i3-gaps window manager"
+,i3-gaps-session,"Xsession for i3-gaps"
 ,arc-theme,"gives the dark GTK theme used in LARBS."
 ,zathura,"PDF viewer"
 ,xserver-xorg,
