@@ -1,9 +1,7 @@
 #!/bin/bash
 
-#This is a lazy script I have for auto-installing Arch.
-#It's not officially part of LARBS, but I use it for testing.
-#DO NOT RUN THIS YOURSELF because Step 1 is it reformatting /dev/sda WITHOUT confirmation,
-#which means RIP in peace qq your data unless you've already backed up all of your drive.
+# This is a lazy script I have for auto-installing Arch.
+# which means RIP in peace qq your data unless you've already backed up all of your drive.
 
 # This is single place to change drive prefix for whole script
 drive=/dev/nvme0n1
@@ -77,7 +75,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
 mv comp /mnt/etc/hostname
-curl https://raw.githubusercontent.com/LukeSmithxyz/LARBS/master/testing/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/testing/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh && rm /mnt/chroot.sh
 
 
 dialog --defaultno --title "Final Qs" --yesno "Reboot computer?"  5 30 && reboot
