@@ -94,6 +94,11 @@ maininstall() { # Installs all needed programs from main repo.
 	installpkg "$1"
 	}
 
+makedirectories() { \
+	mkdir /home/"$name"/github
+	mkdir /home/"$name"/downloads
+	}
+
 manualinstall() { # Installs $1 manually if not installed. Used only for AUR helper here.
 	[ -f "/usr/bin/$1" ] || (
 	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
@@ -108,11 +113,6 @@ manualinstall() { # Installs $1 manually if not installed. Used only for AUR hel
 newperms() { # Set special sudoers settings for install (or after).
 	sed -i "/#LARBS/d" /etc/sudoers
 	echo "$* #LARBS" >> /etc/sudoers ;}
-	
-makedirectories() { \
-	mkdir /home/"$name"/github
-	mkdir /home/"$name"/downloads
-	}
 
 pipinstall() { \
 	dialog --title "LARBS Installation" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
