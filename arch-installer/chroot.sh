@@ -2,6 +2,8 @@
 
 drive=/dev/nvme0n1
 
+error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
+
 passwd
 
 TZuser=$(cat tzfinal.tmp)
@@ -20,7 +22,7 @@ systemctl enable NetworkManager
 systemctl start NetworkManager
 
 # Bootloader
-bootctl install
+bootctl install || error "Installing bootctl"
 # This assumes ROOT is p3
 echo title Arch Linux >> /boot/loader/entries/arch.conf
 echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
