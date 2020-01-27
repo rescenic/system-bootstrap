@@ -7,9 +7,9 @@
 # Don't forget to change it in chroot.sh as well
 
 # sda
-drive=/dev/sda
+# drive=/dev/sda
 # nvme0n1
-#drive=/dev/nvme0n1
+drive=/dev/nvme0n1
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
@@ -69,29 +69,29 @@ EOF
 # ----------------------------
 partprobe
 
-## SDA drives
-yes | mkfs.ext4 ${drive}4
-yes | mkfs.ext4 ${drive}3
-yes | mkfs.fat -F32 ${drive}1
-mkswap ${drive}2
-swapon ${drive}2
-mount ${drive}3 /mnt
-mkdir -p /mnt/boot
-mount ${drive}1 /mnt/boot
-mkdir -p /mnt/home
-mount ${drive}4 /mnt/home
-
-## NVME0N1 drives
-# yes | mkfs.ext4 ${drive}p4
-# yes | mkfs.ext4 ${drive}p3
-# yes | mkfs.fat -F32 ${drive}p1
-# mkswap ${drive}p2
-# swapon ${drive}p2
-# mount ${drive}p3 /mnt
+## sda drive
+# yes | mkfs.ext4 ${drive}4
+# yes | mkfs.ext4 ${drive}3
+# yes | mkfs.fat -F32 ${drive}1
+# mkswap ${drive}2
+# swapon ${drive}2
+# mount ${drive}3 /mnt
 # mkdir -p /mnt/boot
-# mount ${drive}p1 /mnt/boot
+# mount ${drive}1 /mnt/boot
 # mkdir -p /mnt/home
-# mount ${drive}p4 /mnt/home
+# mount ${drive}4 /mnt/home
+
+## nvme drive
+yes | mkfs.ext4 ${drive}p4
+yes | mkfs.ext4 ${drive}p3
+yes | mkfs.fat -F32 ${drive}p1
+mkswap ${drive}p2
+swapon ${drive}p2
+mount ${drive}p3 /mnt
+mkdir -p /mnt/boot
+mount ${drive}p1 /mnt/boot
+mkdir -p /mnt/home
+mount ${drive}p4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
