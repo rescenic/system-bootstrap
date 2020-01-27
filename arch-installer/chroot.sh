@@ -31,7 +31,7 @@ echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
-cat /boot/loader/entries/arch.conf
+cat /boot/loader/entries/arch.conf || error "Couldnt cat /boot/loader/entries/arch.conf"
 
 pacman --noconfirm --needed -S dialog
 installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
