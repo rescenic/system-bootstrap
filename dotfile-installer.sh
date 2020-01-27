@@ -110,8 +110,8 @@ newperms() { # Set special sudoers settings for install (or after).
 	echo "$* #LARBS" >> /etc/sudoers ;}
 	
 makedirectories() { \
-	mkdir /home/$name/github
-	mkdir /home/$name/downloads
+	mkdir /home/"$name"/github
+	mkdir /home/"$name"/downloads
 	}
 
 pipinstall() { \
