@@ -28,7 +28,7 @@ echo title Arch Linux >> /boot/loader/entries/arch.conf
 echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
 echo initrd /intel-ucode.img
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
-echo options root=PARTUUID=${blkid -s PARTUUID -o value /dev/${drive}p3} >> /boot/loader/entries/arch.conf
+echo options root=PARTUUID=${blkid -s PARTUUID -o value ${drive}p3} >> /boot/loader/entries/arch.conf
 
 cat /boot/loader/entries/arch.conf
 
