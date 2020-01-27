@@ -4,6 +4,7 @@
 # which means RIP in peace qq your data unless you've already backed up all of your drive.
 
 # This is single place to change drive prefix for whole script
+# Don't forget to change it in chroot.sh as well
 drive=/dev/nvme0n1
 
 pacman -Sy --noconfirm dialog || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
