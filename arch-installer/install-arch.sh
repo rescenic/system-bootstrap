@@ -57,7 +57,6 @@ ef
 t
 2
 82
-g
 w
 p
 EOF
