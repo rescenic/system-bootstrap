@@ -5,11 +5,11 @@
 
 # This is single place to change drive prefix for whole script
 # Don't forget to change it in chroot.sh as well
-drive=/dev/nvme0n1
+drive=/dev/sda
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
-reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script that is very rough around the edges.\n\nOnly run this script if you're a big-brane who doesn't mind deleting your entire $drive drive.\n\nThis script is only really for me so I can autoinstall Arch."  15 60 || exit
 
@@ -65,22 +65,18 @@ EOF
 # ----------------------------
 partprobe
 
-yes | mkfs.ext4 ${drive}p4
-yes | mkfs.ext4 ${drive}p3
-yes | mkfs.fat -F32 ${drive}p1
-mkswap ${drive}p2
-swapon ${drive}p2
-mount ${drive}p3 /mnt
+yes | mkfs.ext4 ${drive}4
+yes | mkfs.ext4 ${drive}3
+yes | mkfs.fat -F32 ${drive}1
+mkswap ${drive}2
+swapon ${drive}2
+mount ${drive}3 /mnt
 mkdir -p /mnt/boot
-mount ${drive}p1 /mnt/boot
+mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
-mount ${drive}p4 /mnt/home
+mount ${drive}4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
-
-# OBSOLETE: Install mirrors
-# sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist
-# rankmirrors -n 6 /etc/pacman.d/mirrorlist
 
 # Install arch
 pacstrap /mnt base base-devel linux linux-headers linux-firmware

@@ -1,7 +1,7 @@
 # Potential variables: timezone, lang and local
 
-drive=/dev/nvme0n1
-UUID=$(blkid -s PARTUUID -o value /dev/nvme0n1p3)
+drive=/dev/sda
+UUID=$(blkid -s PARTUUID -o value /dev/sda3)
 
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
