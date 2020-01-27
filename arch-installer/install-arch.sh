@@ -7,7 +7,9 @@
 # Don't forget to change it in chroot.sh as well
 drive=/dev/nvme0n1
 
-pacman -Sy --noconfirm dialog || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
+pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
+
+reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script that is very rough around the edges.\n\nOnly run this script if you're a big-brane who doesn't mind deleting your entire $drive drive.\n\nThis script is only really for me so I can autoinstall Arch."  15 60 || exit
 
