@@ -81,7 +81,7 @@ pacman -Sy --noconfirm archlinux-keyring
 # rankmirrors -n 6 /etc/pacman.d/mirrorlist
 
 # Install arch
-pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
+pacstrap /mnt base base-devel linux linux-headers linux-firmware
 
 # generate FSTAB
 genfstab -U /mnt >> /mnt/etc/fstab
