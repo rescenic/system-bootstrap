@@ -6,10 +6,6 @@ On an Arch based distribution as root, run the following:
 ```
 sh arch-installer.sh
 ```
-On an Ubuntu distribution as root, run the following:
-```
-sh ubuntu-installer.sh
-```
 
 That's it.
 
