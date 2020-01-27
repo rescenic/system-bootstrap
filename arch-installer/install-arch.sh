@@ -70,9 +70,16 @@ mount ${drive}p4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
-pacstrap /mnt base base-devel linux linux-headers linux-firmware
+# Install mirrors
+sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist
+rankmirrors -n 6 /etc/pacman.d/mirrorlist
 
+# Install arch
+pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
+
+# generate FSTAB
 genfstab -U /mnt >> /mnt/etc/fstab
+
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
 mv comp /mnt/etc/hostname
