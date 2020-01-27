@@ -76,9 +76,9 @@ mount ${drive}p4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
-# Install mirrors
-sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist
-rankmirrors -n 6 /etc/pacman.d/mirrorlist
+# OBSOLETE: Install mirrors
+# sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist
+# rankmirrors -n 6 /etc/pacman.d/mirrorlist
 
 # Install arch
 pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
