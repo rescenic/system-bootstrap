@@ -59,7 +59,7 @@ partprobe
 
 yes | mkfs.ext4 ${drive}p4
 yes | mkfs.ext4 ${drive}p3
-yes | mkfs.ext4 ${drive}p1
+yes | mkfs.fat -F32 ${drive}p1
 mkswap ${drive}p2
 swapon ${drive}p2
 mount ${drive}p3 /mnt
