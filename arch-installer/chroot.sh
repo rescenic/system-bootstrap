@@ -15,11 +15,20 @@ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 echo "en_US ISO-8859-1" >> /etc/locale.gen
 locale-gen
 
-pacman --noconfirm --needed -S networkmanager
+pacman --noconfirm --needed -S networkmanager intel-ucode
 systemctl enable NetworkManager
 systemctl start NetworkManager
 
-pacman --noconfirm --needed -S grub && grub-install --target=i386-pc $drive && grub-mkconfig -o /boot/grub/grub.cfg
+# Bootloader
+bootctl install
+# This assumes ROOT is p3
+echo title Arch Linux >> /boot/loader/entries/arch.conf
+echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
+echo initrd /intel-ucode.img
+echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
+echo options root=PARTUUID=${blkid -s PARTUUID -o value /dev/${drive}p3} >> /boot/loader/entries/arch.conf
+
+cat /boot/loader/entries/arch.conf
 
 pacman --noconfirm --needed -S dialog
 installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
