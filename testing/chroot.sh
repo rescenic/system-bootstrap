@@ -1,5 +1,7 @@
 #Potential variables: timezone, lang and local
 
+drive=/dev/nvme0n1
+
 passwd
 
 TZuser=$(cat tzfinal.tmp)
@@ -17,8 +19,8 @@ pacman --noconfirm --needed -S networkmanager
 systemctl enable NetworkManager
 systemctl start NetworkManager
 
-pacman --noconfirm --needed -S grub && grub-install --target=i386-pc /dev/sda && grub-mkconfig -o /boot/grub/grub.cfg
+pacman --noconfirm --needed -S grub && grub-install --target=i386-pc $drive && grub-mkconfig -o /boot/grub/grub.cfg
 
 pacman --noconfirm --needed -S dialog
 larbs() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer.sh && bash arch-installer.sh ;}
-dialog --title "Install Luke's Rice" --yesno "This install script will easily let you access Luke's Auto-Rice Boostrapping Scripts (LARBS) which automatically install a full Arch Linux i3-gaps desktop environment.\n\nIf you'd like to install this, select yes, otherwise select no.\n\nLuke"  15 60 && larbs
+dialog --title "Install dotfiles?" --yesno "This install script will easily let you access boostrapping scripts which automatically install a full Arch Linux i3-gaps desktop environment.\n\nIf you'd like to install this, select yes, otherwise select no."  15 60 && larbs
