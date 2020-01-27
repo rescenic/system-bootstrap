@@ -1,7 +1,12 @@
 # Potential variables: timezone, lang and local
 
-drive=/dev/sda
-UUID=$(blkid -s PARTUUID -o value /dev/sda3)
+# sda
+# drive=/dev/sda
+# UUID=$(blkid -s PARTUUID -o value /dev/sda3)
+
+# nvme0n1
+drive=/dev/nvme0n1
+UUID=$(blkid -s PARTUUID -o value /dev/nvme0n1p3)
 
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
@@ -31,7 +36,7 @@ echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
-cat /boot/loader/entries/arch.conf || error "Couldnt cat /boot/loader/entries/arch.conf"
+# cat /boot/loader/entries/arch.conf || error "Couldnt cat /boot/loader/entries/arch.conf"
 
 pacman --noconfirm --needed -S dialog
 installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
