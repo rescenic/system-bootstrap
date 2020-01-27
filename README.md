@@ -2,9 +2,9 @@
 
 ## Installation:
 
-On an Arch based distribution as root, run the following:
+In an Arch live image, run the following:
 ```
-sh arch-installer.sh
+sudo ./install-arch.sh
 ```
 
 That's it.
