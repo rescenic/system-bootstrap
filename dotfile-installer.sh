@@ -19,6 +19,10 @@ esac done
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
+# Make things download faster...
+pacman -S reflector
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist
+
 ### FUNCTIONS ###
 
 installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
@@ -122,6 +126,11 @@ installationloop() { \
 			*) maininstall "$program" "$comment" ;;
 		esac
 	done < /tmp/progs.csv ;}
+	
+makedirectories() { \
+	mkdir /home/$name/github
+	mkdir /home/$name/downloads
+	}
 
 putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriting conflicts
 	dialog --infobox "Downloading and installing config files..." 4 60
@@ -198,6 +207,9 @@ rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 
 # Most important command! Get rid of the beep!
 systembeepoff
+
+# Make github folder and misc.
+makedirectories
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
