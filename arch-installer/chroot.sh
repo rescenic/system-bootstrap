@@ -1,4 +1,4 @@
-#Potential variables: timezone, lang and local
+# Potential variables: timezone, lang and local
 
 drive=/dev/nvme0n1
 
