@@ -5,6 +5,7 @@
 
 # This is single place to change drive prefix for whole script
 # Don't forget to change it in chroot.sh as well
+
 drive=/dev/sda
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
