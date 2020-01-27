@@ -206,10 +206,10 @@ putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 
 # Most important command! Get rid of the beep!
-systembeepoff
+systembeepoff || error "Couldnt turn off system beep, erghh!"
 
 # Make github folder and misc.
-makedirectories
+makedirectories || error "Couldnt make github dir or misc."
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
