@@ -42,6 +42,12 @@ aurinstall() { \
 	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
 	}
 	
+enabledocker() { \
+	systemctl enable docker.service
+	systemctl start docker.service
+	usermod -aG docker $USER
+	}
+	
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 	
 finalize(){ \
@@ -218,6 +224,9 @@ newperms "%wheel ALL=(ALL) ALL #LARBS
 
 # Make zsh the default shell for the user
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
+
+# Start docker systemd service and add $USER to group
+enabledocker
 
 # Last message! Install complete!
 finalize
