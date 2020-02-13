@@ -16,6 +16,8 @@
 ,imagemagick,"is a terminal image-manipulator providing some convenient shortcuts and the lockscreen in LARBS."
 ,libnotify,"allows desktop notifications."
 ,maim,"can take quick screenshots at your request."
+,man-db,"Facilitates viewing of man pages"
+,man-pages,"Linux man pages"
 ,mediainfo,"shows audio and video information and is used by vifm as well."
 ,nautilus,"A GUI file browser."
 ,neovim,"a tidier vim with some useful features"
