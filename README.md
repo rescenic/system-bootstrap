@@ -5,7 +5,7 @@
 In an Arch live image, run the following:
 
 ```
-wget --no-check-certificate --content-diposition http://bootstrap.vdoster.com
+wget --no-check-certificate --content-disposition http://bootstrap.vdoster.com
 ./preinstall.sh
 sudo ./install-arch.sh
 ```
