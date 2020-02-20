@@ -49,6 +49,7 @@
 ,xorg-xprop,"is a tool for detecting window properties."
 ,xorg-xwininfo,"allows querying information about windows."
 ,xwallpaper,"sets the wallpaper."
+,yarn,"Fast, reliable, and secure dep mgmt"
 ,zathura,"is a pdf viewer with vim-like bindings."
 ,zathura-pdf-mupdf,"allows mupdf pdf compatibility in zathura."
 ,zsh-syntax-highlighting,"provides fish-like syntax highlighting in the shell."
