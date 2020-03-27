@@ -6,8 +6,8 @@ In an Arch live image, run the following:
 
 ```
 wget --no-check-certificate --content-disposition bootstrap.vdoster.com
-./preinstall.sh
-sudo ./install-arch.sh
+./setup-installer.sh
+sudo ./install.sh
 ```
 
 That's it.
