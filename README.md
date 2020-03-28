@@ -5,8 +5,7 @@
 In an Arch live image, run the following:
 
 ```
-wget --no-check-certificate --content-disposition bootstrap.vdoster.com
-./setup-installer.sh
+curl -LO files.vdoster.com/setup-installer.sh | sh
 sudo ./install.sh
 ```
 
