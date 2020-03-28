@@ -9,8 +9,6 @@ curl -LO files.vdoster.com/setup-installer.sh | sh
 sudo ./install.sh
 ```
 
-That's it.
-
 ## What is this?
 
 A script that autoinstalls and autoconfigures a fully-functioning
