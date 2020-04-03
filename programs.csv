@@ -1,5 +1,5 @@
 #TAG,NAME IN REPO (or git url),PURPOSE
-#--,X programs,--#
+#,#--X programs--#,
 ,xorg-server,"is the graphical server."
 ,xorg-xwininfo,"allows querying information about windows."
 ,xorg-xinit,"starts the graphical server."
@@ -10,10 +10,10 @@
 ,xorg-xbacklight,"enables changing screen brightness levels."
 ,xclip,"allows for copying and pasting from the command line."
 ,xdotool,"provides window action utilities on the command line."
-#--,Suckless programs,--#
+#,#--Suckless programs--#,
 ,dunst,"is a suckless notification system."
 G,https://github.com/vladdoster/st.git,"is my custom build of suckless's terminal emulator."
-#--,i3 & desktop programs,--#
+#,#--i3 & desktop programs--#,
 ,i3-gaps,"is the main graphical user interface and window manager."
 ,i3lock-color,"allows you to lock your computer, and quickly unlock with your password."
 A,gtk-theme-arc-gruvbox-git,"gives the dark GTK theme used."
@@ -22,7 +22,7 @@ A,polybar,"is a status bar for i3"
 ,unclutter,"hides an inactive mouse."
 ,xcape,"gives the special escape/super mappings."
 ,maim,"can take quick screenshots at your request."
-#--,Terminal related,--#
+#,#--Terminal related--#,
 ,tmux,"is a terminal multiplexer and the dropdown window."
 ,calcurse,"is a lightweight terminal-based calendar."
 ,neovim,"a tidier vim with some useful features"
@@ -32,13 +32,13 @@ G,https://github.com/vladdoster/dmenu.git,"runs commands and provides a UI for s
 ,zsh-syntax-highlighting,"provides fish-like syntax highlighting in the shell."
 ,lshw,"is small tool to provide detailed information on the hardware configuration of the machine."
 ,tldr,"is aommunity effort to simplify man pages with practical examples."
-#--,Fonts,--#
+#,#--Fonts--#,
 ,adobe-source-code-pro-fonts,"is the main font used system wide"
 ,noto-fonts-emoji,"is an emoji font."
-#--,Networking,--#
+#,#--Networking--#,
 ,networkmanager,"does exactly what it sounds like."
 ,socat,"is a socket utility."
-#--,Personal,--#
+#,#--Personal--#,
 ,docker,"is a way to pack, ship and run any application as a lightweight container."
 ,docker-compose,"allows for fast, isolated development environments using Docker"
 ,nautilus,"is a GUI file browser."
@@ -48,17 +48,17 @@ A,pycharm-professional,"is a Python IDE"
 A,google-chrome,"is the only program in here your girlfriend has ever heard of."
 A,slack-desktop, "is program to connect coworkers"
 A,spotify, "is music streaming platform"
-#--,Accessing filesystems,--#
+#,#--Accessing filesystems--#,
 ,dosfstools,"allows your computer to access dos-like filesystems."
 ,exfat-utils,"allows management of FAT drives."
 ,ntfs-3g,"allows accessing NTFS partitions."
 A,simple-mtpfs-git,"enables the mounting of cell phones."
-#--,File info/unpacking,--#
+#,#--File info/unpacking--#,
 ,unrar,"extracts rar's."
 ,unzip,"unzips zips."
 ,mediainfo,"shows audio and video information."
 ,atool,"manages and gives information about archives."
-#--,Misc.,--#
+#,#--Misc.--#,
 ,bc,"is used for a dropdown calculator."
 ,sxiv,"is a minimalist image viewer."
 ,ffmpeg,"can record and splice video and audio on the command line."
