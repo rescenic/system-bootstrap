@@ -31,6 +31,7 @@ A,polybar,"is a status bar for i3"
 G,https://github.com/vladdoster/dmenu.git,"runs commands and provides a UI for selection."
 ,zsh-syntax-highlighting,"provides fish-like syntax highlighting in the shell."
 ,lshw,"is small tool to provide detailed information on the hardware configuration of the machine."
+,tldr,"is aommunity effort to simplify man pages with practical examples."
 #--Fonts--#
 ,adobe-source-code-pro-fonts,"is the main font used system wide"
 ,noto-fonts-emoji,"is an emoji font."
