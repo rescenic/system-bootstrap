@@ -103,8 +103,8 @@ maininstall() { # Installs all needed programs from main repo.
 	}
 
 makedirectories() { \
-	mkdir /home/"$name"/github
-	mkdir /home/"$name"/downloads
+	mkdir -p /home/"$name"/github
+	mkdir -p /home/"$name"/downloads
 	}
 
 manualinstall() { # Installs $1 manually if not installed. Used only for AUR helper here.
