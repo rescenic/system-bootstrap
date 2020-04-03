@@ -43,10 +43,8 @@ G,https://github.com/vladdoster/dmenu.git,"runs commands and provides a UI for s
 ,docker-compose,"allows for fast, isolated development environments using Docker"
 ,nautilus,"is a GUI file browser."
 A,code, "is a multi-language IDE by Microsoft."
-A,discord, "is a program to connect gamers."
-A,pycharm-professional,"is a Python IDE"
+,pycharm-community-edition,"is a Python IDE"
 A,google-chrome,"is the only program in here your girlfriend has ever heard of."
-A,slack-desktop, "is program to connect coworkers"
 A,spotify, "is music streaming platform"
 #,#--Accessing filesystems--#,
 ,dosfstools,"allows your computer to access dos-like filesystems."
