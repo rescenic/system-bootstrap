@@ -53,6 +53,16 @@ your programs file. Installs from top to bottom.
 
 If you include commas in your program descriptions, be sure to include double quotes around the whole description to ensure correct parsing.
 
+##### Helpful programs.csv bash snippets
+Check which programs arent installed
+```
+printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
+ if [[ $tag == 'G' ]]; then 
+ printf "$program might not be installed because it is from git\n" 
+ else printf "$(pacman -Qi "$program" > /dev/null)"
+ fi;  done
+```
+
 ### The script itself
 
 The script is broken up extensively into functions for easier readability and
