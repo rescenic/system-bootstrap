@@ -257,7 +257,7 @@ newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 
 # Check which programs arent present programs.csv
 potential_packages="$(curl -s $progsfile | sed '/^#/d')"
-num_possible_packages=$($potential_packages | wc -l)
+num_possible_packages=$(echo "$potential_packages" | wc -l)
 unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s $progsfile | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
 
 # Install complete!
