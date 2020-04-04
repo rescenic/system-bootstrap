@@ -186,7 +186,7 @@ adduserandpass || error "Error adding username and/or password."
 # refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
 # Set fastest mirrors
-dialog --title "Dotfile installer" --infobox "Installing \`reflector\` for fastest possible download speeds." 5 70
+dialog --title "Dotfile installer" --infobox "Installing and running \`reflector\` for fastest possible download speeds." 5 70
 installpkg reflector
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
