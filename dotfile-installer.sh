@@ -188,7 +188,7 @@ adduserandpass || error "Error adding username and/or password."
 # Set fastest mirrors
 dialog --title "Dotfile installer" --infobox "Installing \`reflector\` for fastest possible download speeds." 5 70
 installpkg reflector
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 # Required packages for smooth install
 dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 5 70
