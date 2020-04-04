@@ -53,7 +53,7 @@ error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 	
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --colors --title "All done!" --msgbox "Congrats! If no hidden errors, dotfile-installer.sh completed successfully. \nNumber of programs installed -> \\Zb$total\\Zn." 9 80
+	dialog --colors --title "All done!" --msgbox "Congrats! If no hidden errors, dotfile-installer.sh completed successfully. \nNumber of programs installed -> \\Zb$total\\Zn.\n$unsuccessfully_installed_programs" 12 80
 	}
 	
 getuserandpass() { \
@@ -250,6 +250,13 @@ sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
 newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui"
+
+# Check which programs arent present programs.csv
+unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
+ if [[ $tag == 'G' ]]; then 
+ printf "$program might not be installed because it is from git\n" 
+ else printf "$(pacman -Qi "$program" > /dev/null)"
+ fi;  done)
 
 # Install complete!
 finalize
