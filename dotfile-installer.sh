@@ -94,6 +94,8 @@ installationloop() { \
 			*) maininstall "$program" "$comment" ;;
 		esac
 	done < /tmp/programs.csv ;}
+	
+installnvimplugins(){ nvim +PlugInstall +qall >/dev/null 2>&1 ;}
 
 installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
 
@@ -238,6 +240,8 @@ makedirectories || error "Couldnt make github or downloads dir."
 
 # Docker shenanigans
 enabledocker || error "Couldnt enable docker."
+
+installnvimplugins || error "Couldnt install neovim plugins"
 
 # Make zsh the default shell for the user
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
