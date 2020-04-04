@@ -147,7 +147,7 @@ refreshkeys() { \
 	}
 	
 run_reflector(){
-dialog --title "Dotfile installer" --yesno "Want to run \`reflector`\? It might speed up package downloads." 7 60
+dialog --title "Dotfile installer" --yesno "Install and run reflector? It might speed up package downloads." 7 60
 response=$?
 case $response in
    0) installpkg reflector && reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null;;
