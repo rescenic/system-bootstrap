@@ -254,8 +254,8 @@ newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 # Check which programs arent present programs.csv
 unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
  if [[ $tag == 'G' ]]; then 
- printf "$program might not be installed because it is from git\n" 
- else printf "$(pacman -Qi "$program" > /dev/null)"
+ printf "$program\n" 
+ else printf "$(pacman -Qi "$program" > /dev/null)\n"
  fi;  done)
 
 # Install complete!
