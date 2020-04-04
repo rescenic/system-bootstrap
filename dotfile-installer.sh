@@ -230,7 +230,7 @@ yes | sudo -u "$name" $aurhelper -S libxft-bgra >/dev/null 2>&1
 # Install the dotfiles in the user's home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 # Remove dotfiles git repo cruft
-rm -f "/home/$name/README.md" "/home/$name/LICENSE"
+rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
 
 # Most important command! Get rid of the beep
 systembeepoff || error "Couldnt turn off system beep, erghh!"
