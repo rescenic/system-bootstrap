@@ -145,6 +145,15 @@ refreshkeys() { \
 	dialog --infobox "Refreshing Arch Keyring..." 4 40
 	pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 	}
+	
+run_reflector(){
+dialog --title "Dotfile installer" --yesno "Want to run \`reflector`\? It might speed up package downloads." 7 60
+response=$?
+case $response in
+   0) installpkg reflector && reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null;;
+   1) return ;;
+esac
+}
 
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
 	rmmod pcspkr
@@ -184,10 +193,8 @@ adduserandpass || error "Error adding username and/or password."
 # Refresh Arch keyrings.
 # refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
-# Set fastest mirrors
-dialog --title "Dotfile installer" --infobox "Installing and running \`reflector\` for fastest possible download speeds." 5 70
-installpkg reflector
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+# Get fast mirrors
+run_reflector
 
 # Required packages for smooth install
 dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 5 70
