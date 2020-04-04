@@ -53,7 +53,7 @@ error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 	
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1)." 12 80
+	dialog --title "All done!" --msgbox "Congrats! If no hidden errors, dotfile-installer.sh completed successfully and all the programs and configuration files should be in place. Number of programs installed was $total." 12 80
 	}
 	
 getuserandpass() { \
