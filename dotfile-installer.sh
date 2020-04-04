@@ -185,11 +185,13 @@ adduserandpass || error "Error adding username and/or password."
 # Refresh Arch keyrings.
 # refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
-dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 5 70
 # Set fastest mirrors
+dialog --title "Dotfile installer" --infobox "Installing \`reflector\` for fastest possible download speeds." 5 70
 installpkg reflector
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
+
 # Required packages for smooth install
+dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 5 70
 installpkg curl
 installpkg base-devel
 installpkg git
