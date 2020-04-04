@@ -5,7 +5,10 @@
 # UUID=$(blkid -s PARTUUID -o value /dev/sda3)
 
 pacman --noconfirm --needed -S dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist
+dialog --title "Dotfile installer" --infobox "Installing and running \`reflector\` for fastest possible download speeds." 5 70
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+# Clear terminal to see new output
+clear
 
 # nvme0n1
 drive=/dev/nvme0n1
@@ -38,8 +41,6 @@ echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
 echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
-
-# cat /boot/loader/entries/arch.conf || error "Couldnt cat /boot/loader/entries/arch.conf"
 
 installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
 dialog --title "Install dotfiles?" --yesno "This install script will easily let you access boostrapping scripts which automatically install a full Arch Linux i3-gaps desktop environment.\n\nIf you'd like to install this, select yes, otherwise select no."  15 60 && installdotfiles
