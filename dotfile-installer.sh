@@ -14,9 +14,6 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit ;;
 esac done
 
-# Set distro
-distro="arch"
-
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
@@ -25,7 +22,7 @@ distro="arch"
 # Read in types of packages in programs.csv
 grepseq="\"^[PGA]*,\""
 
-### FUNCTIONS ###
+#--- FUNCTIONS ---#
 
 adduserandpass() { \
 	# Adds user `$name` with password $pass1.
@@ -162,7 +159,7 @@ welcomemsg() { \
 	dialog --title "Welcome!" --msgbox "Welcome to bootstrapping script!\\n\\nThis script will automatically install a fully-featured Arch Linux desktop." 10 60
 	}
 
-### THE ACTUAL SCRIPT ###
+#--- SCRIPT LOGIC ---#
 # This is how everything happens in an intuitive format and order.
 
 # Check if user is root on Arch distro. Install dialog.
