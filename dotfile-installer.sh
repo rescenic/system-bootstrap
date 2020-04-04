@@ -53,7 +53,7 @@ error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 	
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --title "All done!" --msgbox "Congrats! If no hidden errors, dotfile-installer.sh completed successfully and all the programs and configuration files should be in place.\nNumber of programs installed was $total." 5 50
+	dialog --title "All done!" --msgbox "Congrats! If no hidden errors, dotfile-installer.sh completed successfully. \nNumber of programs installed was $total." 9 80
 	}
 	
 getuserandpass() { \
