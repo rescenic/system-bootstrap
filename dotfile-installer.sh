@@ -81,8 +81,8 @@ gitmakeinstall() {
 	cd /tmp || return ;}
 
 installationloop() { \
-	([ -f "$progsfile" ] && cp "$progsfile" /tmp/progs.csv) || curl -Ls "$progsfile" | sed '/^#/d' | eval grep "$grepseq" > /tmp/progs.csv
-	total=$(wc -l < /tmp/progs.csv)
+	([ -f "$progsfile" ] && cp "$progsfile" /tmp/programs.csv) || curl -Ls "$progsfile" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
+	total=$(wc -l < /tmp/programs.csv)
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
 		n=$((n+1))
@@ -93,7 +93,7 @@ installationloop() { \
 			"P") pipinstall "$program" "$comment" ;;
 			*) maininstall "$program" "$comment" ;;
 		esac
-	done < /tmp/progs.csv ;}
+	done < /tmp/programs.csv ;}
 
 installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
 
