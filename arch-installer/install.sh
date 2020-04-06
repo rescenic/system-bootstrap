@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail   # Unveils hidden failures
 
 # This is a lazy script I have for auto-installing Arch.
 # which means RIP in peace qq your data unless you've already backed up all of your drive.
@@ -7,18 +8,29 @@
 # Don't forget to change it in chroot.sh as well
 
 # Figure out which drive to install Arch on
-echo "Set the $drive variable in this script to the one of the following drives"
-lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'
+printf "Select one of the following drives to install Arch on\n"
+lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -r drive
-echo "You have selected '$drive' to be the drive to install Arch on, is this correct [Y/N]?"
+printf "Selected %s drive to install Arch on, is this correct [Y/N]?" $drive
 read -r user_confirmation
 if [[ "$user_confirmation" == "Y" ]]; then
-echo "Setting drive to '$drive' for Arch install"
+    echo "Setting drive to '$drive' for Arch install"
+    if [[ "$drive" =~ ^nvme ]]; then
+        echo "Need to make add p for nvme drive partitions"
+        drive_partition_prefix=$drive"p"
+    else
+        drive_partition_prefix=$drive
+fi
 else
-echo "Exiting install script"
-exit 0
+    echo "Exiting install script"
+    exit 0
 fi
 
+# Alert user about installation drive
+echo "Arch will install on $drive and the partitions will start with $drive_partition_prefix"
+exit 1
+
+# #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
@@ -77,36 +89,24 @@ EOF
 # ----------------------------
 partprobe
 
-## sda drive
-# yes | mkfs.ext4 ${drive}4
-# yes | mkfs.ext4 ${drive}3
-# yes | mkfs.fat -F32 ${drive}1
-# mkswap ${drive}2
-# swapon ${drive}2
-# mount ${drive}3 /mnt
-# mkdir -p /mnt/boot
-# mount ${drive}1 /mnt/boot
-# mkdir -p /mnt/home
-# mount ${drive}4 /mnt/home
-
-## nvme drive
-yes | mkfs.ext4 ${drive}p4
-yes | mkfs.ext4 ${drive}p3
-yes | mkfs.fat -F32 ${drive}p1
-mkswap ${drive}p2
-swapon ${drive}p2
-mount ${drive}p3 /mnt
+# Partition drive
+yes | mkfs.ext4 ${drive_partition_prefix}4
+yes | mkfs.ext4 ${drive_partition_prefix}3
+yes | mkfs.fat -F32 ${drive_partition_prefix}1
+mkswap ${drive_partition_prefix}2
+swapon ${drive_partition_prefix}2
+mount ${drive_partition_prefix}3 /mnt
 mkdir -p /mnt/boot
-mount ${drive}p1 /mnt/boot
+mount ${drive_partition_prefix}1 /mnt/boot
 mkdir -p /mnt/home
-mount ${drive}p4 /mnt/home
+mount ${drive_partition_prefix}4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
-# Install arch
+# Install Arch
 pacstrap /mnt base base-devel linux linux-headers linux-firmware
 
-# generate FSTAB
+# Generate FSTAB
 genfstab -U /mnt >> /mnt/etc/fstab
 
 cat tz.tmp > /mnt/tzfinal.tmp
