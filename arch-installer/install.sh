@@ -10,11 +10,11 @@ set -o pipefail   # Unveils hidden failures
 # Figure out which drive to install Arch on
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
-read -r drive
-printf "Selected %s drive to install Arch on, is this correct [Y/N]?" $drive
-read -r user_confirmation
+read -rp "Drive: " drive
+printf "Selected %s drive to install Arch on, is this correct?\n" $drive
+read -p "Enter [Y/n] : " user_confirmation
 if [[ "$user_confirmation" == "Y" ]]; then
-    echo "Setting drive to '$drive' for Arch install"
+    printf "Setting drive to %s for Arch install" $drive
     if [[ "$drive" =~ ^nvme ]]; then
         echo "Need to make add p for nvme drive partitions"
         drive_partition_prefix=$drive"p"
@@ -27,7 +27,7 @@ else
 fi
 
 # Alert user about installation drive
-echo "Arch will install on $drive and the partitions will start with $drive_partition_prefix"
+echo "Arch will install on $drive and partitions will start with $drive_partition_prefix"
 exit 1
 
 # #---Install script---# #
