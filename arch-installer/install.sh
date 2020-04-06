@@ -6,21 +6,16 @@
 # This is single place to change drive prefix for whole script
 # Don't forget to change it in chroot.sh as well
 
-# sda
-# drive=/dev/sda
-# nvme0n1
-drive=/dev/nvme0n1
-
+# Figure out which drive to install Arch on
 echo "Set the $drive variable in this script to the one of the following drives"
-echo "$(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}')"
-read drive
-echo "You have selected $drive to be the drive to install Arch on, is this correct [y/N]?
-read user_confirmation
-if [[ $user_confirmation == "Y" ]]; then
-break
-else [[ $user_confirmation == "Y" ]]; then
-echo "Will exit script now!"
-exit 1
+lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'
+read -r drive
+echo "You have selected '$drive' to be the drive to install Arch on, is this correct [y/N]?"
+read -r user_confirmation
+if [[ "$user_confirmation" == "Y" ]]; then
+echo "Setting drive to '$drive' for Arch install"
+elif [[ "$user_confirmation" != "Y" ]]; then
+echo "Exiting install script"
 fi
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
