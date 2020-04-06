@@ -11,6 +11,9 @@
 # nvme0n1
 drive=/dev/nvme0n1
 
+echo "Set the $drive variable in this script to the one of the following drives"
+echo "$(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}')"
+
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
