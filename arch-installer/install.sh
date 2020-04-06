@@ -13,6 +13,15 @@ drive=/dev/nvme0n1
 
 echo "Set the $drive variable in this script to the one of the following drives"
 echo "$(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}')"
+read drive
+echo "You have selected $drive to be the drive to install Arch on, is this correct [y/N]?
+read user_confirmation
+if [[ $user_confirmation == "Y" ]]; then
+break
+else [[ $user_confirmation == "Y" ]]; then
+echo "Will exit script now!"
+exit 1
+fi
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
