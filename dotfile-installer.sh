@@ -247,6 +247,8 @@ enabledocker || error "Couldnt enable docker."
 
 installnvimplugins || error "Couldnt install neovim plugins"
 
+killall pulseaudio; sudo -n "$name" pulseaudio --start --daemonize=yes
+
 # Make zsh the default shell for the user
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 
