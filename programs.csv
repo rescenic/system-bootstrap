@@ -44,7 +44,6 @@ G,https://github.com/vladdoster/dmenu.git,"runs commands and provides a UI for s
 ,nautilus,"is a GUI file browser."
 A,code, "is a multi-language IDE by Microsoft."
 A,google-chrome,"is the only program in here your girlfriend has ever heard of."
-A,spotify, "is music streaming platform"
 A,gitkraken, "is a program to manage git repositories"
 #,#--Accessing filesystems--#,
 ,dosfstools,"allows your computer to access dos-like filesystems."
