@@ -16,6 +16,7 @@ esac done
 
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
+[ -z "$vimwikirepo" ] && vimwikirepo="https://github.com/vladdoster/vimwiki.git"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
@@ -23,7 +24,6 @@ esac done
 grepseq="\"^[PGA]*,\""
 
 #--- FUNCTIONS ---#
-
 adduserandpass() { \
 	# Adds user `$name` with password $pass1.
 	dialog --infobox "Adding user \"$name\"..." 4 50
@@ -169,97 +169,69 @@ welcomemsg() { \
 	}
 
 #--- SCRIPT LOGIC ---#
-# This is how everything happens in an intuitive format and order.
-
 # Check if user is root on Arch distro. Install dialog.
 installpkg dialog ||  error "Are you sure you're running this as the root user and have an internet connection?"
-
 # Welcome user and pick dotfiles.
 welcomemsg || error "User exited."
-
 # Get and verify username and password.
 getuserandpass || error "User exited."
-
 # Give warning if user already exists.
 usercheck || error "User exited."
-
 # Last chance for user to back out before install.
 preinstallmsg || error "User exited."
-
-### The rest of the script requires no user input.
-
+# Add user
 adduserandpass || error "Error adding username and/or password."
-
 # Refresh Arch keyrings.
-# refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
-
+refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 # Get fast mirrors
 run_reflector
-
 # Required packages for smooth install
 dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 5 70
 installpkg curl
 installpkg base-devel
 installpkg git
 installpkg ntp
-
 # Synchronize NTP servers
 dialog --title "Dotfile installer" --infobox "Synchronizing system time to ensure successful and secure installation of software..." 4 70
 ntp 0.us.pool.ntp.org >/dev/null 2>&1
-
-[ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers # Just in case
-
-# Allow user to run sudo without password. Since AUR programs must be installed
-# in a fakeroot environment, this is required for all builds with AUR.
+[ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
+# Allow user to run sudo without password. AUR programs require a fakeroot environment
 newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
-
 # Make pacman/yay colorful and add eye candy on the progress bar
 grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
 grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-
 # Use all cores for compilation
 sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
-
 manualinstall $aurhelper || error "Failed to install AUR helper."
-
-# The command that does all the installing. Reads the programs.csv file and
-# installs each needed program the way required. Be sure to run this only after
-# the user has been created and has priviledges to run sudo without a password
-# and all build dependencies are installed.
+# The command that does all the installing. 
+# Reads programs.csv file and installs each program given tag.
 installationloop
-
+# Install libxft-bgra for color emojis
 dialog --title "Dotfile installer" --infobox "Finally, installing \`libxft-bgra\` to enable color emoji in suckless software without crashes." 5 70
 yes | sudo -u "$name" $aurhelper -S libxft-bgra >/dev/null 2>&1
-
-# Install the dotfiles in the user's home directory
+# Install dotfiles and vimwiki in home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
+putgitrepo "$vimwikirepo" "/home/$name" "$repobranch"
 # Remove dotfiles git repo cruft
 rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
-
-# Most important command! Get rid of the beep
+# Get rid of system beep
 systembeepoff || error "Couldnt turn off system beep, erghh!"
-
 # Make github folder and misc
 makedirectories || error "Couldnt make github or downloads dir."
-
 # Docker shenanigans
 enabledocker || error "Couldnt enable docker."
-
-installnvimplugins || error "Couldnt install neovim plugins"
-
+# Vim shenanigans
+installnvimplugins || error "Couldnt install nvim plugins"
+# Start audio daemon
 killall pulseaudio; sudo -n "$name" pulseaudio --start --daemonize=yes
-
-# Make zsh the default shell for the user
+# Zsh is default shell
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
-
-# This line, overwriting the `newperms` command above will allow the user to run
+# This line, overwriting the `newperms` command above will allow me to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
 newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
-
 # Check which programs arent present programs.csv
 unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s $progsfile | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
-
 # Install complete!
 finalize
 clear
