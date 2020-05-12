@@ -44,11 +44,10 @@ The second column is the name of the program in the repository, or the link to
 the git repository, and the third comment is a description (should be a verb
 phrase) that describes the program.
 
-**Note**:If a program description includes commas, be sure to include double quotes around the whole description to ensure correct parsing.
+**Note**: If a program description includes commas, be sure to include double quotes around the whole description to ensure correct parsing.
 
-##### Helpful programs.csv bash snippets
+##### Check which programs arent installed
 
-Check which programs arent installed
 ```sh
 $ printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
  if [[ $tag == 'G' ]]; then 
