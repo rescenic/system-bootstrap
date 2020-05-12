@@ -49,11 +49,14 @@ phrase) that describes the program.
 ##### Check which programs arent installed
 
 ```sh
-$ printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
- if [[ $tag == 'G' ]]; then 
- printf "$program might not be installed because it is from git\n" 
- else printf "$(pacman -Qi "$program" > /dev/null)"
- fi;  done
+$ programs="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
+$ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
+  while IFS=, read -r tag program comment; do
+   if [[ $tag == 'G' ]]; then 
+       printf "$program might not be installed because it is from git\n" 
+   else 
+       printf "$(pacman -Qi "$program" > /dev/null)"
+   fi;  done
 ```
 
 ### The script itself
