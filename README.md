@@ -1,12 +1,12 @@
-# Bootstraping Scripts
+# Bootstrapping Scripts
 
 ## Installation:
 
 In an Arch live image, run the following:
 
-```
-curl -LO files.vdoster.com/setup-installer.sh | sh
-sudo ./install.sh
+```sh
+$ curl -LO files.vdoster.com/setup-installer.sh | sh
+$ sudo ./install.sh
 ```
 
 ## What is this?
@@ -24,10 +24,8 @@ programs).
 ## Customization
 
 By default, it uses the programs [here in programs.csv](programs.csv) and installs
-[my dotfiles repo) here](https://github.com/vladdoster/dotfiles),
-but you can easily change this by either modifying the default variables at the
-beginning of the script or giving the script one of these options:
-
+[my dotfiles](https://github.com/vladdoster/dotfiles),but you can easily change this by either 
+modifying the default variables at the beginning of the script or giving the script one of these options:
 - `-r`: custom dotfiles repository (URL)
 - `-p`: custom programs list/dependencies (local file or URL)
 - `-a`: a custom AUR helper (must be able to install with `-S` unless you
@@ -54,9 +52,10 @@ your programs file. Installs from top to bottom.
 If you include commas in your program descriptions, be sure to include double quotes around the whole description to ensure correct parsing.
 
 ##### Helpful programs.csv bash snippets
+
 Check which programs arent installed
-```
-printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
+```sh
+$ printf "\n" && echo "$(curl -s https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv | sed '/^#/d')" | while IFS=, read -r tag program comment; do
  if [[ $tag == 'G' ]]; then 
  printf "$program might not be installed because it is from git\n" 
  else printf "$(pacman -Qi "$program" > /dev/null)"
