@@ -28,7 +28,6 @@ fi
 
 # Alert user about installation drive
 echo "Arch will install on $drive and partitions will start with $drive_partition_prefix"
-exit 1
 
 # #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
