@@ -13,21 +13,23 @@ lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Drive: " drive
 printf "Selected %s drive to install Arch on, is this correct?\n" $drive
 read -p "Enter [Y/n] : " user_confirmation
-if [[ "$user_confirmation" == "Y" ]]; then
-    printf "Setting drive to %s for Arch install" $drive
-    if [[ "$drive" =~ ^nvme ]]; then
-        echo "Need to make add p for nvme drive partitions"
-        drive_partition_prefix=$drive"p"
-    else
-        drive_partition_prefix=$drive
+if [[ ${user_confirmation,,} != "y" ]]; then
+    exit
 fi
-else
-    echo "Exiting install script"
-    exit 0
-fi
+
+printf "Setting drive to %s for Arch install" $drive
+drive_partition_prefix=$drive
+if [[ "$drive" =~ ^nvme ]]; then
+    echo "Need to add p for nvme drive partitions"
+    drive_partition_prefix=$drive"p"
+fi      
 
 # Alert user about installation drive
 echo "Arch will install on $drive and partitions will start with $drive_partition_prefix"
+read -rp "Is this correct? [y/N]: " confirm
+if [[ ${confirm,,} != "y" ]]; then
+    exit 0
+fi
 
 # #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
