@@ -9,7 +9,7 @@ fi
 
 ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" && exit 0
 
-pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
+pacman -Sy --noconfirm dialog pv reflector >/dev/null 2>&1
 
 ################################
 # ====== Install script ====== #
@@ -62,8 +62,8 @@ do
    umount --l ${drive}${i} >/dev/null 2>&1
 done
 
-dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}...\nThis could take a few minutes" 4 50
-dd if=/dev/zero of=${drive} bs=512; sync
+dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}...\n$(dd if=/dev/zero | pv --size | of=${drive} bs=4096; sync)" 6 50
+
 
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
