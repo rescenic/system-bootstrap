@@ -5,7 +5,7 @@
 In an Arch live image, run:
 
 ```sh
-$ curl -LO files.vdoster.com/setup-installer.sh | sh
+$ curl -LO files.vdoster.com/setup | sh
 $ sudo ./install.sh
 ```
 
