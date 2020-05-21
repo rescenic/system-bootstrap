@@ -117,8 +117,12 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
+
+# System hostname
 mv comp /mnt/etc/hostname
-curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh ${drive} && rm /mnt/chroot.sh
+
+# Enter chroot
+curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
 dialog --defaultno --title "Final Qs" --yesno "Reboot computer?"  5 30 && reboot
 dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?"  6 30 && arch-chroot /mnt
