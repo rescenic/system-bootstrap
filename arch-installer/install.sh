@@ -11,13 +11,8 @@ set -o pipefail   # Unveils hidden failures
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Drive: " drive
-printf "Selected %s drive to install Arch on, is this correct?\n" $drive
-read -p "Enter [Y/n] : " user_confirmation
-if [[ ${user_confirmation,,} != "y" ]]; then
-    exit
-fi
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  15 60 || exit
 
-printf "Setting drive to %s for Arch install" $drive
 partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
     echo "Need to add p for nvme drive partitions"
@@ -27,11 +22,7 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-echo "Arch will install on $drive and partitions will start with $partition_prefix"
-read -rp "Is this correct? [y/N]: " confirm
-if [[ ${confirm,,} != "y" ]]; then
-    exit 0
-fi
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno ""Arch will install on $drive\nPartitions will start with $partition_prefix""  15 60 || exit
 
 # #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
