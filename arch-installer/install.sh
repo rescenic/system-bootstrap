@@ -3,14 +3,9 @@ set -o pipefail   # Unveils hidden failures
 
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
-# This is a lazy script I have for auto-installing Arch.
-# which means RIP in peace qq your data unless you've already backed up all of your drive.
-
-# #---Install script---# #
-
-# This is single place to change drive prefix for whole script
-# Don't forget to change it in chroot.sh as well
-
+################################
+# ====== Install script ====== #
+################################
 # Figure out which drive to install Arch on
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
