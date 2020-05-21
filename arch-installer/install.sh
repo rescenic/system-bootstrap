@@ -1,7 +1,14 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
 
-pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1 || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
+if [ "$(id -u)" == "0" ]; then
+   echo "This script requires it be run as root" 1>&2
+   exit 1
+fi
+
+ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" 
+
+pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
 
 ################################
 # ====== Install script ====== #
