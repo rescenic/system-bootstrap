@@ -53,6 +53,9 @@ fi
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  10 50 || exit
 
+dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
+dd if=/dev/zero of=${drive}  bs=512  count=1
+
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
 # The sed script strips off all the comments so that we can 
@@ -115,7 +118,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
 mv comp /mnt/etc/hostname
-curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh ${drive} && rm /mnt/chroot.sh
 
 dialog --defaultno --title "Final Qs" --yesno "Reboot computer?"  5 30 && reboot
 dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?"  6 30 && arch-chroot /mnt
