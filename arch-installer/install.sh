@@ -63,6 +63,7 @@ dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Drive: ${drive}\nSwap
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 for i in {1..4}
 do
+   echo "${drive}${i}"
    umount --force ${drive}${i} >/dev/null 2>&1
 done
 
