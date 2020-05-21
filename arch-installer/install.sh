@@ -1,8 +1,12 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
 
+pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
+
 # This is a lazy script I have for auto-installing Arch.
 # which means RIP in peace qq your data unless you've already backed up all of your drive.
+
+# #---Install script---# #
 
 # This is single place to change drive prefix for whole script
 # Don't forget to change it in chroot.sh as well
@@ -22,25 +26,24 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  5 50 || exit
 
-# #---Install script---# #
-pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
-
+dialog --infobox "Updating system mirrors"..." 5 50
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script that is very rough around the edges.\n\nOnly run this script if you're a big-brane who doesn't mind deleting your entire $drive drive.\n\nThis script is only really for me so I can autoinstall Arch."  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads. \
+                                                         \nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive."  10 50 || exit
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  5 50 || exit
 
-dialog --no-cancel --inputbox "Enter a name for your computer." 10 60 2> comp
+dialog --no-cancel --inputbox "Enter a name for your computer." 5 50 2> comp
 
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
-dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 4 50
+dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 5 50
 timedatectl set-ntp true
 
-dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 10 50 2>psize
+dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 5 50 2>psize
 
 IFS=' ' read -ra SIZE <<< $(cat psize)
 
