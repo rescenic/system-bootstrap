@@ -74,10 +74,10 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${drive}
   3 # partion number 3 
     # default, start immediately after preceding partition
   +${SIZE[1]}G # size user specified, extend partition to end of disk
-  n
-  p
-  
-  
+  n # new partition
+  p # primary partition
+    # default, start immediately after preceding partition
+    # default, extend for rest of drive space
   a # make a partition bootable
   1 # bootable partition is partition 1
   t # set partition type
