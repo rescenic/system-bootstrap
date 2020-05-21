@@ -18,14 +18,14 @@ if [[ ${user_confirmation,,} != "y" ]]; then
 fi
 
 printf "Setting drive to %s for Arch install" $drive
-drive_partition_prefix=$drive
+partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
     echo "Need to add p for nvme drive partitions"
-    drive_partition_prefix=$drive"p"
+    partition_prefix=$drive"p"
 fi      
 
 # Alert user about installation drive
-echo "Arch will install on $drive and partitions will start with $drive_partition_prefix"
+echo "Arch will install on $drive and partitions will start with $partition_prefix"
 read -rp "Is this correct? [y/N]: " confirm
 if [[ ${confirm,,} != "y" ]]; then
     exit 0
@@ -44,6 +44,9 @@ dialog --no-cancel --inputbox "Enter a name for your computer." 10 60 2> comp
 
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 60 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
+dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 4 50
+timedatectl set-ntp true
+
 dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 10 60 2>psize
 
 IFS=' ' read -ra SIZE <<< $(cat psize)
@@ -53,54 +56,58 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
     SIZE=(12 50);
 fi
 
-timedatectl set-ntp true
-# PARTITIONS
-# Assuming there are no partitons yet!
-# ----------------------------
-cat <<EOF | fdisk $drive
-n
-p
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "swap: ${SIZE[0]} root: ${SIZE[1]}\nIs this correct?"  15 60 || exit
 
-
-+1G
-n
-p
-
-
-+${SIZE[0]}G
-n
-p
-
-
-+${SIZE[1]}G
-n
-p
-
-
-
-t
-1
-1
-t
-2
-19
-w
-p
+# to create the partitions programatically (rather than manually)
+# we're going to simulate the manual input to fdisk
+# The sed script strips off all the comments so that we can 
+# document what we're doing in-line with the actual commands
+# Note that a blank line (commented as "defualt" will send a empty
+# line terminated with a newline to take the fdisk default.
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${drive}
+  o # clear the in memory partition table
+  n # new partition
+  p # primary partition
+  1 # partition number 1
+    # default - start at beginning of disk 
+  +1G # 1 GiB boot parttion
+  n # new partition
+  p # primary partition
+  2 # partion number 2
+    # default, start immediately after preceding partition
+  +${SIZE[0]}G # size user specified, extend partition to end of disk
+  n # new partition
+  p # primary partition
+  3 # partion number 3 
+    # default, start immediately after preceding partition
+  +${SIZE[1]}G # size user specified, extend partition to end of disk
+  n
+  p
+  
+  
+  a # make a partition bootable
+  1 # bootable partition is partition 1
+  t # set partition type
+  2 # partition 2
+  19 # SWAP
+  p # print the in-memory partition table
+  w # write the partition table
+  q # and we're done
 EOF
-# ----------------------------
+
 partprobe
 
 # Partition drive
-yes | mkfs.ext4 ${drive_partition_prefix}4
-yes | mkfs.ext4 ${drive_partition_prefix}3
-yes | mkfs.fat -F32 ${drive_partition_prefix}1
-mkswap ${drive_partition_prefix}2
-swapon ${drive_partition_prefix}2
-mount ${drive_partition_prefix}3 /mnt
+yes | mkfs.ext4 ${partition_prefix}4
+yes | mkfs.ext4 ${partition_prefix}3
+yes | mkfs.fat -F32 ${partition_prefix}1
+mkswap ${partition_prefix}2
+swapon ${partition_prefix}2
+mount ${partition_prefix}3 /mnt
 mkdir -p /mnt/boot
-mount ${drive_partition_prefix}1 /mnt/boot
+mount ${partition_prefix}1 /mnt/boot
 mkdir -p /mnt/home
-mount ${drive_partition_prefix}4 /mnt/home
+mount ${partition_prefix}4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
