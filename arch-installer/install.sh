@@ -49,7 +49,10 @@ fi
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Drive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"  8 30 || exit
 
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
-umount --force ${drive} || echo "Error unmounting" && exit 
+for i in {1..4}
+do
+   umount --l "${drive}""$i" >/dev/null 2>&1
+done
 
 dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
 dd if=/dev/zero of=${drive} bs=512; sync
