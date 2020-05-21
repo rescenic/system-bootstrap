@@ -59,7 +59,7 @@ dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Drive: ${drive}\nSwap
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 for i in {1..4}
 do
-   umount --l ${drive}${i} || true
+   umount --l ${drive}${i} >/dev/null 2>&1
 done
 
 dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
