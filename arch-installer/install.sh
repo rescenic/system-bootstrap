@@ -22,7 +22,9 @@ partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
     echo "Need to add p for nvme drive partitions"
     partition_prefix=$drive"p"
-fi      
+fi
+
+drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
 echo "Arch will install on $drive and partitions will start with $partition_prefix"
@@ -56,7 +58,7 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
     SIZE=(12 50);
 fi
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "swap: ${SIZE[0]} root: ${SIZE[1]}\nIs this correct?"  15 60 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  15 20 || exit
 
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
@@ -98,16 +100,16 @@ EOF
 partprobe
 
 # Partition drive
-yes | mkfs.ext4 ${partition_prefix}4
-yes | mkfs.ext4 ${partition_prefix}3
-yes | mkfs.fat -F32 ${partition_prefix}1
-mkswap ${partition_prefix}2
-swapon ${partition_prefix}2
-mount ${partition_prefix}3 /mnt
+yes | mkfs.ext4 ${drive}4
+yes | mkfs.ext4 ${drive}3
+yes | mkfs.fat -F32 ${drive}1
+mkswap ${drive}2
+swapon ${drive}2
+mount ${drive}3 /mnt
 mkdir -p /mnt/boot
-mount ${partition_prefix}1 /mnt/boot
+mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
-mount ${partition_prefix}4 /mnt/home
+mount ${drive}4 /mnt/home
 
 pacman -Sy --noconfirm archlinux-keyring
 
