@@ -9,7 +9,7 @@ pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are yo
 # Figure out which drive to install Arch on
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
-read -rp "Drive: " drive
+read -rp "Full drive name (ex. sda or nvme0n1): " drive
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  7 50 || exit
 
 partition_prefix=$drive
