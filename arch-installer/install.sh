@@ -56,7 +56,7 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
     SIZE=(12 50);
 fi
 
-dialog --defaultno --title "System information" --yesno "Hostname: ${comp}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"  8 30 || exit
+dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"  8 30 || exit
 
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 for i in {1..4}
