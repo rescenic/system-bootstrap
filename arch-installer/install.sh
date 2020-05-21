@@ -3,7 +3,7 @@ set -o pipefail   # Unveils hidden failures
 
 # require root user
 if [ "$(id -u)" != "0" ]; then
-   echo "This script requires it be run as root" 1>&2
+   echo "This script requires it be run as root"
    exit 1
 fi
 
