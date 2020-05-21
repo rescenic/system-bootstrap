@@ -120,10 +120,10 @@ mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
-pacman -Sy --noconfirm archlinux-keyring
+pacman -Sy --noconfirm archlinux-keyring >/dev/null
 
 # Install Arch
-pacstrap /mnt base base-devel linux linux-headers linux-firmware
+pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null
 
 # Generate FSTAB
 genfstab -U /mnt >> /mnt/etc/fstab
