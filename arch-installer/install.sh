@@ -26,9 +26,9 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  7 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on ${drive}\nPartitions will start with ${partition_prefix}"  7 50 || exit
 
-dialog --infobox "Updating system mirrors"..." 7 50
+dialog --infobox "Updating system mirrors..." 7 50
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive."  10 50 || exit
