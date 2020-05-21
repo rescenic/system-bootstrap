@@ -1,11 +1,13 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
-
+ 
 # require root user
 if [ "$(id -u)" != "0" ]; then
    echo "This script requires it be run as root"
    exit 1
 fi
+
+echo "Doing preliminary checks..."
 
 ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
 
