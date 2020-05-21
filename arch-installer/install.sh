@@ -48,9 +48,10 @@ fi
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  10 50 || exit
 
-dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
+dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 umount --force ${drive} || echo "Error unmounting" && exit 
-unmount -l ${drive} || echo "Error unmounting" && exit
+
+dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
 dd if=/dev/zero of=${drive} bs=512; sync
 
 # to create the partitions programatically (rather than manually)
