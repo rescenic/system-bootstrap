@@ -138,7 +138,7 @@ rm tz.tmp
 mv comp /mnt/etc/hostname
 
 # Enter chroot
-curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
 dialog --defaultno --title "Final Qs" --yesno "Reboot computer?" 3 30 && reboot
 dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
