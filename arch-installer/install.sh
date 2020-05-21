@@ -66,8 +66,7 @@ do
    echo "${drive}${i}"
    umount --force ${drive}${i} >/dev/null 2>&1
 done
-swapoff -a
-exit 0
+swapoff -a >/dev/null 2>&1
 
 dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}...\n$(dd if=/dev/zero | pv --size | of=${drive} bs=4096; sync)" 6 50
 
