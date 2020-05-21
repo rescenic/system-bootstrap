@@ -40,7 +40,8 @@ reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist &> /
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
 
-dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 hostname && hostname 2> comp
+dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
+hostname=$(cat comp)
 
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
