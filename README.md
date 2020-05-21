@@ -5,8 +5,8 @@
 In an Arch live image, run:
 
 ```sh
-$ curl -LO files.vdoster.com/setup | sh
-$ sudo ./install.sh
+$ curl -LO files.vdoster.com/setup.sh
+$ sh ./setup.sh
 ```
 
 ## What is this?
