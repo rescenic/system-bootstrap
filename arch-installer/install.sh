@@ -22,7 +22,7 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno ""Arch will install on $drive\nPartitions will start with $partition_prefix""  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  10 50 || exit
 
 # #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
