@@ -13,6 +13,8 @@ ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo 
 
 pacman -Sy --noconfirm dialog pv reflector >/dev/null 2>&1
 
+clear && clear && clear
+
 ################################
 # ====== Install script ====== #
 ################################
