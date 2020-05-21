@@ -1,15 +1,15 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
 
-# require root user
-if [ "$(id -u)" != "0" ]; then
-   echo "This script requires it be run as root"
-   exit 1
-fi
+# # require root user
+# if [ "$(id -u)" != "0" ]; then
+#    echo "This script requires it be run as root"
+#    exit 1
+# fi
 
-ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" && exit 0
+# ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" && exit 0
 
-pacman -Sy --noconfirm dialog pv reflector >/dev/null 2>&1
+# pacman -Sy --noconfirm dialog pv reflector >/dev/null 2>&1
 
 ################################
 # ====== Install script ====== #
