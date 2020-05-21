@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
 
-pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
+pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1 || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
 
 ################################
 # ====== Install script ====== #
