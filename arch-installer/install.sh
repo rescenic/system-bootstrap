@@ -49,7 +49,7 @@ fi
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  10 50 || exit
 
 dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}..." 7 50
-dd if=/dev/zero of=${drive}  bs=512  count=1
+dd if=/dev/zero of=${drive} conv=fdatasync bs=1M count=1; sync
 
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
