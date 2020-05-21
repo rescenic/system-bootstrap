@@ -36,11 +36,9 @@ drive="/dev/${partition_prefix}"
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on ${drive}\nPartitions will start with ${partition_prefix}"  7 50 || exit
 
 dialog --title "Arch installer" --infobox "Updating pacman mirrors..." 3 50
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive."  10 50 || exit
-
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  7 50 || exit
 
 dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
 
@@ -141,6 +139,6 @@ mv comp /mnt/etc/hostname
 # Enter chroot
 curl https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/arch-installer/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
-dialog --defaultno --title "Final Qs" --yesno "Reboot computer?"  5 30 && reboot
-dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?"  6 30 && arch-chroot /mnt
+dialog --defaultno --title "Final Qs" --yesno "Reboot computer?" 3 30 && reboot
+dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
 clear
