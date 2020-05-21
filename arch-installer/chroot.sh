@@ -26,6 +26,7 @@ dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 5 70
 reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 # Set system password
+clear && clear
 passwd
 
 # Set system timezone
