@@ -11,7 +11,7 @@ set -o pipefail   # Unveils hidden failures
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Drive: " drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  15 60 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  10 5 || exit
 
 partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
@@ -22,7 +22,7 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno ""Arch will install on $drive\nPartitions will start with $partition_prefix""  15 60 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno ""Arch will install on $drive\nPartitions will start with $partition_prefix""  10 5 || exit
 
 # #---Install script---# #
 pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are you sure you're running this as the root user? Are you sure you have an internet connection?"; exit; }
@@ -40,7 +40,7 @@ dialog --defaultno --title "Time Zone select" --yesno "Do you want use the defau
 dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 4 50
 timedatectl set-ntp true
 
-dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 10 60 2>psize
+dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 10 20 2>psize
 
 IFS=' ' read -ra SIZE <<< $(cat psize)
 
@@ -49,7 +49,7 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
     SIZE=(12 50);
 fi
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  15 20 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  10 5 || exit
 
 # to create the partitions programatically (rather than manually)
 # we're going to simulate the manual input to fdisk
