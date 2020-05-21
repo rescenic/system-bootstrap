@@ -46,7 +46,7 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
     SIZE=(12 50);
 fi
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "drive: ${drive}\nswap: ${SIZE[0]}\nroot: ${SIZE[1]}\nIs this correct?"  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Drive: ${drive}\nSwap: ${SIZE[0]}GiB\nRoot: ${SIZE[1]}GiB\nIs this correct?"  10 50 || exit
 
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 umount --force ${drive} || echo "Error unmounting" && exit 
