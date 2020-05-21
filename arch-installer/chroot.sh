@@ -1,3 +1,4 @@
+#!/bin/sh
 # Potential variables: timezone, lang, local, drive, and bootloader partition
 pacman --noconfirm --needed -Sy dialog intel-ucode reflector networkmanager >/dev/null 2>&1
 
