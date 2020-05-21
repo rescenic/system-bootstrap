@@ -22,7 +22,7 @@ clear && clear && clear
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Full drive name (ex. sda or nvme0n1): " drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  4 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  5 50 || exit
 
 partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
