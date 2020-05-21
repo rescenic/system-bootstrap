@@ -15,7 +15,7 @@ pacman -Sy --noconfirm dialog reflector || { echo "Error at script start: Are yo
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Drive: " drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Install Arch on: /dev/${drive}"  7 50 || exit
 
 partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
@@ -26,24 +26,23 @@ fi
 drive="/dev/${partition_prefix}"
 
 # Alert user about installation drive
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  5 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on $drive\nPartitions will start with $partition_prefix"  7 50 || exit
 
-dialog --infobox "Updating system mirrors"..." 5 50
+dialog --infobox "Updating system mirrors"..." 7 50
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads. \
-                                                         \nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive."  10 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive."  10 50 || exit
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  5 50 || exit
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Do you think I'm meming? Only select yes to DELET your entire ${drive} and reinstall Arch.\n\nTo stop this script, press no."  7 50 || exit
 
-dialog --no-cancel --inputbox "Enter a name for your computer." 5 50 2> comp
+dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
 
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
-dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 5 50
+dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 7 50
 timedatectl set-ntp true
 
-dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 5 50 2>psize
+dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 7 50 2>psize
 
 IFS=' ' read -ra SIZE <<< $(cat psize)
 
