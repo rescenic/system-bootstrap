@@ -7,7 +7,7 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" 
+ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || echo "Are you sure there is an active internet connection?" && exit 0
 
 pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
 
