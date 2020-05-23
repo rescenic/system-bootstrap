@@ -16,7 +16,8 @@ clear; clear; clear
 ################################
 #        Install script        #
 ################################
-# -- Figure out which drive to install Arch on -- #
+
+# -- Get drive to install on -- #
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Full drive name (ex. sda or nvme0n1): " drive
@@ -28,19 +29,21 @@ if [[ "$drive" =~ ^nvme ]]; then
 fi
 drive="/dev/${partition_prefix}"
 
-# -- Alert user about drive choice -- #
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on: ${drive}\nPartitions will be on: ${partition_prefix}"  7 50 || exit
+# -- Confirm drive choice -- #
+dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
 
+# -- Set fast Pacman mirrors -- #
 dialog --title "Arch install" --infobox "Updating pacman mirrors..." 3 50
 reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
-
+# -- Get hostname -- #
 dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
 hostname=$(cat comp)
 
+# -- Get timezone -- #
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
+# -- Sync w/ NTP -- #
 dialog --title "Arch install" --infobox "Setting timedatectl to use ntp \"$name\"..." 7 50
 timedatectl set-ntp true
 
@@ -55,14 +58,14 @@ fi
 # -- One last chance to quit -- #
 dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"  8 30 || exit
 
-# ================================================================= #
-# To create partitions programatically (rather than manually)       #
-# we're going to simulate the manual input to gdisk.                #
-# The sed script strips off all the comments so that we can         #
-# document what we're doing in-line with the actual commands        #
-# ================================================================= #
+# ============================================================= #
+# To create partitions programatically (rather than manually)   #
+# simulate the manual input to gdisk.                           #
+# The sed script strips off all the comments so that we can     #
+# document what we're doing in-line with the actual commands    #
+# ============================================================= #
 
-# -- Clear cruft partitions and make new GPT partition table -- #
+# -- Clear cruft partitions and make GPT partition table -- #
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
 for i in {1..4}
 do
@@ -148,6 +151,7 @@ mv comp /mnt/etc/hostname
 # -- Enter chroot environment -- #
 curl https://raw.githubusercontent.com/vladdoster/personal-system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
+# -- Post install user options -- #
 dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
 dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
 clear
