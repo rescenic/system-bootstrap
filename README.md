@@ -1,7 +1,7 @@
-# Personal system installer
+## Personal system installer
 An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducibility**.
 
-## Included:
+### Included:
 
 1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
 2. Dotfile installer sets up fully configured system using [Suckless utilities](https://suckless.org/).
@@ -9,7 +9,7 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
     - [Dynamic menu](https://tools.suckless.org/dmenu/)
     - [Simple Terminal](https://st.suckless.org/)
 
-## Installation:
+### Installation:
 
 Get this script, it gets other scripts:
 ```bash
@@ -38,7 +38,7 @@ The first column is a "tag" that determines how the program is installed, ""
 (blank) for the main repository, `A` for via the AUR or `G` if the program is a
 git repository that is meant to be `make && sudo make install`ed.
 
-##### Check which programs arent installed:
+#### Check which programs arent installed:
 
 ```bash
 $ programs="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
