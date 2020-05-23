@@ -95,22 +95,22 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
   1 # 1st partition
     # start at beginning of disk 
   +512M # 512 MiB boot partition
-  C12A7328-F81F-11D2-BA4B-00A0C93EC93B  # EFI system partition
+  ef00  # EFI system partition
   n # Linux swap
   2 # 2nd partition
     # start immediately after preceding partition
   +${SIZE[0]}G # user specified size
-  0657FD6D-A4AB-43C4-84E5-0933C84B4F4F # Linux swap
+  8200 # Linux swap
   n # new partition
   3 # 3rd partition
     # start immediately after preceding partition
   +${SIZE[1]}G # user specified size
-  4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709 # Linux x86-64 root (/)
+  8304 # Linux x86-64 root (/)
   n # new partition
   4 # 4th partition
     # start immediately after preceding partition
     # extend for rest of drive space
-  933AC7E1-2EB4-4F13-B844-0E14E2AEF915 # Linux /home
+  8302 # Linux /home
   w # write the partition table
   Y # confirmation
   q # exit gdisk
