@@ -3,7 +3,7 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
 
 ## Included:
 
-1. Arch Linux installer which asks for input, has sensible defaults, and does the heavy lifting for you.
+1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
 2. Dotfile installer sets up fully configured system using [Suckless utilities](https://suckless.org/).
     - [Dynamic window manager](https://dwm.suckless.org/)
     - [Dynamic menu](https://tools.suckless.org/dmenu/)
