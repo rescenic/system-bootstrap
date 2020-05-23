@@ -1,5 +1,5 @@
 # Personal system installer
-An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducable**.
+An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducibility**.
 
 ## Included:
 
