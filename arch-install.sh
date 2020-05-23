@@ -134,10 +134,10 @@ mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
 dialog --title "Arch install" --infobox "Refreshing archlinux-keyring" 3 50
-pacman -Sy --noconfirm archlinux-keyring >/dev/null
+pacman -Sy --noconfirm archlinux-keyring >/dev/null 2>&1
 
 # Install Arch
-dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 7 50
+dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 3 50
 pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null
 
 # Generate FSTAB
