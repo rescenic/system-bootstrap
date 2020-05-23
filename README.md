@@ -54,7 +54,7 @@ $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
 ```
     
 ## Screenshot
-Running on laptop and virtual box concurrently
+Running on laptop and virtual box concurrently.
 
 ![personal-system.png](personal-system.png)
 
