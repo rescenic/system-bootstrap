@@ -50,3 +50,7 @@ $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
        printf "$(pacman -Qi "$program" > /dev/null)"
    fi;  done
 ```
+
+## TODO:
+    [ ] Make swap default based on system RAM
+    [ ] Don't break Windows if trying to dual boot
