@@ -138,7 +138,7 @@ pacman -Sy --noconfirm archlinux-keyring >/dev/null 2>&1
 
 # Install Arch
 dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 3 50
-pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null
+pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null 2>&1
 
 # Generate FSTAB
 genfstab -U /mnt >> /mnt/etc/fstab
