@@ -3,17 +3,17 @@
 pacman --noconfirm --needed -Sy dialog intel-ucode reflector networkmanager >/dev/null 2>&1
 
 if [ $# -ne 2 ]; then
-    dialog --title "BOOMER BRAINLET" --infobox "Something went wrong. Chroot did not receive 2 arguments.\It needs the drive and the bootloader partition." 7 50
+    dialog --title "BOOMER BRAINLET" --infobox "Something went wrong. Chroot did not receive 2 arguments.\nIt needs the drive and the bootloader partition." 5 50
     exit 1
 fi
 
 drive="$1"
 bootloader_partition="$2"
 
-dialog --title "Dotfile installer" --infobox "Arch was installed on: ${drive}" 7 50
+dialog --title "Dotfile installer" --infobox "Arch was installed on: ${drive}" 3 50
 sleep 10
 
-dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition}" 7 50
+dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition}" 3 50
 sleep 5
 UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
 bootctl install || error "Installing bootctl"
@@ -23,8 +23,8 @@ echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
-dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 5 70
-reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 3 70
+reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 
 # Set system password
 clear && clear
