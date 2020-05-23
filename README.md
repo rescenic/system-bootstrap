@@ -1,10 +1,9 @@
 # System Installer
 
-## Goal
+### Goal:
+An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducable**.
 
-provide a everyday desktop evironment which is geared towards productivity, resource light, and quickly reproducable.
-
-## What is included
+## Included:
 
 1. Arch Linux installer which asks for input, has sensible defaults, and does the heavy lifting for you.
 2. Dotfile installer sets up fully configured system using [Suckless utilities](https://suckless.org/).
@@ -29,7 +28,7 @@ Install just dotfiles:
 $ sudo ./dotfile-installer.sh
 ```
 
-### The `programs.csv` list
+### `programs.csv` list
 
 Parses the given programs list and install all given programs.
 Can handle:
