@@ -28,7 +28,7 @@ Install just dotfiles:
 $ sudo ./dotfile-installer.sh
 ```
 
-### `programs.csv` list
+#### `programs.csv` list
 
 Parses the given programs list and install all given programs.
 Can handle:
