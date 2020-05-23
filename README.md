@@ -14,17 +14,17 @@ provide a everyday desktop evironment which is geared towards productivity, reso
 
 ## Installation:
 
-Get this script, it gets other scripts.
+Get this script, it gets other scripts:
 ```bash
 $ curl -LO files.vdoster.com/setup.sh; sudo bash ./setup.sh
 ```
 
-Arch install (asks to install dotfiles in chroot env)
+Arch install (asks to install dotfiles in chroot env):
 ```bash
 $ sudo ./arch-installer.sh
 ```
 
-Install just dotfiles
+Install just dotfiles:
 ```bash
 $ sudo ./dotfile-installer.sh
 ```
