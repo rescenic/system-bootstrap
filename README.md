@@ -52,5 +52,5 @@ $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
 ```
 
 ## TODO:
-    [ ] Make swap default based on system RAM
-    [ ] Don't break Windows if trying to dual boot
+    [ ]: Make swap default based on system RAM
+    [ ]: Don't break Windows if trying to dual boot
