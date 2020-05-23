@@ -1,6 +1,4 @@
 # Personal system installer
-
-### Goal:
 An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducable**.
 
 ## Included:
