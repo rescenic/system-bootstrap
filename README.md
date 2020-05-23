@@ -21,7 +21,7 @@ Arch install (asks to install dotfiles in chroot env):
 $ sudo ./arch-installer.sh
 ```
 
-Install just dotfiles:
+Dotfiles install:
 ```bash
 $ sudo ./dotfile-installer.sh
 ```
