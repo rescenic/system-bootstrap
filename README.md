@@ -14,11 +14,19 @@ provide a everyday desktop evironment which is geared towards productivity, reso
 
 ## Installation:
 
-In an Arch live image, run:
+Get this script, it gets other scripts.
+```bash
+$ curl -LO files.vdoster.com/setup.sh; sudo bash ./setup.sh
+```
 
-```sh
-$ curl -LO files.vdoster.com/setup.sh && sudo bash ./setup.sh
-$ sudo bash ./arch-install.sh
+Arch install (asks to install dotfiles in chroot env)
+```bash
+$ sudo ./arch-installer.sh
+```
+
+Install just dotfiles
+```bash
+$ sudo ./dotfile-installer.sh
 ```
 
 ### The `programs.csv` list
