@@ -26,7 +26,7 @@ grepseq="\"^[PGA]*,\""
 #--- FUNCTIONS ---#
 adduserandpass() { \
 	# Adds user `$name` with password $pass1.
-	dialog --infobox "Adding user \"$name\"..." 4 50
+	dialog --title "Dotfile installer" --infobox "Adding user \"$name\"..." 4 50
 	useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 ||
 	usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
 	repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel "$repodir"
@@ -55,16 +55,16 @@ finalize(){ \
 	
 getuserandpass() { \
 	# Prompts user for new username an password.
-	name=$(dialog --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
+	name=$(dialog --title "Dotfile installer" --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
 	while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" >/dev/null 2>&1; do
 		name=$(dialog --no-cancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done
-	pass1=$(dialog --no-cancel --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
-	pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+	pass1=$(dialog --no-cancel --title "Dotfile installer" --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
+	pass2=$(dialog --no-cancel --title "Dotfile installer" --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	while ! [ "$pass1" = "$pass2" ]; do
 		unset pass2
-		pass1=$(dialog --no-cancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
-		pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+		pass1=$(dialog --no-cancel --title "Dotfile installer" --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
+		pass2=$(dialog --no-cancel --title "Dotfile installer" --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done ;}
 	
 gitmakeinstall() {
@@ -108,7 +108,7 @@ makedirectories() { \
 
 manualinstall() { # Installs $1 manually if not installed. Used only for AUR helper here.
 	[ -f "/usr/bin/$1" ] || (
-	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
+	dialog --title "Dotfile installer" --infobox "Installing \"$1\", an AUR helper..." 4 50
 	cd /tmp || exit
 	rm -rf /tmp/"$1"*
 	curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
@@ -142,7 +142,7 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	}
 
 refreshkeys() { \
-	dialog --infobox "Refreshing Arch Keyring..." 4 40
+	dialog --title "Dotfile installer" --infobox "Refreshing Arch Keyring..." 4 40
 	pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 	}
 	
@@ -155,7 +155,7 @@ case $response in
 esac
 }
 
-systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
+systembeepoff() { dialog --title "Dotfile installer" --infobox "Getting rid of that retarded error beep sound..." 10 50
 	rmmod pcspkr
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
