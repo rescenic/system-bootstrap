@@ -35,7 +35,7 @@ drive="/dev/${partition_prefix}"
 # Alert user about installation drive
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "Arch will install on: ${drive}\nPartitions will be on: ${partition_prefix}"  7 50 || exit
 
-dialog --title "Arch installer" --infobox "Updating pacman mirrors..." 3 50
+dialog --title "Arch install" --infobox "Updating pacman mirrors..." 3 50
 reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
@@ -45,10 +45,10 @@ hostname=$(cat comp)
 
 dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
-dialog --infobox "Setting timedatectl to use ntp \"$name\"..." 7 50
+dialog --title "Arch install" --infobox "Setting timedatectl to use ntp \"$name\"..." 7 50
 timedatectl set-ntp true
 
-dialog --no-cancel --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 7 50 2>psize
+dialog --no-cancel --title "Arch install" --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 7 50 2>psize
 
 IFS=' ' read -ra SIZE <<< $(cat psize)
 
@@ -69,63 +69,75 @@ swapoff -a >/dev/null 2>&1
 
 dialog --title "Clearing previous partitions" --infobox "Wiping all parititons from ${drive}...\n$(dd if=/dev/zero | pv --size | of=${drive} bs=4096; sync)" 6 50
 
+# ================================================================= #
+# To create partitions programatically (rather than manually)       #
+# we're going to simulate the manual input to gdisk                 #
+# The sed script strips off all the comments so that we can         #
+# document what we're doing in-line with the actual commands        #
+# Note that a blank line (commented as "defualt" will send a empty  #
+# line terminated with a newline to take the fdisk default.         #
+# ================================================================= #
 
-# to create the partitions programatically (rather than manually)
-# we're going to simulate the manual input to fdisk
-# The sed script strips off all the comments so that we can 
-# document what we're doing in-line with the actual commands
-# Note that a blank line (commented as "defualt" will send a empty
-# line terminated with a newline to take the fdisk default.
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${drive}
+# -- Clear cruft partitons and make new GPT partition table -- #
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
   o # clear the in memory partition table
-  n # new partition
-  p # primary partition
-  1 # partition number 1
-    # default - start at beginning of disk 
-  +1G # 1 GiB boot parttion
-  n # new partition
-  p # primary partition
-  2 # partion number 2
-    # default, start immediately after preceding partition
-  +${SIZE[0]}G # size user specified, extend partition to end of disk
-  n # new partition
-  p # primary partition
-  3 # partion number 3 
-    # default, start immediately after preceding partition
-  +${SIZE[1]}G # size user specified, extend partition to end of disk
-  n # new partition
-  p # primary partition
-    # default, start immediately after preceding partition
-    # default, extend for rest of drive space
-  a # make a partition bootable
-  1 # bootable partition is partition 1
-  t # set partition type
-  2 # partition 2
-  19 # SWAP
-  p # print the in-memory partition table
+  Y # confirmation
   w # write the partition table
+  Y # confirmation
   q # and we're done
 EOF
 
 partprobe
 
-# Partition drive
-yes | mkfs.ext4 ${drive}4
-yes | mkfs.ext4 ${drive}3
+# -- Make new partitons -- #
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
+  n # new partition
+  1 # 1st partition
+    # start at beginning of disk 
+  +512M # 512 MiB boot partition
+  C12A7328-F81F-11D2-BA4B-00A0C93EC93B  # EFI system partition
+  n # Linux swap
+  2 # 2nd partition
+    # start immediately after preceding partition
+  +${SIZE[0]}G # user specified size
+  0657FD6D-A4AB-43C4-84E5-0933C84B4F4F # Linux swap
+  n # new partition
+  3 # 3rd partition
+    # start immediately after preceding partition
+  +${SIZE[1]}G # user specified size
+  4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709 # Linux x86-64 root (/)
+  n # new partition
+  4 # 4th partition
+    # start immediately after preceding partition
+    # extend for rest of drive space
+  933AC7E1-2EB4-4F13-B844-0E14E2AEF915 # Linux /home
+  w # write the partition table
+  Y # confirmation
+  q # exit gdisk
+EOF
+
+partprobe
+
+dialog --title "Arch install" --infobox "Format and mount partitions" 3 50
+# Partition file systems
 yes | mkfs.fat -F32 ${drive}1
+yes | mkfs.ext4 ${drive}3
+yes | mkfs.ext4 ${drive}4
+# Enable swap
 mkswap ${drive}2
 swapon ${drive}2
+# Mount partitions
 mount ${drive}3 /mnt
 mkdir -p /mnt/boot
 mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
-dialog --infobox "Refreshing archlinux-keyring" 3 50
+dialog --title "Arch install" --infobox "Refreshing archlinux-keyring" 3 50
 pacman -Sy --noconfirm archlinux-keyring >/dev/null
 
 # Install Arch
-dialog --infobox "Installing Arch via pacstrap" 7 50
+dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 7 50
 pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null
 
 # Generate FSTAB
@@ -140,6 +152,6 @@ mv comp /mnt/etc/hostname
 # Enter chroot
 curl https://raw.githubusercontent.com/vladdoster/system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
-dialog --defaultno --title "Final Qs" --yesno "Reboot computer?" 3 30 && reboot
-dialog --defaultno --title "Final Qs" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
+dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
+dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
 clear
