@@ -34,7 +34,7 @@ Parses the given programs list and install all given programs.
 Can handle:
     - AUR packages
     - Python via pip
-    - Git repos (assuming it uses `Make` for compilation)
+    - Git repos
   
 The first column is a "tag" that determines how the program is installed, ""
 (blank) for the main repository, `A` for via the AUR or `G` if the program is a
