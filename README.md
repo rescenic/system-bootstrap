@@ -5,10 +5,9 @@
 In an Arch live image, run:
 
 ```sh
-$ curl -LO files.vdoster.com/setup.sh
-$ sh setup.sh
+$ curl -LO files.vdoster.com/setup.sh | sudo bash ./setup.sh
+$ sudo bash ./arch-install.sh
 ```
-
 ## What is this?
 
 A script that autoinstalls and autoconfigures a fully-functioning
