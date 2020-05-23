@@ -11,7 +11,7 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
 
 ### Installation:
 
-Get this script, it gets other scripts:
+cURL this script, it downloads all files you might need:
 ```bash
 $ curl -LO files.vdoster.com/setup.sh; sudo bash ./setup.sh
 ```
