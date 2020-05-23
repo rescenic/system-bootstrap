@@ -126,6 +126,7 @@ mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
+# -- Refresh Arch keyring -- #
 dialog --title "Arch install" --infobox "Refreshing archlinux-keyring" 3 50
 pacman -Sy --noconfirm archlinux-keyring >/dev/null 2>&1
 
@@ -137,6 +138,7 @@ pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null 2>&1
 genfstab -U /mnt >> /mnt/etc/fstab
 # -- Set timezone -- #
 
+# -- Set timezone -- #
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
 
@@ -144,7 +146,7 @@ rm tz.tmp
 mv comp /mnt/etc/hostname
 
 # -- Enter chroot environment -- #
-curl https://raw.githubusercontent.com/vladdoster/system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/personal-system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
 dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
 dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
