@@ -1,6 +1,8 @@
 ## Personal system installer
 An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducibility**.
 
+
+
 ### Included:
 
 1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
@@ -50,6 +52,11 @@ $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
        printf "$(pacman -Qi "$program" > /dev/null)"
    fi;  done
 ```
+    
+## Screenshot
+Running on lap0top and virtual box concurrently.
+
+![personal-system.png](personal-system.png)
 
 ## TODO:
     [ ]: Make swap default based on system RAM
