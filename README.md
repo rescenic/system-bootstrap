@@ -38,7 +38,7 @@ Can handle:
     - AUR packages
     - Python via pip
     - Git repos
-  
+
 The first column is a "tag" that determines how the program is installed, ""
 (blank) for the main repository, `A` for via the AUR or `G` if the program is a
 git repository that is meant to be `make && sudo make install`ed.
@@ -49,17 +49,17 @@ git repository that is meant to be `make && sudo make install`ed.
 $ programs="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
 $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
   while IFS=, read -r tag program comment; do
-   if [[ $tag == 'G' ]]; then 
-       printf "$program might not be installed because it is from git\n" 
-   else 
+   if [[ $tag == 'G' ]]; then
+       printf "$program might not be installed because it is from git\n"
+   else
        printf "$(pacman -Qi "$program" > /dev/null)"
    fi;  done
 ```
-    
+
 ## Screenshot
 Running on laptop and virtual box concurrently.
 
-![personal-system.png](personal-system.png)
+![What desktop looks like](sytem-screenshot.png)
 
 ## TODO:
     [ ]: Make swap default based on system RAM
