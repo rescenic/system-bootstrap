@@ -9,7 +9,7 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
 ### Included:
 
 1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
-    - Uses [systemd-boot](https://wiki.archlinux.org/index.php/systemd-boot)
+    - Uses [systemd-boot](https://wiki.archlinux.org/index.php/systemd-boot) boot manager
     - Seperate root/user partitions
 2. Dotfile installer sets up fully configured system using [Suckless utilities](https://suckless.org/).
     - [Dynamic window manager](https://dwm.suckless.org/)
