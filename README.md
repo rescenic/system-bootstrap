@@ -16,19 +16,9 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
 
 ### Installation:
 
-cURL this script, it downloads all files you might need:
+cURL install wizard:
 ```bash
-$ curl -LO files.vdoster.com/setup.sh; sudo bash ./setup.sh
-```
-
-Arch install (asks to install dotfiles in chroot env):
-```bash
-$ sudo ./arch-installer.sh
-```
-
-Dotfiles install:
-```bash
-$ sudo ./dotfile-installer.sh
+$ curl -LO files.vdoster.com/wizard.sh; sudo bash ./wizard.sh
 ```
 
 #### `programs.csv` list
