@@ -44,5 +44,5 @@ locale-gen
 systemctl enable NetworkManager
 systemctl start NetworkManager
 
-installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
+installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-installer/chroot.sh && bash dotfile-installer.sh ;}
 dialog --title "Install dotfiles?" --yesno "Install dotfiles.vdoster.com?" 5 50 && installdotfiles
