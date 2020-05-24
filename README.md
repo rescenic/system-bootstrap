@@ -18,7 +18,7 @@ An everyday desktop evironment geared towards **productivity** ,  **development*
 
 cURL install wizard:
 ```bash
-$ curl -LO files.vdoster.com/wizard.sh; sudo bash ./wizard.sh
+$ curl -LO files.vdoster.com/install-wizard.sh; sudo bash ./install-wizard.sh
 ```
 
 #### `programs.csv` list
@@ -49,7 +49,7 @@ $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
 ## Screenshot
 Running on laptop and virtual box concurrently.
 
-![What desktop looks like](sytem-screenshot.png)
+![What desktop looks like](system-screenshot.png)
 
 ## TODO:
     [ ]: Make swap default based on system RAM
