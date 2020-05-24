@@ -208,9 +208,8 @@ installationloop
 # Install libxft-bgra for color emojis
 dialog --title "Dotfile installer" --infobox "Finally, installing \`libxft-bgra\` to enable color emoji in suckless software without crashes." 5 70
 yes | sudo -u "$name" $aurhelper -S libxft-bgra >/dev/null 2>&1
-# Install dotfiles and vimwiki in home directory
+# Install dotfiles in home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
-putgitrepo "$vimwikirepo" "/home/$name" "$repobranch"
 # Remove dotfiles git repo cruft
 rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
 # Get rid of system beep
