@@ -12,11 +12,10 @@ display_result() {
     --no-collapse \
     --msgbox "$result" 0 0
 }
-
   exec 3>&1
   selection=$(dialog \
-    --backtitle "System Information" \
-    --title "Menu" \
+    --backtitle "System bootstrap" \
+    --title "System boostrap" \
     --clear \
     --cancel-label "Exit" \
     --menu "Please select:" $HEIGHT $WIDTH 4 \
