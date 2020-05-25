@@ -39,18 +39,26 @@ dialog \
 # drives=()
 # drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
 # echo "$drives"
-rm --force "$INPUT"
+# rm --force "$INPUT"
 
-INPUT=/tmp/drive.sh.$$
+# INPUT=/tmp/drive.sh.$$
+# drives=()
+# drives+=($(lsblk -d -o name | tail -n +2 | awk '{print "$1"}'))
+# #mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print NR" "$1}')
+# # echo "$drives"
+
+# dialog --menu "Select an installation drive " 0 0 0 "${drives[@]}" 2>"${INPUT}"
+# drive=$(<"${INPUT}")
+
 drives=()
-drives+=($(lsblk -d -o name | tail -n +2 | awk '{print "$1"}'))
-#mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print NR" "$1}')
-# echo "$drives"
+drive=""
+drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
+#mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print ""$1}')
+selection=$(dialog \
+  --menu "Please select:" 0 0 0 \
+  "${drives[@]}" 2>&1 > /dev/tty)
 
-dialog --menu "Select an installation drive " 0 0 0 "${drives[@]}" 2>"${INPUT}"
-drive=$(<"${INPUT}")
-dialog --title "Arch install" --infobox "$drive..." 10 50
-sleep 30
+drive=${drives[$selection]}
 
 # -- Confirm drive choice -- #
 dialog --defaultno --title "Installation drive" --yesno "Install Arch on: /dev/${drive}"  6 50 || exit
