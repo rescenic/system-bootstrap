@@ -12,7 +12,9 @@ WIZARD_DEPENDENCIES="dialog git"
 catch() {
   # error handling goes here
   error=$(echo "$@")
-  dialog --title "Install wizard" \
+  dialog \
+    --backtitle "$TITLE" \
+    --title "$TITLE Error" \
     --no-collapse \
     --msgbox "$error" "$HEIGHT" "$WIDTH"
   exit
@@ -21,18 +23,22 @@ catch() {
 # --- Different options --- #
 function install_arch() {
 
-  dialog --infobox "Please wait" 10 30
+  dialog \
+    --title "$TITLE" \
+    --infobox "Please wait" 10 30
+    
   msg=$(
-    git clone --quiet https://github.com/vladdoster/system-bootstrap 2>&1 1> /dev/null &&
+      rm --recursive ./system-bootstrap/ 2>&1 1> /dev/null &&
+      git clone --quiet https://github.com/vladdoster/system-bootstrap 2>&1 1> /dev/null &&
       cp --recursive ./system-bootstrap/* $(pwd) 2>&1 1> /dev/null &&
       rm --recursive ./system-bootstrap/ LICENSE README.md 2>&1 1> /dev/null &&
       chmod +x *.sh 2>&1 1> /dev/null
   )
   [[ -n $msg ]] && catch $msg
+  
   dialog \
-	--title "$TITLE" \
-	--yesno "Install Arch Linux?" 6 50
-
+    --title "$TITLE" \
+    --yesno "Install Arch Linux?" 6 50
   response=$?
   case $response in
     0) (./arch-installer.sh) ;;
@@ -56,8 +62,7 @@ fi
 # --- Install dependencies --- #
 sudo pacman --quiet --noconfirm -S "$WIZARD_DEPENDENCIES" > /dev/null 2>&1
 
-# --- Main menu of install wizard --- #
-
+# --- Main menu --- #
 while true; do
   exec 3>&1
   selection=$(dialog \
@@ -65,7 +70,7 @@ while true; do
     --title "$TITLE" \
     --clear \
     --cancel-label "Exit" \
-    --menu "Please select:" 15 $WIDTH 4 \
+    --menu "Please select:" 0 0 0 \
     "1" "Install Arch Linux" \
     "2" "Install dotfiles" \
     2>&1 1>&3)
