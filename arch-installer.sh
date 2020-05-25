@@ -8,7 +8,9 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # -- Check internet connection -- #
-echo "Doing preliminary checks..."
+dialog \
+  --title "$TITLE" \
+  --infobox "Doing preliminary checks..." 0 0
 ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
 pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
 clear; clear; clear
