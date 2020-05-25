@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Potential variables: timezone, lang, local, drive, and bootloader partition
 pacman --quiet -Sy dialog intel-ucode reflector networkmanager 
 
