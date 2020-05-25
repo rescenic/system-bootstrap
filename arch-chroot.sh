@@ -1,5 +1,6 @@
 #!/bin/sh
 # Potential variables: timezone, lang, local, drive, and bootloader partition
+title="Dotfile installer"
 pacman --noconfirm --needed -Sy dialog intel-ucode reflector networkmanager >/dev/null 2>&1
 
 if [ $# -ne 2 ]; then
@@ -10,10 +11,14 @@ fi
 drive="$1"
 bootloader_partition="$2"
 
-dialog --title "Dotfile installer" --infobox "Arch was installed on: ${drive}" 3 50
-sleep 10
+dialog --title $title --infobox "Arch was installed on: ${drive}" 3 50
+sleep 5
 
-dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition}" 3 50
+dialog --title $title --infobox "Updating pacman mirrors." 3 70
+reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
+sleep 5
+
+dialog --title $title --infobox "Installing bootloader on ${bootloader_partition}" 3 50
 sleep 5
 UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
 bootctl install || error "Installing bootctl"
@@ -23,11 +28,8 @@ echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
-dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 3 70
-reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-
 # Set system password
-passwd
+clear && passwd
 
 # Set system timezone
 TZuser=$(cat tzfinal.tmp)
