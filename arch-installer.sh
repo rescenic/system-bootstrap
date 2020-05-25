@@ -41,8 +41,8 @@ drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
 dialog \
   --title "Drive selection" \
   --menu "Select one of the following drives to install Arch on" 0 0 0 \
-  "${drives[@]}"  2>"${drive}"
-drive=$(<"${drive}")
+  "${drives[@]}"  2>"${input}"
+drive=$(<"${input}")
 
 # -- Confirm drive choice -- #
 dialog --defaultno --title "Installation drive" --yesno "Install Arch on: /dev/${drive}"  6 50 || exit
