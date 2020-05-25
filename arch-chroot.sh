@@ -42,5 +42,5 @@ echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
 
-installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/chroot.sh && bash dotfile-installer.sh ;}
+installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-installer.sh && bash dotfile-installer.sh ;}
 dialog --title "Install dotfiles?" --yesno "Install dotfiles.vdoster.com?" 5 50 && installdotfiles
