@@ -11,8 +11,7 @@ fi
 drive="$1"
 bootloader_partition="$2"
 
-dialog --title $title --infobox "Arch was installed on: ${drive}" 3 50
-sleep 5
+dialog --title $title --msgbox "Arch was installed on: ${drive}" 3 50
 
 dialog --title $title --msgbox "Updating pacman mirrors." 3 70
 reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
