@@ -1,6 +1,6 @@
 #!/bin/bash
 # Potential variables: timezone, lang, local, drive, and bootloader partition
-pacman -Sy dialog intel-ucode reflector networkmanager 
+pacman --noconfirm -Sy dialog intel-ucode reflector networkmanager 
 
 if [ $# -ne 2 ]; then
     dialog --title "BOOMER BRAINLET" --msgbox "Something went wrong. Chroot did not receive 2 arguments.\nIt needs the drive and the bootloader partition." 5 50
