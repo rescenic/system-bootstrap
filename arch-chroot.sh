@@ -7,6 +7,9 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
+systemctl enable NetworkManager
+systemctl start NetworkManager
+
 # Set system locale
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
@@ -38,8 +41,6 @@ echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
 echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
 echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
 
-systemctl enable NetworkManager
-systemctl start NetworkManager
 
 installdotfiles() { curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/chroot.sh && bash dotfile-installer.sh ;}
 dialog --title "Install dotfiles?" --yesno "Install dotfiles.vdoster.com?" 5 50 && installdotfiles
