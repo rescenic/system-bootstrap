@@ -10,12 +10,12 @@ fi
 drive="$1"
 bootloader_partition="$2"
 
-dialog --title "Dotfile installer" --infobox "Arch was installed on: \${drive}\" 3 50
+dialog --title "Dotfile installer" --infobox "Arch was installed on ${drive}!" 3 50
 
 # dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 3 70
 # reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 
-dialog --title "Dotfile installer" --infobox "Installing bootloader on \${bootloader_partition}\" 3 50
+dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition}" 3 50
 UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
 bootctl install || error "Installing bootctl" && exit
 echo title Arch Linux >> /boot/loader/entries/arch.conf
