@@ -175,9 +175,10 @@ rm tz.tmp
 mv comp /mnt/etc/hostname
 
 # -- Enter chroot environment -- #
-curl https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
+# && rm /mnt/chroot.sh
 
 # -- Post install user options -- #
-dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
-dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
-clear
+# dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
+# dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
+# clear
