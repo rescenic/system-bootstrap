@@ -3,8 +3,6 @@
 # --- Variables --- #
 DIALOG_CANCEL=1
 DIALOG_ESC=255
-HEIGHT=6
-WIDTH=50
 TITLE="Install Wizard"
 WIZARD_DEPENDENCIES="dialog git"
 
