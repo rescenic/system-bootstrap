@@ -160,10 +160,10 @@ pacman -Sy --noconfirm archlinux-keyring
 
 # -- Install Arch -- #
 dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 3 50
-pacstrap /mnt base base-devel linux linux-headers linux-firmware
+pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
 
 # -- Generate FSTAB -- #
-genfstab -U /mnt >> /mnt/etc/fstab
+genfstab -U -p /mnt >> /mnt/etc/fstab
 # -- Set timezone -- #
 
 # -- Set timezone -- #
