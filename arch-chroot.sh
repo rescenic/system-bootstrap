@@ -7,19 +7,19 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-# Set system password
-passwd
+# Set system locale
+echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+echo "en_US ISO-8859-1" >> /etc/locale.gen
+locale-gen
 
 # Set system timezone
 TZuser=$(cat tzfinal.tmp)
 ln -sf /usr/share/zoneinfo/$TZuser /etc/localtime
 hwclock --systohc
 
-# Set system locale
-echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-echo "en_US ISO-8859-1" >> /etc/locale.gen
-locale-gen
+# Set system password
+passwd
 
 drive="$1"
 bootloader_partition="$2"
