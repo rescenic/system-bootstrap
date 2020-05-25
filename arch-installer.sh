@@ -1,5 +1,4 @@
 #!/bin/bash
-set -o pipefail   # Unveils hidden failures
  
 # --- Error handling --- #
 catch() {
@@ -91,11 +90,11 @@ dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\n
 
 # -- Clear cruft partitions and make GPT partition table -- #
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
+swapoff -a >/dev/null 2>&1
 for i in {1..4}
 do
    umount --force ${drive}${i} >/dev/null 2>&1
 done
-swapoff -a >/dev/null 2>&1
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
   o # clear the in memory partition table
   Y # confirmation
