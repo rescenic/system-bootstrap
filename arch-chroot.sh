@@ -26,7 +26,7 @@ locale-gen
 
 drive="$1"
 bootloader_partition="$2"
-UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
+UUID=$(blkid -s PARTUUID -o value "$drive"3)
 
 dialog --title "Arch chroot" --yesno "Install bootloader on ${bootloader_partition} with UUID ${UUID}?" 5 50 && echo "ok"
 
