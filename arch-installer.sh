@@ -1,9 +1,21 @@
 #!/bin/bash
 set -o pipefail   # Unveils hidden failures
  
+# --- Error handling --- #
+catch() {
+  # error handling goes here
+  error=$(echo "$@")
+  dialog \
+    --backtitle "$TITLE" \
+    --title "$TITLE Error" \
+    --no-collapse \
+    --msgbox "$error" 0 0
+  exit
+}
+
 # -- Require root user -- #
 if [ "$(id -u)" != "0" ]; then
-   echo "This script requires it be run as root"
+   catch "This script requires it be run as root"
    exit 1
 fi
 
@@ -11,15 +23,19 @@ fi
 dialog \
   --title "$TITLE" \
   --infobox "Doing preliminary checks..." 0 0
-ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
-pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
-clear; clear; clear
+  msg=$(
+      ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3`
+      pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1 &&
+  )
+[[ -n $msg ]] && catch $msg  
+# ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
+# pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
 
 ################################
 #        Install script        #
 ################################
 
-# -- Get drive to install on -- #
+# -- Set drive to install on -- #
 printf "Select one of the following drives to install Arch on\n"
 lsblk -d -o name | tail -n +2 | awk '{print NR ". " $1}'
 read -rp "Full drive name (ex. sda or nvme0n1): " drive
@@ -151,7 +167,7 @@ rm tz.tmp
 mv comp /mnt/etc/hostname
 
 # -- Enter chroot environment -- #
-curl https://raw.githubusercontent.com/vladdoster/personal-system-installer/master/chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
+curl https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 && rm /mnt/chroot.sh
 
 # -- Post install user options -- #
 dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
