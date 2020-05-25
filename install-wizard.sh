@@ -4,7 +4,6 @@
 DIALOG_CANCEL=1
 DIALOG_ESC=255
 TITLE="Install Wizard"
-WIZARD_DEPENDENCIES="dialog git"
 
 # --- Error handling --- #
 catch() {
@@ -58,7 +57,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # --- Install dependencies --- #
-sudo pacman --quiet --noconfirm -S "$WIZARD_DEPENDENCIES" 2>&1 1> /dev/null
+sudo pacman --quiet --noconfirm -S dialog git 2>&1 1> /dev/null
 
 # --- Main menu --- #
 while true; do
