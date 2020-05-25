@@ -14,10 +14,9 @@ dialog --title "Dotfile installer" --infobox "Arch was installed on ${drive}!" 3
 
 # dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 3 70
 # reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-
-dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition}" 3 50
 UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
-bootctl install || error "Installing bootctl"
+dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition} with UUID ${UUID}" 3 50
+bootctl install >/dev/null 2>&1 || echo "Bootctl seemed to hit a snag..."
 echo title Arch Linux >> /boot/loader/entries/arch.conf
 echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
 echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
