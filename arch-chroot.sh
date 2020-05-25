@@ -4,7 +4,7 @@ title="Dotfile installer"
 pacman --noconfirm --needed -Sy dialog intel-ucode reflector networkmanager >/dev/null 2>&1
 
 if [ $# -ne 2 ]; then
-    dialog --title "BOOMER BRAINLET" --infobox "Something went wrong. Chroot did not receive 2 arguments.\nIt needs the drive and the bootloader partition." 5 50
+    dialog --title "BOOMER BRAINLET" --msgbox "Something went wrong. Chroot did not receive 2 arguments.\nIt needs the drive and the bootloader partition." 5 50
     exit 1
 fi
 
@@ -14,12 +14,10 @@ bootloader_partition="$2"
 dialog --title $title --infobox "Arch was installed on: ${drive}" 3 50
 sleep 5
 
-dialog --title $title --infobox "Updating pacman mirrors." 3 70
+dialog --title $title --msgbox "Updating pacman mirrors." 3 70
 reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-sleep 5
 
-dialog --title $title --infobox "Installing bootloader on ${bootloader_partition}" 3 50
-sleep 5
+dialog --title $title --msgbox "Installing bootloader on ${bootloader_partition}" 3 50
 UUID=$(blkid -s PARTUUID -o value ${bootloader_partition})
 bootctl install || error "Installing bootctl"
 echo title Arch Linux >> /boot/loader/entries/arch.conf
