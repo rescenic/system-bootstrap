@@ -3,11 +3,10 @@
 # --- Variables --- #
 DIALOG_CANCEL=1
 DIALOG_ESC=255
-HEIGHT=0
-WIDTH=0
-
-# --- Dependencies --- #
-sudo pacman --quiet --noconfirm -S dialog git > /dev/null 2>&1
+HEIGHT=6
+WIDTH=50
+TITLE="Install Wizard"
+WIZARD_DEPENDENCIES="dialog git"
 
 # --- Error handling --- #
 catch() {
@@ -15,7 +14,7 @@ catch() {
   error=$(echo "$@")
   dialog --title "Install wizard" \
     --no-collapse \
-    --msgbox "$error" 0 0
+    --msgbox "$error" "$HEIGHT" "$WIDTH"
   exit
 }
 
@@ -24,7 +23,7 @@ function install_arch() {
 
   dialog --title "Install wizard" \
     --no-collapse \
-    --msgbox "Installing arch" 3 30
+    --msgbox "Installing arch" "$HEIGHT" "$WIDTH"
   msg=$(
     git clone --quiet https://github.com/vladdoster/system-bootstrap 2>&1 1> /dev/null &&
       cp --recursive ./system-bootstrap/* $(pwd) 2>&1 1> /dev/null &&
@@ -32,46 +31,68 @@ function install_arch() {
       chmod +x *.sh 2>&1 1> /dev/null
   )
   [[ -n $msg ]] && catch $msg
+  dialog --title "$TITLE" --yesno "Install Arch Linux?" "$HEIGHT" "$WIDTH"
+
+  response=$?
+  case $response in
+    0) (./arch-installer.sh) ;;
+    1) return ;;
+  esac
 }
 
 function install_dotfiles() {
   echo "Installing dotfiles"
 }
 
+################################
+#        Install script        #
+################################
+# --- Require root user --- #
+if [ "$(id -u)" != "0" ]; then
+  echo "This script requires it be run as root"
+  exit 1
+fi
+
+# --- Install dependencies --- #
+sudo pacman --quiet --noconfirm -S "$WIZARD_DEPENDENCIES" > /dev/null 2>&1
+
 # --- Main menu of install wizard --- #
-exec 3>&1
-selection=$(dialog \
-  --backtitle "System bootstrap" \
-  --title "System boostrap" \
-  --clear \
-  --cancel-label "Exit" \
-  --menu "Please select:" $HEIGHT $WIDTH 4 \
-  "1" "Install Arch Linux" \
-  "2" "Install dotfiles" \
-  2>&1 1>&3)
-exit_status=$?
-exec 3>&-
-case $exit_status in
-  $DIALOG_CANCEL)
-    clear
-    echo "Program terminated."
-    exit
-    ;;
-  $DIALOG_ESC)
-    clear
-    echo "Program aborted." >&2
-    exit 1
-    ;;
-esac
-case $selection in
-  0)
-    clear
-    echo "Program terminated."
-    ;;
-  1)
-    install_arch
-    ;;
-  2)
-    install_dotfiles
-    ;;
-esac
+
+while true; do
+  exec 3>&1
+  selection=$(dialog \
+    --backtitle "$TITLE" \
+    --title "$TITLE" \
+    --clear \
+    --cancel-label "Exit" \
+    --menu "Please select:" $HEIGHT $WIDTH 4 \
+    "1" "Install Arch Linux" \
+    "2" "Install dotfiles" \
+    2>&1 1>&3)
+  exit_status=$?
+  exec 3>&-
+  case $exit_status in
+    $DIALOG_CANCEL)
+      clear
+      echo "Program terminated."
+      exit
+      ;;
+    $DIALOG_ESC)
+      clear
+      echo "Program aborted." >&2
+      exit 1
+      ;;
+  esac
+  case $selection in
+    0)
+      clear
+      echo "Program terminated."
+      ;;
+    1)
+      install_arch
+      ;;
+    2)
+      install_dotfiles
+      ;;
+  esac
+done
