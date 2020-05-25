@@ -65,7 +65,7 @@ while true; do
     --title "$TITLE" \
     --clear \
     --cancel-label "Exit" \
-    --menu "Please select:" $HEIGHT $WIDTH 4 \
+    --menu "Please select:" 15 $WIDTH 4 \
     "1" "Install Arch Linux" \
     "2" "Install dotfiles" \
     2>&1 1>&3)
