@@ -57,8 +57,8 @@ drive="/dev/${partition_prefix}"
 dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
 
 # -- Set fast Pacman mirrors -- #
-dialog --title "Arch install" --infobox "Updating pacman mirrors..." 3 50
-reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+# dialog --title "Arch install" --infobox "Updating pacman mirrors..." 3 50
+# reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 # -- Get hostname -- #
 dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
@@ -91,11 +91,11 @@ dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\n
 
 # -- Clear cruft partitions and make GPT partition table -- #
 dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
-for i in {1..4}
-do
-   echo "${drive}${i}"
-   umount --force ${drive}${i} >/dev/null 2>&1
-done
+# for i in {1..4}
+# do
+#    echo "${drive}${i}"
+#    umount --force ${drive}${i} >/dev/null 2>&1
+# done
 swapoff -a >/dev/null 2>&1
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
   o # clear the in memory partition table
@@ -153,13 +153,15 @@ mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
+# >/dev/null 2>&1
+
 # -- Refresh Arch keyring -- #
 dialog --title "Arch install" --infobox "Refreshing archlinux-keyring" 3 50
-pacman -Sy --noconfirm archlinux-keyring >/dev/null 2>&1
+pacman -Sy --noconfirm archlinux-keyring 
 
 # -- Install Arch -- #
 dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 3 50
-pacstrap /mnt base base-devel linux linux-headers linux-firmware >/dev/null 2>&1
+pacstrap /mnt base base-devel linux linux-headers linux-firmware
 
 # -- Generate FSTAB -- #
 genfstab -U /mnt >> /mnt/etc/fstab
