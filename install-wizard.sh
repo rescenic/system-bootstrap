@@ -57,7 +57,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # --- Install dependencies --- #
-sudo pacman --quiet --noconfirm -S dialog git 2>&1 1> /dev/null
+dialog \
+  --title "$TITLE" \
+  --infobox "Please wait" 0 0
+sudo pacman --quiet --noconfirm -Sy dialog git 2>&1 1> /dev/null
 
 # --- Main menu --- #
 while true; do
