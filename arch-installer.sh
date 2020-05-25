@@ -36,24 +36,8 @@ dialog \
 ################################
 
 # -- Set drive to install on -- #
-# drives=()
-# drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
-# echo "$drives"
-# rm --force "$INPUT"
-
-# INPUT=/tmp/drive.sh.$$
-# drives=()
-# drives+=($(lsblk -d -o name | tail -n +2 | awk '{print "$1"}'))
-# #mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print NR" "$1}')
-# # echo "$drives"
-
-# dialog --menu "Select an installation drive " 0 0 0 "${drives[@]}" 2>"${INPUT}"
-# drive=$(<"${INPUT}")
-
 drives=()
-drive=""
 drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
-#mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print ""$1}')
 selection=$(dialog \
   --menu "Please select:" 0 0 0 \
   "${drives[@]}" 2>&1 > /dev/tty)
