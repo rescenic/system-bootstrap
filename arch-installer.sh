@@ -42,7 +42,7 @@ selection=$(dialog \
   --menu "Please select:" 0 0 0 \
   "${drives[@]}" 2>&1 > /dev/tty)
 
-drive=${drives[$selection]}
+drive=${drives["$selection"]}
 
 # -- Confirm drive choice -- #
 dialog --defaultno --title "Installation drive" --yesno "Install Arch on: /dev/${drive}"  6 50 || exit
