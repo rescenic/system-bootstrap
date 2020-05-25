@@ -43,7 +43,7 @@ rm --force "$INPUT"
 
 INPUT=/tmp/drive.sh.$$
 drives=()
-drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
+drives+=($(lsblk -d -o name | tail -n +2 | awk '{print $1}'))
 #mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print NR" "$1}')
 # echo "$drives"
 
