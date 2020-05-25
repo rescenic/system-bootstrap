@@ -24,8 +24,8 @@ dialog \
   --title "$TITLE" \
   --infobox "Doing preliminary checks..." 0 0
   msg=$(
-      ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3`
-      pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1 &&
+      ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) &&
+      pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
   )
 [[ -n $msg ]] && catch $msg  
 # ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
