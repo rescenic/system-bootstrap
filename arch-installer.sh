@@ -36,11 +36,17 @@ dialog \
 ################################
 
 # -- Set drive to install on -- #
+# drives=()
+# drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
+# echo "$drives" 
 drives=()
 drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
-echo "$drives" 
-dialog --title "Arch install" --infobox "$drives..." 10 50
-sleep 30
+#mapfile -t drives < <(lsblk -d -o name | tail -n +2 | awk '{print NR" "$1}')
+echo "$drives"
+
+dialog --menu "Select a drive " 0 0 0 "${drives[@]}"
+# dialog --title "Arch install" --infobox "$drives..." 10 50
+# sleep 30
 dialog \
   --title "Drive selection" \
   --menu "Select one of the following drives to install Arch on" 0 0 0 \
