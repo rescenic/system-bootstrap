@@ -21,9 +21,7 @@ catch() {
 # --- Different options --- #
 function install_arch() {
 
-  dialog --title "Install wizard" \
-    --no-collapse \
-    --msgbox "Installing arch" "$HEIGHT" "$WIDTH"
+  dialog --infobox "Please wait" 10 30
   msg=$(
     git clone --quiet https://github.com/vladdoster/system-bootstrap 2>&1 1> /dev/null &&
       cp --recursive ./system-bootstrap/* $(pwd) 2>&1 1> /dev/null &&
@@ -31,7 +29,9 @@ function install_arch() {
       chmod +x *.sh 2>&1 1> /dev/null
   )
   [[ -n $msg ]] && catch $msg
-  dialog --title "$TITLE" --yesno "Install Arch Linux?" "$HEIGHT" "$WIDTH"
+  dialog \
+	--title "$TITLE" \
+	--yesno "Install Arch Linux?" 6 50
 
   response=$?
   case $response in
