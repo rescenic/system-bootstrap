@@ -58,7 +58,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # --- Install dependencies --- #
-sudo pacman --quiet --noconfirm -S "$WIZARD_DEPENDENCIES" > /dev/null 2>&1
+sudo pacman --quiet --noconfirm -S "$WIZARD_DEPENDENCIES" 2>&1 1> /dev/null
 
 # --- Main menu --- #
 while true; do
