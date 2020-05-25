@@ -32,16 +32,14 @@ function install_arch() {
       chmod +x *.sh 2>&1 1> /dev/null
   )
   [[ -n $msg ]] && catch $msg
-  echo "Run "sudo bash ./arch-installer.sh"
-  exit
-#   dialog \
-#     --title "$TITLE" \
-#     --yesno "Install Arch Linux?" 0 0
-#   response=$?
-#   case $response in
-#     0) (./arch-installer.sh) ;;
-#     1) return ;;
-#   esac
+   dialog \
+     --title "$TITLE" \
+     --yesno "Install Arch Linux?" 0 0
+   response=$?
+   case $response in
+     0) ./arch-installer.sh ;;
+     1) return ;;
+   esac
 }
 
 function install_dotfiles() {
