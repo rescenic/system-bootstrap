@@ -16,7 +16,7 @@ catch() {
     --backtitle "$TITLE" \
     --title "$TITLE Error" \
     --no-collapse \
-    --msgbox "$error" "$HEIGHT" "$WIDTH"
+    --msgbox "$error" 0 0
   exit
 }
 
@@ -25,7 +25,7 @@ function install_arch() {
 
   dialog \
     --title "$TITLE" \
-    --infobox "Please wait" 10 30
+    --infobox "Please wait" 0 0
     
   msg=$(
       rm --recursive ./system-bootstrap/ 2>&1 1> /dev/null &&
@@ -38,7 +38,7 @@ function install_arch() {
   
   dialog \
     --title "$TITLE" \
-    --yesno "Install Arch Linux?" 6 50
+    --yesno "Install Arch Linux?" 0 0
   response=$?
   case $response in
     0) (./arch-installer.sh) ;;
