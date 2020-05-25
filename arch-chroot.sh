@@ -28,12 +28,12 @@ drive="$1"
 bootloader_partition="$2"
 UUID=$(blkid -s PARTUUID -o value "$drive"3)
 
-dialog --title "Arch chroot" --yesno "Install bootloader on ${bootloader_partition} with UUID ${UUID}?" 5 50 && echo "ok"
+dialog --title "Arch chroot" --yesno "Install bootloader on ${bootloader_partition} with UUID ${UUID}?" 0 0 && echo "ok"
 
 # dialog --title "Dotfile installer" --infobox "Updating pacman mirrors." 3 70
 # reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 
-dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition} with UUID ${UUID}" 3 50
+dialog --title "Dotfile installer" --infobox "Installing bootloader on ${bootloader_partition} with UUID ${UUID}" 0 0
 bootctl install || echo "Bootctl seemed to hit a snag..."
 echo title Arch Linux >> /boot/loader/entries/arch.conf
 echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
