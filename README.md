@@ -1,4 +1,4 @@
-## Personal system installer
+## ***Personal system installer***
 
 Install Arch Linux and/or dotfiles
 
