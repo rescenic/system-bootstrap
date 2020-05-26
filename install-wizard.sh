@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# --- Variables --- #
+# --- Dialog variables --- #
 DIALOG_CANCEL=1
 DIALOG_ESC=255
 TITLE="Install Wizard"
@@ -31,27 +31,14 @@ download_installer() {
 }
 
 # --- Different options --- #
-function install_arch() {
-   download_installer arch
+function install() {
+   download_installer ${1}
    dialog \
      --title "$TITLE" \
-     --yesno "Install Arch Linux?" 0 0
+     --yesno "Install ${1}?" 0 0
    response=$?
    case $response in
-     0) ./arch-installer.sh ;;
-     1) return ;;
-   esac
-}
-
-function install_dotfiles() { 
-  download_installer dotfile
-  [[ -n $msg ]] && catch $msg
-   dialog \
-     --title "$TITLE" \
-     --yesno "Install dotfiles?" 0 0
-   response=$?
-   case $response in
-     0) ./dotfile-installer.sh ;;
+     0) ./${1}-installer.sh ;;
      1) return ;;
    esac
 }
@@ -64,12 +51,6 @@ if [ "$(id -u)" != "0" ]; then
   echo "This script requires it be run as root"
   exit 1
 fi
-
-# --- Install dependencies --- #
-dialog \
-  --title "$TITLE" \
-  --infobox "Please wait" 0 0
-sudo pacman --quiet --noconfirm -Sy dialog git 2>&1 1> /dev/null
 
 # --- Main menu --- #
 while true; do
@@ -103,10 +84,10 @@ while true; do
       echo "Program terminated."
       ;;
     1)
-      install_arch
+      install arch
       ;;
     2)
-      install_dotfiles
+      install dotfiles
       ;;
   esac
 done
