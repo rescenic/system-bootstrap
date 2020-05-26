@@ -84,7 +84,7 @@ gitmakeinstall() { \
 }
 
 installationloop() { \
-	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
+	([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user-programs-file" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
 	total=$(wc -l < /tmp/programs.csv)
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
@@ -96,7 +96,7 @@ installationloop() { \
 			"P") pipinstall "$program" "$comment" ;;
 			*) maininstall "$program" "$comment" ;;
 		esac
-	done < /tmp/programs.csv
+	done < /tmp/programs.csv;
 }
 	
 installnvimplugins(){ \
