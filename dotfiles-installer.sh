@@ -84,8 +84,8 @@ gitmakeinstall() { \
 }
 
 installationloop() { \
-	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
-	total=$(wc -l < "/tmp/${user_programs_filee}")
+	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/${user_programs_file}) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
+	total=$(wc -l < "/tmp/${user_programs_file}")
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
 		n=$((n+1))
@@ -193,69 +193,92 @@ welcomemsg() { \
 	dialog --title "Welcome!" --msgbox "Welcome to bootstrapping script!\\n\\nThis script will automatically install a fully-featured Arch Linux desktop." 0 0
 }
 
-#--- SCRIPT LOGIC ---#
-# Check if user is root on Arch distro. Install dialog.
+# --- SCRIPT LOGIC --- #
+# --- Check if user is root on Arch distro --- #
 installpkg dialog ||  error "Are you sure you're running this as the root user and have an internet connection?"
-# Welcome user and pick dotfiles.
+
+# --- Welcome user and pick dotfiles --- #
 welcomemsg || error "User exited."
-# Get and verify username and password.
+
+# --- Get and verify username and password --- #
 getuserandpass || error "User exited."
-# Give warning if user already exists.
+
+# --- Give warning if user already exists --- #
 usercheck || error "User exited."
-# Last chance for user to back out before install.
+
+# --- Last chance for user to back out before install. --- #
 preinstallmsg || error "User exited."
-# Add user
+
+# --- Add user --- #
 adduserandpass || error "Error adding username and/or password."
-# Refresh Arch keyrings.
+
+# --- Refresh Arch keyrings. --- #
 refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
-# Get fast mirrors
+
+# --- Get fast mirrors --- #
 run_reflector
-# Required packages for smooth install
+
+# --- Required packages for smooth install --- #
 dialog --title "Dotfile installer" --infobox "Installing \`basedevel\` and \`git\` for installing other software." 0 0
 installpkg curl
 installpkg base-devel
 installpkg git
 installpkg ntp
-# Synchronize NTP servers
+
+# --- Synchronize NTP servers --- #
 dialog --title "Dotfile installer" --infobox "Synchronizing system time to ensure successful and secure installation of software..." 0 0
 ntp 0.us.pool.ntp.org >/dev/null 2>&1
 [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
-# Allow user to run sudo without password. AUR programs require a fakeroot environment
+
+# --- AUR programs require a fakeroot environment --- #
 newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
-# Make pacman/yay colorful and add eye candy on the progress bar
+
+# --- Make pacman/yay colorful and add eye candy on the progress bar --- #
 grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
 grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-# Use all cores for compilation
+
+# --- Utilize all cores for compilation --- #
 sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 manualinstall $aur_helper || error "Failed to install AUR helper."
-# The command that does all the installing. 
-# Reads programs.csv file and installs each program given tag.
+
+# --- Reads programs.csv file and installs each program given tag. --- #
 installationloop
-# Install libxft-bgra for color emojis
+
+# --- Install libxft-bgra for color emojis --- #
 dialog --title "Dotfile installer" --infobox "Finally, installing \`libxft-bgra\` to enable color emoji in suckless software without crashes." 5 70
 yes | sudo -u "$name" $aur_helper -S libxft-bgra >/dev/null 2>&1
-# Install dotfiles in home directory
+
+# --- Install dotfiles in home directory --- #
 putgitrepo "$dotfiles_repo" "/home/$name" "$repo_branch"
-# Remove dotfiles git repo cruft
+
+# --- Remove dotfiles git repo cruft --- #
 rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
-# Get rid of system beep
+
+# --- Get rid of system beep --- #
 systembeepoff || error "Couldnt turn off system beep, erghh!"
-# Make github folder and misc
+
+# --- Make github folder and misc. --- #
 makedirectories || error "Couldnt make github or downloads dir."
-# Docker shenanigans
+
+# --- Docker shenanigans --- #
 enabledocker || error "Couldnt enable docker."
-# Vim shenanigans
+
+# --- Vim shenanigans --- #
 installnvimplugins || error "Couldnt install nvim plugins"
-# Start audio daemon
+
+# --- Start audio daemon --- #
 killall pulseaudio; sudo -n "${name}" pulseaudio --start --daemonize=yes
-# Zsh is default shell
+
+# --- Zsh is default shell --- #
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
-# This line, overwriting the `newperms` command above will allow me to run
-# serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
+
+# --- Overwrite `newperms` command allows user to execute `shutdown`, `reboot`, updating, etc. without a password  --- #
 newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
-# Check which programs arent present programs.csv
+
+# --- Check which programs arent present programs.csv --- #
 unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
-# Install complete!
+
+# --- Install complete  --- #
 finalize
 clear
