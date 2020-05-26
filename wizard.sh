@@ -18,7 +18,7 @@ catch() {
 }
 
 # --- Downloads installers --- #
-download_installer() {
+function download_installer() {
   dialog \
       --title "$TITLE" \
       --infobox "Please wait" 0 0
