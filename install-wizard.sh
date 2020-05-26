@@ -39,7 +39,7 @@ function install() {
    response=$?
    echo ${1}
    case $response in
-     0) ./${1}-installer.sh ;;
+     0) sudo ./${1}-installer.sh ;;
      1) return ;;
    esac
 }
