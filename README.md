@@ -17,7 +17,7 @@ An everyday desktop evironment geared towards **productivity**,  **software deve
 
 ### Installation:
 
-cURL install wizard:
+**cURL the wizard**:
 ```bash
 $ curl -LO files.vdoster.com/install-wizard.sh
 $ sudo bash ./install-wizard.sh
