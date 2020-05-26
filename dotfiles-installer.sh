@@ -111,7 +111,7 @@ maininstall() { \
 	# Installs all needed programs from main repo.
 	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total). $1 $2" 0 0
 	installpkg "$1"
-;}
+}
 
 makedirectories() { \
 	mkdir -p /home/"${name}"/github
