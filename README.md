@@ -29,13 +29,12 @@ Parses the given programs list and installs them.
 
 The first column is a "tag" that determines how the program is installed.
 
-" " -> Packages in main repository.
 
-`A` -> Packages contained in the AUR.
+- " " -> Packages in main repository.
+- `A` -> Packages contained in the AUR.
+- `G` -> Git repositories installed by `make && sudo make install`.
+- `P` -> Python packages installed via `pip`.
 
-`G` -> Git repositories installed by `make && sudo make install`.
-
-`P` -> Python packages installed via `pip`.
 
 #### Check which programs arent installed:
 
