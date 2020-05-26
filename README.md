@@ -26,15 +26,14 @@ $ curl -LO files.vdoster.com/install-wizard.sh; sudo bash ./install-wizard.sh
 
 #### `programs.csv` list
 
-Parses the given programs list and install all given programs.
-Can handle:
-    - AUR packages
-    - Python via pip
-    - Git repos
+Parses the given programs list and installs them.
 
-The first column is a "tag" that determines how the program is installed, ""
-(blank) for the main repository, `A` for via the AUR or `G` if the program is a
-git repository that is meant to be `make && sudo make install`ed.
+The first column is a "tag" that determines how the program is installed.
+
+"" (blank) for the main repository
+`A` - Packages contained in the AUR.
+`G` - Git repositories installed by `make && sudo make install`.
+`P` - Python packages installed via `pip`.
 
 #### Check which programs arent installed:
 
