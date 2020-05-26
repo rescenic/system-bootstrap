@@ -38,7 +38,6 @@ function install() {
      --yesno "Install ${1}?" 0 0
    response=$?
    echo ${1}
-   sleep 60
    case $response in
      0) ./${1}-installer.sh ;;
      1) return ;;
