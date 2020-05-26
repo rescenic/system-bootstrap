@@ -9,13 +9,13 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 	h) printf "Optional arguments for custom use:\\n  -r: Dotfiles repository (local file or url)\\n  -p: Dependencies and programs csv (local file or url)\\n  -a: AUR helper (must have pacman-like syntax)\\n  -h: Show this message\\n" && exit ;;
 	r) dotfilesrepo=${OPTARG} && git ls-remote "$dotfilesrepo" || exit ;;
 	b) repobranch=${OPTARG} ;;
-	p) progsfile=${OPTARG} ;;
+	p) user-programs-file=${OPTARG} ;;
 	a) aurhelper=${OPTARG} ;;
 	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit ;;
 esac done
 
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git"
-[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-user-programs.csv"
+[ -z "$user-programs-file" ] && user-programs-file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-user-programs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
@@ -78,11 +78,12 @@ gitmakeinstall() { \
 	cd "$dir" || exit
 	make >/dev/null 2>&1
 	make install >/dev/null 2>&1
-	cd /tmp || return ;}
+	cd /tmp || return 
+;}
 
 installationloop() { \
-	([ -f "$progsfile" ] && cp "$progsfile" /tmp/programs.csv) || curl -Ls "$progsfile" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
-	total=$(wc -l < /tmp/programs.csv)
+	([ -f "$user-programs-file" ] && cp "${user-programs-file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
+	total=$(wc -l < "/tmp/${user-programs-file}")
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
 		n=$((n+1))
@@ -93,7 +94,7 @@ installationloop() { \
 			"P") pipinstall "$program" "$comment" ;;
 			*) maininstall "$program" "$comment" ;;
 		esac
-	done < /tmp/programs.csv 
+	done < "/tmp/${user-programs-file}"
 ;}
 	
 installnvimplugins(){ \
@@ -131,17 +132,18 @@ manualinstall() { \
 newperms() { \
 	# Set special sudoers settings for install (or after).
 	sed -i "/#dotfile-installer/d" /etc/sudoers
-	echo "$* #dotfile-installer" >> /etc/sudoers ;}
+	echo "$* #dotfile-installer" >> /etc/sudoers 
+;}
 
 pipinstall() { \
 	dialog --title "Dotfile installer" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 0 0
 	command -v pip || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
-	}
+;}
 
 preinstallmsg() { \
 	dialog --title "Let's get this party started!" --yes-label "Let's go!" --no-label "No, nevermind!" --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 0 0 || { clear; exit; }
-	}
+;}
 
 putgitrepo() { \
 	# Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
@@ -152,7 +154,7 @@ putgitrepo() { \
 	chown -R "$name":wheel "$dir" "$2"
 	sudo -u "$name" git clone -b "$branch" --depth 1 "$1" "$dir" >/dev/null 2>&1
 	sudo -u "$name" cp -rfT "$dir" "$2"
-	}
+;}
 
 refreshkeys() { \
 	dialog --title "Dotfile installer" --infobox "Refreshing Arch Keyring..." 0 0
@@ -251,7 +253,7 @@ sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
 # Check which programs arent present programs.csv
-unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s $progsfile | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
+unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s ${user-programs-file} | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
 # Install complete!
 finalize
 clear
