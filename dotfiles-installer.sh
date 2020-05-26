@@ -84,8 +84,8 @@ gitmakeinstall() { \
 }
 
 installationloop() { \
-	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/${user_programs_file}) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
-	total=$(wc -l < "/tmp/${user_programs_file}")
+	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
+	total=$(wc -l < /tmp/programs.csv)
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
 		n=$((n+1))
@@ -96,7 +96,7 @@ installationloop() { \
 			"P") pipinstall "$program" "$comment" ;;
 			*) maininstall "$program" "$comment" ;;
 		esac
-	done < "/tmp/${user_programs_file}"
+	done < /tmp/programs.csv
 }
 	
 installnvimplugins(){ \
@@ -193,7 +193,9 @@ welcomemsg() { \
 	dialog --title "Welcome!" --msgbox "Welcome to bootstrapping script!\\n\\nThis script will automatically install a fully-featured Arch Linux desktop." 0 0
 }
 
-# --- SCRIPT LOGIC --- #
+################################
+#        Install script        #
+################################
 # --- Check if user is root on Arch distro --- #
 installpkg dialog ||  error "Are you sure you're running this as the root user and have an internet connection?"
 
@@ -269,7 +271,7 @@ installnvimplugins || error "Couldnt install nvim plugins"
 # --- Start audio daemon --- #
 killall pulseaudio; sudo -n "${name}" pulseaudio --start --daemonize=yes
 
-# --- Zsh is default shell --- #
+# --- Set Zsh as default shell --- #
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 
 # --- Overwrite `newperms` command allows user to execute `shutdown`, `reboot`, updating, etc. without a password  --- #
