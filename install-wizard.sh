@@ -25,10 +25,7 @@ function install_arch() {
     --infobox "Please wait" 0 0
     
   msg=$(
-      rm --force --recursive ./system-bootstrap/ 2>&1 1> /dev/null &&
-      git clone --quiet https://github.com/vladdoster/system-bootstrap 2>&1 1> /dev/null &&
-      cp --recursive ./system-bootstrap/* $(pwd) 2>&1 1> /dev/null &&
-      rm --recursive ./system-bootstrap/ LICENSE README.md 2>&1 1> /dev/null &&
+      curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-installer.sh
       chmod +x *.sh 2>&1 1> /dev/null
   )
   [[ -n $msg ]] && catch $msg
