@@ -4,8 +4,6 @@ Install Arch Linux and/or dotfiles
 
 An everyday desktop evironment geared towards **productivity**,  **software development**,  **low resource usage**, and **reproducibility**.
 
-
-
 ### Included:
 
 1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
@@ -25,13 +23,13 @@ $ curl -LO files.vdoster.com/install-wizard.sh
 $ sudo bash ./install-wizard.sh
 ```
 
-#### `programs.csv` list
+#### `user-programs.csv` list
 
 Parses the given programs list and installs them.
 
 The first column is a "tag" that determines how the program is installed.
 
-"" (blank) for the main repository
+" " - Packages in main repository.
 `A` - Packages contained in the AUR.
 `G` - Git repositories installed by `make && sudo make install`.
 `P` - Python packages installed via `pip`.
@@ -39,7 +37,7 @@ The first column is a "tag" that determines how the program is installed.
 #### Check which programs arent installed:
 
 ```bash
-$ programs="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/programs.csv"
+$ programs="https://raw.githubusercontent.com/vladdoster/dotfile-installer/master/user-programs.csv"
 $ printf "\n" && echo "$(curl -s "$programs" | sed '/^#/d')" | \
   while IFS=, read -r tag program comment; do
    if [[ $tag == 'G' ]]; then
