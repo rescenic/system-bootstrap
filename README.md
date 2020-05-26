@@ -2,7 +2,7 @@
 
 Install Arch Linux and/or dotfiles
 
-An everyday desktop evironment geared towards **productivity** ,  **development** ,  **low resource usage**, and **reproducibility**.
+An everyday desktop evironment geared towards **productivity**,  **software development**,  **low resource usage**, and **reproducibility**.
 
 
 
