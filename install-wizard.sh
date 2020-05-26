@@ -39,8 +39,24 @@ function install_arch() {
    esac
 }
 
-function install_dotfiles() {
-  echo "Installing dotfiles"
+function install_dotfiles() { 
+  dialog \
+    --title "$TITLE" \
+    --infobox "Please wait" 0 0
+    
+  msg=$(
+      curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-installer.sh
+      chmod +x *.sh 2>&1 1> /dev/null
+  )
+  [[ -n $msg ]] && catch $msg
+   dialog \
+     --title "$TITLE" \
+     --yesno "Install Arch Linux?" 0 0
+   response=$?
+   case $response in
+     0) ./dotfile-installer.sh ;;
+     1) return ;;
+   esac
 }
 
 ################################
