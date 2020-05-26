@@ -180,7 +180,7 @@ run_reflector(){ \
 
 systembeepoff() { \
 	dialog --title "Dotfile installer" --infobox "Getting rid of that retarded error beep sound..." 0 0
-	rmmod pcspkr
+	rmmod pcspkr || dialog --title "Dotfile installer" --infobox "pcspkr module not loaded, skipping..." 0 0
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf 
 }
 
