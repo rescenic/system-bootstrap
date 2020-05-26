@@ -7,17 +7,17 @@
 
 while getopts ":a:r:b:p:h" o; do case "${o}" in
 	h) printf "Optional arguments for custom use:\\n  -r: Dotfiles repository (local file or url)\\n  -p: Dependencies and programs csv (local file or url)\\n  -a: AUR helper (must have pacman-like syntax)\\n  -h: Show this message\\n" && exit ;;
-	r) dotfilesrepo=${OPTARG} && git ls-remote "$dotfilesrepo" || exit ;;
-	b) repobranch=${OPTARG} ;;
-	p) user-programs-file=${OPTARG} ;;
-	a) aurhelper=${OPTARG} ;;
+	r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
+	b) repo_branch=${OPTARG} ;;
+	p) user_programs_file=${OPTARG} ;;
+	a) aur_helper=${OPTARG} ;;
 	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit ;;
 esac done
 
-[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/vladdoster/dotfiles.git"
-[ -z "$user-programs-file" ] && user-programs-file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfile-user-programs.csv"
-[ -z "$aurhelper" ] && aurhelper="yay"
-[ -z "$repobranch" ] && repobranch="master"
+[ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
+[ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-user-programs.csv"
+[ -z "$aur_helper" ] && aur_helper="yay"
+[ -z "$repo_branch" ] && repo_branch="master"
 
 # Read in types of packages in programs.csv
 grepseq="\"^[PGA]*,\""
@@ -36,7 +36,7 @@ adduserandpass() { \
 aurinstall() { \
 	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total) from the AUR. $1 $2" 0 0
 	echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
-	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
+	sudo -u "$name" $aur_helper -S --noconfirm "$1" >/dev/null 2>&1
 ;}
 	
 enabledocker() { \
@@ -82,8 +82,8 @@ gitmakeinstall() { \
 ;}
 
 installationloop() { \
-	([ -f "$user-programs-file" ] && cp "${user-programs-file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
-	total=$(wc -l < "/tmp/${user-programs-file}")
+	([ -f "$user_programs_file" ] && cp "${user_programs_file}" /tmp/programs.csv) || curl -Ls "${user-programs-file}" | sed '/^#/d' | eval grep "$grepseq" > "/tmp/${user-programs-file}"
+	total=$(wc -l < "/tmp/${user_programs_filee}")
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
 		n=$((n+1))
@@ -94,7 +94,7 @@ installationloop() { \
 			"P") pipinstall "$program" "$comment" ;;
 			*) maininstall "$program" "$comment" ;;
 		esac
-	done < "/tmp/${user-programs-file}"
+	done < "/tmp/${user_programs_file}"
 ;}
 	
 installnvimplugins(){ \
@@ -112,8 +112,8 @@ maininstall() { \
 ;}
 
 makedirectories() { \
-	mkdir -p /home/"$name"/github
-	mkdir -p /home/"$name"/downloads
+	mkdir -p /home/"${name}"/github
+	mkdir -p /home/"${name}"/downloads
 ;}
 
 manualinstall() { \
@@ -148,7 +148,7 @@ preinstallmsg() { \
 putgitrepo() { \
 	# Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
 	dialog --title "Dotfile installer" --infobox "Downloading and installing config files..." 0 0
-	[ -z "$3" ] && branch="master" || branch="$repobranch"
+	[ -z "$3" ] && branch="master" || branch="$repo_branch"
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2"
 	chown -R "$name":wheel "$dir" "$2"
@@ -225,15 +225,15 @@ grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pac
 grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
 # Use all cores for compilation
 sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
-manualinstall $aurhelper || error "Failed to install AUR helper."
+manualinstall $aur_helper || error "Failed to install AUR helper."
 # The command that does all the installing. 
 # Reads programs.csv file and installs each program given tag.
 installationloop
 # Install libxft-bgra for color emojis
 dialog --title "Dotfile installer" --infobox "Finally, installing \`libxft-bgra\` to enable color emoji in suckless software without crashes." 5 70
-yes | sudo -u "$name" $aurhelper -S libxft-bgra >/dev/null 2>&1
+yes | sudo -u "$name" $aur_helper -S libxft-bgra >/dev/null 2>&1
 # Install dotfiles in home directory
-putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
+putgitrepo "$dotfiles_repo" "/home/$name" "$repo_branch"
 # Remove dotfiles git repo cruft
 rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
 # Get rid of system beep
@@ -245,7 +245,7 @@ enabledocker || error "Couldnt enable docker."
 # Vim shenanigans
 installnvimplugins || error "Couldnt install nvim plugins"
 # Start audio daemon
-killall pulseaudio; sudo -n "$name" pulseaudio --start --daemonize=yes
+killall pulseaudio; sudo -n "${name}" pulseaudio --start --daemonize=yes
 # Zsh is default shell
 sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 # This line, overwriting the `newperms` command above will allow me to run
@@ -253,7 +253,7 @@ sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 newperms "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
 # Check which programs arent present programs.csv
-unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s ${user-programs-file} | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
+unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
 # Install complete!
 finalize
 clear
