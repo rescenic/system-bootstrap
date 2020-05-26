@@ -168,7 +168,7 @@ run_reflector(){ \
 	response=$?
 	case $response in
    	0) 
-     	  dialog --title "Dotfile installer" --infobox "Running reflector..." 4 40
+     	  dialog --title "Dotfile installer" --infobox "Running reflector..." 0 0
      	  installpkg reflector
      	  reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
      	  ;;
