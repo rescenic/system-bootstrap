@@ -84,7 +84,7 @@ gitmakeinstall() { \
 }
 
 installationloop() { \
-	([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user-programs-file" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
+	([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
 	total=$(wc -l < /tmp/programs.csv)
 	aurinstalled=$(pacman -Qqm)
 	while IFS=, read -r tag program comment; do
