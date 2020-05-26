@@ -34,7 +34,7 @@ adduserandpass() { \
 }
 
 aurinstall() { \
-	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total) from the AUR. $1 $2" 0 0
+	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" 0 0
 	echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
 	sudo -u "$name" $aur_helper -S --noconfirm "$1" >/dev/null 2>&1
 }
@@ -75,7 +75,7 @@ getuserandpass() { \
 gitmakeinstall() { \
 	progname="$(basename "$1")"
 	dir="$repodir/$progname"
-	dialog --title "Dotfile installer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 0 0
+	dialog --title "Dotfile installer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" 0 0
 	sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
 	cd "$dir" || exit
 	make >/dev/null 2>&1
@@ -109,7 +109,7 @@ installpkg(){
 
 maininstall() { \
 	# Installs all needed programs from main repo.
-	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total). $1 $2" 0 0
+	dialog --title "Dotfile installer" --infobox "Installing \`$1\` ($n of $total).\n$1 $2" 0 0
 	installpkg "$1"
 }
 
@@ -138,7 +138,7 @@ newperms() { \
 }
 
 pipinstall() { \
-	dialog --title "Dotfile installer" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 0 0
+	dialog --title "Dotfile installer" --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" 0 0
 	command -v pip || installpkg python-pip >/dev/null 2>&1
 	yes | pip install "$1"
 }
