@@ -39,14 +39,14 @@ confirm_install() { \
 	dialog --title "DON'T BE A BRAINLET!" \
        --defaultno \
        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
-       9 50 || exit
+       0 0 || exit
 }
 
 confirm_partition_sizes() { \
     dialog --defaultno \
            --title "System information" \
            --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
-           8 30 || exit
+           0 0 || exit
 }
 
 create_partitions() { \
@@ -115,7 +115,7 @@ generate_fstab() { \
 get_hostname() { \
     dialog --no-cancel \
            --inputbox "Enter a name for your computer." \
-           7 50 \
+           0 0 \
            2> comp
     hostname=$(cat comp)
 }
@@ -137,7 +137,7 @@ get_timezone() { \
     dialog --defaultno \
            --title "Arch install" \
            --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  \
-           10 50 && \
+           0 0 && \
            echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 }
 
@@ -208,7 +208,7 @@ select_install_drive() { \
     dialog --defaultno \
            --title "Arch install" \
            --yesno "Install Arch on: /dev/${drive}" \
-           6 50 || exit
+           0 0 || exit
     partition_prefix=$drive
     if [[ "$drive" =~ ^nvme ]]; then
         echo "Need to add p for nvme drive partitions"
