@@ -8,7 +8,8 @@ catch() {
     --backtitle "$TITLE" \
     --title "$TITLE Error" \
     --no-collapse \
-    --msgbox "$error" 0 0
+    --msgbox "$error" \
+    0 0
   exit
 }
 
@@ -45,7 +46,10 @@ selection=$(dialog \
 drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
 
 # -- Confirm drive choice -- #
-dialog --defaultno --title "Installation drive" --yesno "Install Arch on: /dev/${drive}"  6 50 || exit
+dialog --defaultno \
+       --title "Installation drive" \
+       --yesno "Install Arch on: /dev/${drive}" \
+       6 50 || exit
 partition_prefix=$drive
 if [[ "$drive" =~ ^nvme ]]; then
     echo "Need to add p for nvme drive partitions"
@@ -54,11 +58,16 @@ fi
 drive="/dev/${partition_prefix}"
 
 # -- Confirm drive choice again -- #
-dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch install script for chads.\nOnly run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." 9 50 || exit
+dialog --defaultno \
+       --title "DON'T BE A BRAINLET!" \
+       --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
+       9 50 || exit
 
-# -- Set fast Pacman mirrors -- #
-# dialog --title "Arch install" --infobox "Updating pacman mirrors..." 3 50
-# reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+# -- Set Pacman mirrors -- #
+dialog --title "Arch install" \
+       --infobox "Updating pacman mirrors..." \
+       0 0
+reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 # -- Get hostname -- #
 dialog --no-cancel \
