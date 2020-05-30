@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pacman --noconfirm --needed -S dialog intel-ucode reflector networkmanager 
+pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager 
 
 if [ $# -ne 2 ]; then
     dialog --title "BOOMER BRAINLET" \
