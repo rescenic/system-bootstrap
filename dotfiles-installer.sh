@@ -7,26 +7,6 @@
 # License: GNU GPLv3                                    #
 # ----------------------------------------------------- #
 
-while getopts ":a:r:b:p:h" o; do case "${o}" in
-  h) printf 'Optional arguments for custom use:\n  -r: Dotfiles repository (local file or url)\n  -p: Dependencies and programs csv (local file or url)\n  -a: AUR helper (must have pacman-like syntax)\n  -h: Show this message\n' && exit ;;
-  r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
-  b) repo_branch=${OPTARG} ;;
-  p) user_programs_file=${OPTARG} ;;
-  a) aur_helper=${OPTARG} ;;
-  *) printf 'Invalid option: -%s\n' "$OPTARG" && exit ;;
-esac; done
-
-# parse package types in user-programs.csv
-grepseq='"^[PGA]*,"'
-
-[ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
-[ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
-[ -z "$aur_helper" ] && aur_helper="yay"
-[ -z "$repo_branch" ] && repo_branch="master"
-
-BACKTITLE="System bootstrap"
-TITLE="Configuration files installer"
-
 add_dotfiles() {
 	git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
 	rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
@@ -360,6 +340,26 @@ welcome_screen() {
 # ---------------------------- #
 #            Install           #
 # ---------------------------- #
+while getopts ":a:r:b:p:h" o; do case "${o}" in
+  h) printf 'Optional arguments for custom use:\n  -r: Dotfiles repository (local file or url)\n  -p: Dependencies and programs csv (local file or url)\n  -a: AUR helper (must have pacman-like syntax)\n  -h: Show this message\n' && exit ;;
+  r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
+  b) repo_branch=${OPTARG} ;;
+  p) user_programs_file=${OPTARG} ;;
+  a) aur_helper=${OPTARG} ;;
+  *) printf 'Invalid option: -%s\n' "$OPTARG" && exit ;;
+esac; done
+
+# parse package types in user-programs.csv
+grepseq='"^[PGA]*,"'
+
+[ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
+[ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
+[ -z "$aur_helper" ] && aur_helper="yay"
+[ -z "$repo_branch" ] && repo_branch="master"
+
+BACKTITLE="System bootstrap"
+TITLE="Configuration files installer"
+
 # clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
 install_dependencies
 welcome_screen || error "User exited welcome_screen()"
