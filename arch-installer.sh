@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- Error handling --- #
-function catch() {
+function catch() { \
   # error handling goes here
   error=$(echo "$@")
   dialog \
