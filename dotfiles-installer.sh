@@ -270,7 +270,9 @@ system_beep_off() {
   dialog --title "Configuration files installer" \
          --infobox "Getting rid of that retarded error beep sound..." \
          0 0
-  rmmod pcspkr || dialog --title "Configuration files installer" --infobox "pcspkr module not loaded, skipping..." 0 0
+  rmmod pcspkr || dialog --title "Configuration files installer" \
+                         --infobox "pcspkr module not loaded, skipping..." \
+                         0 0
   echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
 
