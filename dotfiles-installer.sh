@@ -32,7 +32,9 @@ add_dotfiles() {
 }
 
 aur_pkg_install() {
-  dialog --title "Configuration files installer" --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" \
+         0 0
   echo "$aurinstalled" | grep "^$1$" > /dev/null 2>&1 && return
   sudo -u "$name" $aur_helper -S --noconfirm "$1" > /dev/null 2>&1
 }
@@ -74,28 +76,51 @@ error() {
 successful_install_alert() {
   # Generate list of programs should be installed, but aren't
   unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
-  dialog --title "Configuration files installed" --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" 12 80
+  dialog --title "Configuration files installed" \
+         --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" \
+         0 0
 }
 
 get_user_credentials() {
   # Prompts user for new username and password.
   name=$(dialog --title "Configuration files installer" --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
   while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
-    name=$(dialog --no-cancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
+    name=$(dialog --no-cancel \
+                  --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." \
+                  10 60 \
+                  3>&1 1>&2 2>&3 3>&1)
   done
-  pass1=$(dialog --no-cancel --title "Configuration files installer" --passwordbox "Enter a password for that user." 10 60 3>&1 1>&2 2>&3 3>&1)
-  pass2=$(dialog --no-cancel --title "Configuration files installer" --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+  pass1=$(dialog --no-cancel 
+                 --title "Configuration files installer" \
+                 --passwordbox "Enter a password for that user." \
+                 10 60 \
+                 3>&1 1>&2 2>&3 3>&1)
+  pass2=$(dialog --no-cancel \
+                 --title "Configuration files installer" \
+                 --passwordbox "Retype password." \
+                 10 60 \
+                 3>&1 1>&2 2>&3 3>&1)
   while ! [ "$pass1" = "$pass2" ]; do
     unset pass2
-    pass1=$(dialog --no-cancel --title "Configuration files installer" --passwordbox 'Passwords do not match.\n\nEnter password again.' 10 60 3>&1 1>&2 2>&3 3>&1)
-    pass2=$(dialog --no-cancel --title "Configuration files installer" --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
+    pass1=$(dialog --no-cancel \
+                   --title "Configuration files installer" \
+                   --passwordbox 'Passwords do not match.\n\nEnter password again.' \
+                   10 60 \
+                   3>&1 1>&2 2>&3 3>&1)
+    pass2=$(dialog --no-cancel \
+                   --title "Configuration files installer" \
+                   --passwordbox "Retype password." \
+                   10 60 \
+                   3>&1 1>&2 2>&3 3>&1)
   done
 }
 
 git_pkg_make_install() {
   progname="$(basename "$1")"
   dir="$repodir/$progname"
-  dialog --title "Configuration files installer" --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" \
+         0 0
   sudo -u "$name" git clone --depth 1 "$1" "$dir" > /dev/null 2>&1 || {
     cd "$dir" || return
     sudo -u "$name" git pull --force origin master
@@ -107,7 +132,9 @@ git_pkg_make_install() {
 }
 
 git_pkg_clone() {
-  dialog --title "Configuration files installer" --infobox "Downloading and installing configuration files..." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Downloading and installing configuration files..." \
+         0 0
   [ -z "$3" ] && branch="master" || branch="$repo_branch"
   dir=$(mktemp -d)
   [ ! -d "$2" ] && mkdir -p "$2"
@@ -117,7 +144,9 @@ git_pkg_clone() {
 }
 
 install_dependencies() {
-  dialog --title "Configuration files installer" --infobox "Installing dependencies for installing other software." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Installing dependencies for installing other software." \
+         0 0
   install_pkg dialog || error "Are you sure you're running  as the root user and have internet connectivity?"
   install_pkg curl
   install_pkg base-devel
@@ -150,13 +179,17 @@ install_pkg() {
 }
 
 official_arch_pkg_install() {
-  dialog --title "Configuration files installer" --infobox "Installing \`$1\` ($n of $total).\n$1 $2" 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Installing \`$1\` ($n of $total).\n$1 $2" \
+         0 0
   install_pkg "$1"
 }
 
 manual_install() {
   [ -f "/usr/bin/$1" ] || (
-    dialog --title "Configuration files installer" --infobox "Installing \"$1\", an AUR helper..." 0 0
+    dialog --title "Configuration files installer" \
+           --infobox "Installing \"$1\", an AUR helper..." \
+           0 0
     cd /tmp || exit
     rm -rf /tmp/"$1"*
     curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
@@ -168,7 +201,9 @@ manual_install() {
 }
 
 pip_pkg_install() {
-  dialog --title "Configuration files installer" --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" \
+         0 0
   command -v pip || install_pkg python-pip > /dev/null 2>&1
   yes | pip install "$1"
 }
@@ -182,7 +217,9 @@ set_postinstall_settings() {
   enabledocker || error "Couldn't enable docker."
   install_nvim_plugins || error "Couldn't install nvim plugins"
   start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
-  dialog --title "Configuration files installer" --infobox "Finally, installing $(libxft-bgra) to enable color emoji in suckless software without crashes." 0 0
+  dialog --title "Configuration files installer" 
+         --infobox "Finally, installing $(libxft-bgra) to enable color emoji in suckless software without crashes." \
+         0 0
   yes | sudo -u "$name" $aur_helper -S libxft-bgra > /dev/null 2>&1
   system_beep_off || error "Couldn't turn off system beep, erghh!"
   create_user_dirs || error "Couldn't make github  or downloads dir."
@@ -190,7 +227,9 @@ set_postinstall_settings() {
 
 set_preinstall_settings() {
   # Synchronize NTP servers
-  dialog --title "Configuration files installer" --infobox "Synchronizing system time to ensure successful and secure installation of software..." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
+         0 0
   ntp 0.us.pool.ntp.org > /dev/null 2>&1
   [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
   # AUR programs require a fakeroot environment
@@ -209,7 +248,9 @@ set_permissions() {
 }
 
 set_user_credentials() {
-  dialog --title "Configuration files installer" --infobox "Adding user \"$name\"..." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Adding user \"$name\"..." \
+         0 0
   useradd -m -g wheel -s /bin/bash "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
     mkdir -p /home/"$name" &&
     chown "$name":wheel /home/"$name"
@@ -226,29 +267,38 @@ start_pulse_audio_daemon() {
 }
 
 system_beep_off() {
-  dialog --title "Configuration files installer" --infobox "Getting rid of that retarded error beep sound..." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Getting rid of that retarded error beep sound..." \
+         0 0
   rmmod pcspkr || dialog --title "Configuration files installer" --infobox "pcspkr module not loaded, skipping..." 0 0
   echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
 
 user_confirm_install() {
-  dialog --title "Let's get this party started!" --yes-label "Let's go!" --no-label "No, nevermind!" --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 0 0 || {
-    clear
-    exit
-  }
+  dialog --title "Let's get this party started!" \
+         --yes-label "Let's go!" \
+         --no-label "No, nevermind!" \
+         --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
+         0 0 || { clear; exit; }
 }
 
 refresh_arch_keyring() {
-  dialog --title "Configuration files installer" --infobox "Refreshing Arch Keyring..." 0 0
+  dialog --title "Configuration files installer" \
+         --infobox "Refreshing Arch Keyring..." \
+         0 0
   pacman --noconfirm -Sy archlinux-keyring > /dev/null 2>&1
 }
 
 run_reflector() {
-  dialog --title "Configuration files installer" --yesno "Install and run reflector? It might speed up package downloads." 0 0
+  dialog --title "Configuration files installer" \
+         --yesno "Install and run reflector? It might speed up package downloads." \
+         0 0
   response=$?
   case $response in
     0)
-      dialog --title "Configuration files installer" --infobox "Running reflector..." 0 0
+      dialog --title "Configuration files installer" \
+             --infobox "Running reflector..." \
+             0 0
       install_pkg reflector
       reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
       ;;
@@ -260,11 +310,18 @@ run_reflector() {
 
 user_exists_warning() {
   ! (id -u "$name" > /dev/null) 2>&1 ||
-    dialog --colors --title "WARNING!" --yes-label "CONTINUE" --no-label "No wait..." --yesno "User already exists." 0 0
+    dialog --colors \
+           --title "WARNING!" \
+           --yes-label "CONTINUE" \
+           --no-label "No wait..." \
+           --yesno "User already exists." \
+           0 0
 }
 
 welcome_screen() {
-  dialog --title "Welcome!" --msgbox "Welcome to dotfile-installer.sh! This script automatically installs a fully-featured Arch Linux desktop." 0 0
+  dialog --title "Welcome!" \
+         --msgbox "Welcome to dotfile-installer.sh! This script automatically installs a fully-featured Arch Linux desktop." \
+         0 0
 }
 
 # ---------------------------- #
