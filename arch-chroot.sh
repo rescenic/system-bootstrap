@@ -39,19 +39,32 @@ install_bootctl_bootloader() { \
 }
 
 install_bootloader() { \
-    OPTIONS=(1 "bootctl"
-             2 "grub")
-    CHOICE=$(dialog --backtitle "$BACKTITLE" \
-                    --title "$TITLE" \
-                    --menu "Choose a bootloader to install" \
-                    "${OPTIONS[@]}" \
-                    2>&1 >/dev/tty)
-    case $CHOICE in
-            1) install_bootctl_bootloader
-               ;;
-            2) install_grub_bootloader
-               ;;
-    esac
+    dialog --backtitle "$BACKTITLE" \
+           --title "$TITLE" \
+           --menu "Choose a bootloader to install" \
+           0 0 \
+           2 1 Grub 2 Bootctl \
+           2>temp
+    if [ "$?" = "0" ]
+    then
+        _return=$(cat temp)
+        if [ "$_return" = "1" ]
+        then
+            install_grub_bootloader
+        fi
+        if [ "$_return" = "2" ]
+        then
+            install_bootctl_bootloader
+        fi
+    else
+        dialog --backtitle "$BACKTITLE" \
+               --title "$TITLE" \
+               --infobox "Installer exited because no bootloader was chosen." \
+               0 0
+        rm -f temp
+        exit
+    fi
+    rm -f temp
 }
 
 install_grub_bootloader() { \
