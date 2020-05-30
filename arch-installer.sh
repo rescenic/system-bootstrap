@@ -4,11 +4,10 @@
 function catch() { \
   # error handling goes here
   error=$(echo "$@")
-  dialog \
-    --title "Arch install" \
-    --no-collapse \
-    --msgbox "$error" \
-    0 0
+  dialog --title "Arch install" \
+         --no-collapse \
+         --msgbox "$error" \
+         0 0
   exit
 }
 
@@ -34,8 +33,8 @@ function clear_partition_cruft() { \
 }
 
 function confirm_install() { \
-dialog --defaultno \
-       --title "DON'T BE A BRAINLET!" \
+dialog --title "DON'T BE A BRAINLET!" \
+       --defaultno \
        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
        9 50 || exit
 }
