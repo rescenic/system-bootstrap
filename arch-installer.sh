@@ -20,14 +20,17 @@ function clear_partition_cruft() { \
     do
        umount --force ${drive}${i} >/dev/null 2>&1
     done
+    # ============================================================= #
+    # The sed script strips off all the comments so that we can     #
+    # document what we're doing in-line with the actual commands    #
+    # ============================================================= #
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
 		o # clear the in memory partition table
 		Y # confirmation
 		w # write the partition table
 		Y # confirmation
 		q # and we're done
-		
-	EOF
+    EOF
 
     update_kernel
 }
@@ -48,15 +51,13 @@ function confirm_partition_sizes() { \
 
 function create_partitions() { \
     # ============================================================= #
-    # To create partitions programatically (rather than manually)   #
-    # simulate the manual input to gdisk.                           #
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
 		n # new partition
 		1 # 1st partition
-		# start at beginning of disk 
+		# start at beginning of disk
 		+512M # 512 MiB boot partition
 		ef00  # EFI system partition
 		n # Linux swap
@@ -78,7 +79,7 @@ function create_partitions() { \
 		Y # confirmation
 		q # exit gdisk
 	EOF
-    
+
     update_kernel
 }
 
@@ -98,7 +99,7 @@ function create_partition_filesystems() { \
     mount ${drive}1 /mnt/boot
     mkdir -p /mnt/home
     mount ${drive}4 /mnt/home
-    
+
     update_kernel
 }
 
@@ -170,7 +171,7 @@ function preinstall_checks { \
         catch "This script requires it be run as root"
         exit 1
     fi
-    
+
     dialog \
       --title "Arch install" \
       --infobox "Doing preliminary checks..." \
