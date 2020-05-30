@@ -36,7 +36,7 @@ clear_partition_cruft() { \
 }
 
 confirm_install() { \
-dialog --title "DON'T BE A BRAINLET!" \
+	dialog --title "DON'T BE A BRAINLET!" \
        --defaultno \
        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
        9 50 || exit
