@@ -1,16 +1,5 @@
 #!/bin/bash
 
-# --- Error handling --- #
-function catch() { \
-  # error handling goes here
-  error=$(echo "$@")
-  dialog --title "Arch install" \
-         --no-collapse \
-         --msgbox "$error" \
-         0 0
-  exit
-}
-
 clear_partition_cruft() { \
     dialog --title "Partitions" \
            --infobox "Unmounting any parititons from ${drive}..." \
@@ -108,6 +97,16 @@ enter_chroot_env() { \
     curl "$chroot_url" > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
 }
 
+error() { \
+  # error handling goes here
+  error=$(echo "$@")
+  dialog --title "Arch install" \
+         --no-collapse \
+         --msgbox "$error" \
+         0 0
+  exit
+}
+
 generate_fstab() { \
     genfstab -U -p /mnt >> /mnt/etc/fstab
 }
@@ -168,7 +167,7 @@ postinstall_options() { \
 
 preinstall_checks() { \
     if [ "$(id -u)" != "0" ]; then
-        catch "This script requires it be run as root"
+        error "This script requires it be run as root"
         exit 1
     fi
 
@@ -179,7 +178,7 @@ preinstall_checks() { \
           ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) >/dev/null 2>&1 &&
           pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
       )
-    [[ -n $msg ]] && catch $msg
+    [[ -n $msg ]] && error $msg
 }
 
 refresh_arch_keyring() { \
