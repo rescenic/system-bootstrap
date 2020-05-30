@@ -29,11 +29,13 @@ install_bootctl_bootloader() { \
            --infobox "Installing bootctl on ${BOOTLOADER_PARTITION} with UUID ${UUID}" \
            0 0
     bootctl install || echo "Bootctl seemed to hit a snag..."
-    echo title Arch Linux >> /boot/loader/entries/arch.conf
-    echo linux /vmlinuz-linux >> /boot/loader/entries/arch.conf
-    echo initrd /intel-ucode.img >> /boot/loader/entries/arch.conf
-    echo initrd /initramfs-linux.img >> /boot/loader/entries/arch.conf
-    echo options root=PARTUUID=${UUID} >> /boot/loader/entries/arch.conf
+    {
+      echo title Arch Linux 
+      echo linux /vmlinuz-linux
+      echo initrd /intel-ucode.img
+      echo initrd /initramfs-linux.img
+      echo options root=PARTUUID="${UUID}"
+    } >> /boot/loader/entries/arch.conf
 }
 
 install_bootloader() { \
@@ -63,7 +65,7 @@ install_grub_bootloader() { \
            --infobox "Installing grub on ${BOOTLOADER_PARTITION}" \
            0 0
     pacman --noconfirm --needed -S grub 
-    grub-install --target=i386-pc $FRIVE
+    grub-install --target=i386-pc "$DRIVE"
     grub-mkconfig -o /boot/grub/grub.
 }
 
@@ -82,7 +84,7 @@ set_root_password() { \
 
 set_timezone() { \
     TZuser=$(cat tzfinal.tmp)
-    ln -sf /usr/share/zoneinfo/$TZuser /etc/localtime
+    ln -sf /usr/share/zoneinfo/"$TZuser" /etc/localtime
     hwclock --systohc
 }
 
@@ -93,8 +95,10 @@ start_network_manager() { \
 
 set_locale() { \
     echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-    echo "en_US ISO-8859-1" >> /etc/locale.gen
+    {
+      echo "en_US.UTF-8 UTF-8"
+      echo "en_US ISO-8859-1"
+    } >> /etc/locale.gen
     locale-gen
 }
 
