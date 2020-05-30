@@ -11,7 +11,7 @@ function catch() { \
   exit
 }
 
-function clear_partition_cruft() { \
+clear_partition_cruft() { \
     dialog --title "Partitions" \
            --infobox "Unmounting any parititons from ${drive}..." \
            0 0
@@ -35,21 +35,21 @@ function clear_partition_cruft() { \
     update_kernel
 }
 
-function confirm_install() { \
+confirm_install() { \
 dialog --title "DON'T BE A BRAINLET!" \
        --defaultno \
        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
        9 50 || exit
 }
 
-function confirm_partition_sizes() { \
+confirm_partition_sizes() { \
     dialog --defaultno \
            --title "System information" \
            --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
            8 30 || exit
 }
 
-function create_partitions() { \
+create_partitions() { \
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
@@ -83,7 +83,7 @@ function create_partitions() { \
     update_kernel
 }
 
-function create_partition_filesystems() { \
+create_partition_filesystems() { \
     dialog --title "Arch install" \
            --infobox "Format and mount partitions" \
            0 0
@@ -103,16 +103,16 @@ function create_partition_filesystems() { \
     update_kernel
 }
 
-function enter_chroot_env() { \
+enter_chroot_env() { \
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
     curl "$chroot_url" > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
 }
 
-function generate_fstab() { \
+generate_fstab() { \
     genfstab -U -p /mnt >> /mnt/etc/fstab
 }
 
-function get_hostname() { \
+get_hostname() { \
     dialog --no-cancel \
            --inputbox "Enter a name for your computer." \
            7 50 \
@@ -120,7 +120,7 @@ function get_hostname() { \
     hostname=$(cat comp)
 }
 
-function get_partition_sizes() { \
+get_partition_sizes() { \
     dialog --no-cancel \
            --title "Arch install" \
            --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
@@ -133,7 +133,7 @@ function get_partition_sizes() { \
     fi
 }
 
-function get_timezone() { \
+get_timezone() { \
     dialog --defaultno \
            --title "Arch install" \
            --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  \
@@ -141,21 +141,21 @@ function get_timezone() { \
            echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 }
 
-function install_arch() { \
+install_arch() { \
     dialog --title "Arch install" \
            --infobox "Installing Arch via pacstrap" \
            0 0
     pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
 }
 
-function ntp_sync() { \
+ntp_sync() { \
     dialog --title "Arch install" \
            --infobox "Setting timedatectl to use ntp \"$name\"..." \
            0 0
     timedatectl set-ntp true
 }
 
-function postinstall_options() { \
+postinstall_options() { \
     dialog --defaultno \
            --title "Arch install complete" \
            --yesno "Reboot computer?" \
@@ -166,7 +166,7 @@ function postinstall_options() { \
            0 0 && arch-chroot /mnt
 }
 
-function preinstall_checks { \
+preinstall_checks { \
     if [ "$(id -u)" != "0" ]; then
         catch "This script requires it be run as root"
         exit 1
@@ -182,21 +182,21 @@ function preinstall_checks { \
     [[ -n $msg ]] && catch $msg
 }
 
-function refresh_arch_keyring() { \
+refresh_arch_keyring() { \
     dialog --title "Arch install" \
            --infobox "Refreshing archlinux-keyring" \
            0 0
     pacman -Sy --noconfirm archlinux-keyring
 }
 
-function run_reflector() { \
+run_reflector() { \
     dialog --title "Arch install" \
            --infobox "Updating pacman mirrors..." \
            0 0
     reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 }
 
-function select_install_drive() { \
+select_install_drive() { \
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
     selection=$(dialog \
@@ -205,7 +205,6 @@ function select_install_drive() { \
 
     drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
 
-    # -- Confirm drive choice -- #
     dialog --defaultno \
            --title "Arch install" \
            --yesno "Install Arch on: /dev/${drive}" \
@@ -218,16 +217,16 @@ function select_install_drive() { \
     drive="/dev/${partition_prefix}"
 }
 
-function set_hostname() { \
+set_hostname() { \
     mv comp /mnt/etc/hostname
 }
 
-function set_timezone() { \
+set_timezone() { \
     cat tz.tmp > /mnt/tzfinal.tmp
     rm tz.tmp
 }
 
-function update_kernel() { \
+update_kernel() { \
     partprobe
 }
 
