@@ -24,8 +24,8 @@ grepseq='"^[PGA]*,"'
 [ -z "$aur_helper" ] && aur_helper="yay"
 [ -z "$repo_branch" ] && repo_branch="master"
 
-TITLE="Configuration files installer"
 BACKTITLE="System bootstrap"
+TITLE="Configuration files installer"
 
 add_dotfiles() {
 	git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
