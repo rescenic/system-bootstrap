@@ -46,7 +46,7 @@ install_bootloader() { \
                     "${OPTIONS[@]}" \
                     2>&1 >/dev/tty)
     case $CHOICE in
-            1) install_systemd_bootloader
+            1) install_bootctl_bootloader
                ;;
             2) install_grub_bootloader
                ;;
