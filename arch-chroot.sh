@@ -57,6 +57,10 @@ function run_reflector() { \
     reflector --verbose --latest 25 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 }
 
+# ---------------------------- #
+#            Install           #
+# ---------------------------- #
+
 get_dependencies
 
 run_reflector
