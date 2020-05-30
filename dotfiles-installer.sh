@@ -37,21 +37,21 @@ aur_pkg_install() {
   sudo -u "$name" $aur_helper -S --noconfirm "$1" > /dev/null 2>&1
 }
 
-clean_installed_packages() {
-  dialog --title "WARNING!" --yesno "Are you sure you want to clean the system of all non-essential packages?" 0 0
-  response=$?
-  case $response in
-    0)
-      # mark all packages as dependencies using command
-      pacman -D --asdeps "$(pacman -Qe)"
-      pacman -S --asexplicit --needed base linux linux-firmware
-      pacman -Rsunc "$(pacman -Qtdq)"
-      ;;
-    1)
-      return
-      ;;
-  esac
-}
+# clean_installed_packages() {
+#   dialog --title "WARNING!" --yesno "Are you sure you want to clean the system of all non-essential packages?" 0 0
+#   response=$?
+#   case $response in
+#     0)
+#       # mark all packages as dependencies using command
+#       pacman -D --asdeps "$(pacman -Qe)"
+#       pacman -S --asexplicit --needed base linux linux-firmware
+#       pacman -Rsunc "$(pacman -Qtdq)"
+#       ;;
+#     1)
+#       return
+#       ;;
+#   esac
+# }
 
 create_user_dirs() {
   mkdir -p /home/"${name}"/github
@@ -271,13 +271,13 @@ welcome_screen() {
 #            Install           #
 # ---------------------------- #
 
-clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
+# clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
 
 install_dependencies
 
 welcome_screen || error "User exited welcome_screen()"
 
-prompt_user_credentials || error "Error in prompt_user_credentials()"
+get_user_credentials || error "Error in prompt_user_credentials()"
 
 user_exists_warning || error "user_exists_warning() could not continue"
 
