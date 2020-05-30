@@ -68,10 +68,10 @@ successful_install_alert() {
 get_user_credentials() { \
 	# Prompts user for new username and password.
 	name=$(dialog --backtitle "$BACKTITLE" \
-				  --title "$TITLE" \
-				  --inputbox "First, please enter a name for the user account." \
-				  0 0 \
-				  3>&1 1>&2 2>&3 3>&1) || exit
+		      --title "$TITLE" \
+		      --inputbox "First, please enter a name for the user account." \
+		      0 0 \
+		      3>&1 1>&2 2>&3 3>&1) || exit
 	while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
 	name=$(dialog --backtitle "$BACKTITLE" \
 		      --title "$TITLE" \
