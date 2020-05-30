@@ -26,6 +26,7 @@ function clear_partition_cruft() { \
 		w # write the partition table
 		Y # confirmation
 		q # and we're done
+		
 	EOF
 
     update_kernel
