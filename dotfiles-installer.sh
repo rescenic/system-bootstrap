@@ -7,14 +7,14 @@
 # License: GNU GPLv3                                    #
 # ----------------------------------------------------- #
 
-add_dotfiles() {
+add_dotfiles() { \
 	git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
 	rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
 	git update-index --assume-unchanged "/home/$name/README.md"
 	git update-index --assume-unchanged "/home/$name/LICENSE"
 }
 
-aur_pkg_install() {
+aur_pkg_install() { \
 	dialog --backtitle "$BACKTITLE" \
 		 --title "$TITLE" \
 		 --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" \
@@ -39,19 +39,19 @@ aur_pkg_install() {
 #   esac
 # }
 
-create_user_dirs() {
+create_user_dirs() { \
 	mkdir -p /home/"${name}"/github
 	mkdir -p /home/"${name}"/downloads
 }
 
-enable_docker() {
+enable_docker() { \
 	# https://docs.docker.com/install/linux/linux-postinstall/
 	systemctl enable docker.service
 	systemctl start docker.service
 	usermod -aG docker "$USER"
 }
 
-error() {
+error() { \
 	clear
 	printf 'ERROR:\n%s\n' "$1"
 	exit
@@ -61,60 +61,60 @@ successful_install_alert() {
 	# Generate list of programs should be installed, but aren't
 	unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
 	dialog --title "Configuration files installed" \
-		 --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" \
-		 0 0
+		   --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" \
+		   0 0
 }
 
-get_user_credentials() {
+get_user_credentials() { \
 	# Prompts user for new username and password.
 	name=$(dialog --backtitle "$BACKTITLE" \
-				--title "$TITLE" \
-				--inputbox "First, please enter a name for the user account." \
-				10 60 \
-				3>&1 1>&2 2>&3 3>&1) || exit
+				  --title "$TITLE" \
+				  --inputbox "First, please enter a name for the user account." \
+				  0 0 \
+				  3>&1 1>&2 2>&3 3>&1) || exit
 	while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
 	name=$(dialog --backtitle "$BACKTITLE" \
 				  --title "$TITLE" \
 				  --no-cancel \
 				  --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." \
-				  10 60 \
+				  0 0 \
 				  3>&1 1>&2 2>&3 3>&1)
 	done
 	pass1=$(dialog --backtitle "$BACKTITLE" \
-				 --title "$TITLE" \
-				 --no-cancel \
-				 --title "Configuration files installer" \
-				 --passwordbox "Enter a password for that user." \
-				 10 60 \
-				 3>&1 1>&2 2>&3 3>&1)
+				   --title "$TITLE" \
+				   --no-cancel \
+				   --title "Configuration files installer" \
+				   --passwordbox "Enter a password for that user." \
+				   0 0 \
+				   3>&1 1>&2 2>&3 3>&1)
 	pass2=$(dialog --backtitle "$BACKTITLE" \
-				 --title "$TITLE" \
-				 --no-cancel \
-				 --passwordbox "Retype password." \
-				 10 60 \
-				 3>&1 1>&2 2>&3 3>&1)
+				   --title "$TITLE" \
+				   --no-cancel \
+				   --passwordbox "Retype password." \
+				   0 0 \
+				   3>&1 1>&2 2>&3 3>&1)
 	while ! [ "$pass1" = "$pass2" ]; do
 	unset pass2
 	pass1=$(dialog --backtitle "$BACKTITLE" \
 				   --title "$TITLE" \
 				   --no-cancel \
 				   --passwordbox 'Passwords do not match.\n\nEnter password again.' \
-				   10 60 \
+				   0 0 \
 				   3>&1 1>&2 2>&3 3>&1)
 	pass2=$(dialog --backtitle "$BACKTITLE" \
 				   --title "$TITLE" \
 				   --no-cancel \
 				   --passwordbox "Retype password." \
-				   10 60 \
+				   0 0 \
 				   3>&1 1>&2 2>&3 3>&1)
 	done
 }
 
-git_pkg_clone() {
+git_pkg_clone() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
-		 --infobox "Downloading and installing configuration files..." \
-		 0 0
+		   --title "$TITLE" \
+		   --infobox "Downloading and installing configuration files..." \
+		   0 0
 	[ -z "$3" ] && branch="master" || branch="$repo_branch"
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2"
@@ -123,13 +123,13 @@ git_pkg_clone() {
 	sudo -u "$name" cp -rfT "$dir" "$2"
 }
 
-git_pkg_install() {
+git_pkg_install() { \
 	progname="$(basename "$1")"
 	dir="$repodir/$progname"
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
-		 --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" \
-		 0 0
+		   --title "$TITLE" \
+		   --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" \
+		   0 0
 	sudo -u "$name" git clone --depth 1 "$1" "$dir" > /dev/null 2>&1 || {
 	cd "$dir" || return
 	sudo -u "$name" git pull --force origin master
@@ -140,11 +140,11 @@ git_pkg_install() {
 	cd /tmp || return
 }
 
-install_dependencies() {
+install_dependencies() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
-		 --infobox "Installing dependencies for installing other software." \
-		 0 0
+		   --title "$TITLE" \
+		   --infobox "Installing dependencies for installing other software." \
+		   0 0
 	install_pkg dialog || error "Are you sure you're running  as the root user and have internet connectivity?"
 	install_pkg curl
 	install_pkg base-devel
@@ -152,7 +152,7 @@ install_dependencies() {
 	install_pkg ntp
 }
 
-install_user_programs() {
+install_user_programs() { \
 	([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
 	total=$(wc -l < /tmp/programs.csv)
 	aurinstalled=$(pacman -Qqm)
@@ -168,26 +168,26 @@ install_user_programs() {
 	done < /tmp/programs.csv
 }
 
-install_nvim_plugins() {
+install_nvim_plugins() { \
 	nvim +PlugInstall +qall > /dev/null 2>&1
 }
 
-install_pkg() {
+install_pkg() { \
 	pacman --noconfirm --needed -S "$1" > /dev/null 2>&1
 }
 
-official_arch_pkg_install() {
+official_arch_pkg_install() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
-		 --infobox "Installing \`$1\` ($n of $total).\n$1 $2" \
-		 0 0
+		   --title "$TITLE" \
+		   --infobox "Installing \`$1\` ($n of $total).\n$1 $2" \
+		   0 0
 	install_pkg "$1"
 }
 
-manual_install() {
+manual_install() { \
 	[ -f "/usr/bin/$1" ] || (
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
+		   --title "$TITLE" \
 		   --infobox "Installing \"$1\", an AUR helper..." \
 		   0 0
 	cd /tmp || exit
@@ -200,16 +200,16 @@ manual_install() {
 	)
 }
 
-pip_pkg_install() {
+pip_pkg_install() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \
-		 --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" \
-		 0 0
+		   --title "$TITLE" \
+		   --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" \
+		   0 0
 	command -v pip || install_pkg python-pip > /dev/null 2>&1
 	yes | pip install "$1"
 }
 
-set_postinstall_settings() {
+set_postinstall_settings() { \
 	# Zsh is default shell
 	sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
 	# Allows user to execute `shutdown`, `reboot`, updating, etc. without password
@@ -219,19 +219,19 @@ set_postinstall_settings() {
 	install_nvim_plugins || error "Couldn't install nvim plugins"
 	start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Finally, installing $(libxft-bgra) to enable color emoji in suckless software without crashes." \
-		 0 0
+		   --title "$TITLE" \ 
+		   --infobox "Finally, installing $(libxft-bgra) to enable color emoji in suckless software without crashes." \
+		   0 0
 	yes | sudo -u "$name" $aur_helper -S libxft-bgra > /dev/null 2>&1
 	system_beep_off || error "Couldn't turn off system beep, erghh!"
 	create_user_dirs || error "Couldn't make github  or downloads dir."
 }
 
-set_preinstall_settings() {
+set_preinstall_settings() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
-		 0 0
+		   --title "$TITLE" \ 
+		   --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
+		   0 0
 	# Synchronize NTP servers
 	ntp 0.us.pool.ntp.org > /dev/null 2>&1
 	[ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
@@ -244,17 +244,17 @@ set_preinstall_settings() {
 	sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 }
 
-set_permissions() {
+set_permissions() { \
 	# Set special `sudoers` settings
 	sed -i "/#dotfile-installer/d" /etc/sudoers
 	echo "$* #dotfile-installer" >> /etc/sudoers
 }
 
-set_user_credentials() {
+set_user_credentials() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Adding user \"$name\"..." \
-		 0 0
+		   --title "$TITLE" \ 
+		   --infobox "Adding user \"$name\"..." \
+		   0 0
 	useradd -m -g wheel -s /bin/bash "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
 	mkdir -p /home/"$name" &&
 	chown "$name":wheel /home/"$name"
@@ -265,51 +265,51 @@ set_user_credentials() {
 	unset pass1 pass2
 }
 
-start_pulse_audio_daemon() {
+start_pulse_audio_daemon() { \
 	killall pulseaudio
 	sudo -u "$name" pulseaudio --start
 }
 
-system_beep_off() {
+system_beep_off() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Getting rid of that retarded error beep sound..." \
-		 0 0
+		   --title "$TITLE" \ 
+		   --infobox "Getting rid of that retarded error beep sound..." \
+		   0 0
 	rmmod pcspkr || dialog --title "Configuration files installer" \
 						 --infobox "pcspkr module not loaded, skipping..." \
 						 0 0
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
 
-user_confirm_install() {
+user_confirm_install() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --yes-label "Let's go!" \
-		 --no-label "No, nevermind!" \
-		 --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
-		 0 0 || { clear; exit; }
+		   --title "$TITLE" \ 
+		   --yes-label "Let's go!" \
+		   --no-label "No, nevermind!" \
+		   --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
+		   0 0 || { clear; exit; }
 }
 
-refresh_arch_keyring() {
+refresh_arch_keyring() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Refreshing Arch Keyring..." \
-		 0 0
+		   --title "$TITLE" \ 
+		   --infobox "Refreshing Arch Keyring..." \
+		   0 0
 	pacman --noconfirm -Sy archlinux-keyring > /dev/null 2>&1
 }
 
-run_reflector() {
+run_reflector() { \
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --yesno "Install and run reflector? It might speed up package downloads." \
-		 0 0
+	       --title "$TITLE" \ 
+	       --yesno "Install and run reflector? It might speed up package downloads." \
+	       0 0
 	response=$?
 	case $response in
 	0)
 	dialog --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --infobox "Running reflector..." \
-		 0 0
+	       --title "$TITLE" \ 
+	       --infobox "Running reflector..." \
+	       0 0
 	  install_pkg reflector
 	  reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 	  ;;
@@ -322,19 +322,19 @@ run_reflector() {
 user_exists_warning() {
 	! (id -u "$name" > /dev/null) 2>&1 ||
 	dialog --colors \
-		 --backtitle "$BACKTITLE" \
-		 --title "$TITLE" \ 
-		 --yes-label "CONTINUE" \
-		 --no-label "No wait..." \
-		 --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
-		 0 0
+	       --backtitle "$BACKTITLE" \
+		   --title "$TITLE" \ 
+		   --yes-label "CONTINUE" \
+		   --no-label "No wait..." \
+		   --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
+		   0 0
 }
 
 welcome_screen() {
 	dialog --backtitle "$BACKTITLE" \
-		 --title "Welcome!" \
-		 --msgbox "Welcome to dotfile-installer.sh! This script automatically installs a fully-featured Arch Linux desktop." \
-		 0 0
+		   --title "Welcome!" \
+		   --msgbox "Welcome to dotfile-installer.sh! This script automatically installs a fully-featured Arch Linux desktop." \
+		   0 0
 }
 
 # ---------------------------- #
