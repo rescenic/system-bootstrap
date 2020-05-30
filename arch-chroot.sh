@@ -72,3 +72,4 @@ set_locale
 set_timezone
 start_network_manager
 install_bootloader
+install_dotfiles
