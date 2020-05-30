@@ -41,8 +41,7 @@ install_bootctl_bootloader() { \
 install_bootloader() { \
     OPTIONS=(1 "bootctl"
              2 "grub")
-    CHOICE=$(dialog --clear \
-                    --backtitle "$BACKTITLE" \
+    CHOICE=$(dialog --backtitle "$BACKTITLE" \
                     --title "$TITLE" \
                     --menu "Choose a bootloader to install" \
                     "${OPTIONS[@]}" \
