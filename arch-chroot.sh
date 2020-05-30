@@ -7,6 +7,9 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
+drive="$1"
+bootloader_partition="$2"
+
 get_dependencies() { \
     pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager 
 }
@@ -34,8 +37,6 @@ set_locale() { \
 }
 
 install_bootloader() { \
-    drive="$1"
-    bootloader_partition="$2"
     UUID=$(blkid -s PARTUUID -o value "$drive"3)
     dialog --title "Arch chroot" --yesno "Install bootloader on ${bootloader_partition} with UUID ${UUID}?" 0 0 || exit
     dialog --title "Arch chroot" \
@@ -50,6 +51,9 @@ install_bootloader() { \
 }
 
 install_dotfiles() { \
+    dialog --title "Arch chroot" \
+           --yesno "Install dotfiles" \
+           0 0 || return
     curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh 
     bash dotfiles-installer.sh 
 }
@@ -61,21 +65,10 @@ run_reflector() { \
 # ---------------------------- #
 #            Install           #
 # ---------------------------- #
-
 get_dependencies
-
 run_reflector
-
 set_root_password
-
 set_locale
-
 set_timezone
-
 start_network_manager
-
 install_bootloader
-
-dialog --title "Arch chroot" \
-       --yesno "Install dotfiles.vdoster.com?" \
-       0 0 && install_dotfiles
