@@ -83,7 +83,10 @@ successful_install_alert() {
 
 get_user_credentials() {
   # Prompts user for new username and password.
-  name=$(dialog --title "Configuration files installer" --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
+  name=$(dialog --title "Configuration files installer" \
+                --inputbox "First, please enter a name for the user account." \
+                10 60 \
+                3>&1 1>&2 2>&3 3>&1) || exit
   while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
     name=$(dialog --no-cancel \
                   --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." \
@@ -280,7 +283,7 @@ user_confirm_install() {
   dialog --title "Let's get this party started!" \
          --yes-label "Let's go!" \
          --no-label "No, nevermind!" \
-         --yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
+         --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
          0 0 || { clear; exit; }
 }
 
@@ -316,7 +319,7 @@ user_exists_warning() {
            --title "WARNING!" \
            --yes-label "CONTINUE" \
            --no-label "No wait..." \
-           --yesno "User already exists." \
+           --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
            0 0
 }
 
@@ -329,33 +332,18 @@ welcome_screen() {
 # ---------------------------- #
 #            Install           #
 # ---------------------------- #
-
 # clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
-
 install_dependencies
-
 welcome_screen || error "User exited welcome_screen()"
-
 get_user_credentials || error "Error in prompt_user_credentials()"
-
 user_exists_warning || error "user_exists_warning() could not continue"
-
 user_confirm_install || error "user_confirm_install() could not continue"
-
 set_user_credentials || error "Error adding user in set_user_credentials()"
-
 refresh_arch_keyring || error "Error automatically refreshing Arch keyring. Consider doing so manually."
-
 run_reflector || error "run_reflector() encountered an error"
-
 set_preinstall_settings || error "set_preinstall_settings() did not finish successfully"
-
 manual_install $aur_helper || error "Failed to install yay via manual_install()"
-
 install_user_programs || error "Error in install_user_programs()"
-
 add_dotfiles || error "Error in add_dotfiles()"
-
 set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
-
 successful_install_alert || error "Unfortunately, the install failed..."
