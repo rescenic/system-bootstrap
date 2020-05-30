@@ -90,7 +90,7 @@ get_user_credentials() {
                   10 60 \
                   3>&1 1>&2 2>&3 3>&1)
   done
-  pass1=$(dialog --no-cancel 
+  pass1=$(dialog --no-cancel \
                  --title "Configuration files installer" \
                  --passwordbox "Enter a password for that user." \
                  10 60 \
