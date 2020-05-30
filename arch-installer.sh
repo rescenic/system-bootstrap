@@ -7,13 +7,13 @@ clear_partition_cruft() { \
     swapoff -a >/dev/null 2>&1
     for i in {1..4}
     do
-       umount --force ${drive}${i} >/dev/null 2>&1
+       umount --force "${drive}""${i}" >/dev/null 2>&1
     done
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		o # clear the in memory partition table
 		Y # confirmation
 		w # write the partition table
@@ -43,7 +43,7 @@ create_partitions() { \
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		n # new partition
 		1 # 1st partition
 		# start at beginning of disk
@@ -76,18 +76,18 @@ create_partition_filesystems() { \
     dialog --title "Arch install" \
            --infobox "Format and mount partitions" \
            0 0
-    yes | mkfs.fat -F32 ${drive}1
-    yes | mkfs.ext4 ${drive}3
-    yes | mkfs.ext4 ${drive}4
+    yes | mkfs.fat -F32 "${drive}"1
+    yes | mkfs.ext4 "${drive}"3
+    yes | mkfs.ext4 "${drive}"4
     # Enable swap
-    mkswap ${drive}2
-    swapon ${drive}2
+    mkswap "${drive}"2
+    swapon "${drive}"2
     # Mount partitions
-    mount ${drive}3 /mnt
+    mount "${drive}"3 /mnt
     mkdir -p /mnt/boot
-    mount ${drive}1 /mnt/boot
+    mount "${drive}"1 /mnt/boot
     mkdir -p /mnt/home
-    mount ${drive}4 /mnt/home
+    mount "${drive}"4 /mnt/home
 
     update_kernel
 }
@@ -149,7 +149,7 @@ install_arch() { \
 
 ntp_sync() { \
     dialog --title "Arch install" \
-           --infobox "Setting timedatectl to use ntp \"$name\"..." \
+           --infobox "Setting timedatectl to use ntp..." \
            0 0
     timedatectl set-ntp true
 }
@@ -178,7 +178,7 @@ preinstall_checks() { \
           ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) >/dev/null 2>&1 &&
           pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
       )
-    [[ -n $msg ]] && error $msg
+    [[ -n $msg ]] && error "$msg"
 }
 
 refresh_arch_keyring() { \
@@ -234,41 +234,23 @@ update_kernel() { \
 #        Install script        #
 ################################
 preinstall_checks
-
 select_install_drive
-
 confirm_install
-
 run_reflector
-
 get_hostname
-
 get_timezone
-
 ntp_sync
-
 get_partition_sizes
-
 confirm_partition_sizes
-
 clear_partition_cruft
-
 create_partitions
-
 create_partition_filesystems
-
 refresh_arch_keyring
-
 install_arch
-
 generate_fstab
-
 set_timezone
-
 set_hostname
-
 enter_chroot_env
-
 postinstall_options
 
 clear
