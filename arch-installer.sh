@@ -21,7 +21,8 @@ fi
 # -- Check internet connection -- #
 dialog \
   --title "$TITLE" \
-  --infobox "Doing preliminary checks..." 0 0
+  --infobox "Doing preliminary checks..." \
+  0 0
   msg=$(
       ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) >/dev/null 2>&1 &&
       pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
@@ -60,18 +61,31 @@ dialog --defaultno --title "DON'T BE A BRAINLET!" --yesno "This is an Arch insta
 # reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 
 # -- Get hostname -- #
-dialog --no-cancel --inputbox "Enter a name for your computer." 7 50 2> comp
+dialog --no-cancel \
+       --inputbox "Enter a name for your computer." \
+       7 50 \
+       2> comp
 hostname=$(cat comp)
 
 # -- Get timezone -- #
-dialog --defaultno --title "Time Zone select" --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  10 50 && echo "America/New_York" > tz.tmp || tzselect > tz.tmp
+dialog --defaultno \
+       --title "Time Zone select" \
+       --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  \
+       10 50 && \
+       echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 
 # -- Sync w/ NTP -- #
-dialog --title "Arch install" --infobox "Setting timedatectl to use ntp \"$name\"..." 7 50
+dialog --title "Arch install" \
+       --infobox "Setting timedatectl to use ntp \"$name\"..." \
+       0 0
 timedatectl set-ntp true
 
 # -- Read in/sanity check user swap/root partition sizes -- #
-dialog --no-cancel --title "Arch install" --inputbox "Enter partitionsize in gb, separated by space (swap & root)." 7 50 2>psize
+dialog --no-cancel \
+       --title "Arch install" \
+       --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
+       0 0 \
+       2>psize
 IFS=' ' read -ra SIZE <<< $(cat psize)
 re='^[0-9]+$'
 if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]] ; then
@@ -79,7 +93,10 @@ if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $r
 fi
 
 # -- One last chance to quit -- #
-dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"  8 30 || exit
+dialog --defaultno \
+       --title "System information" \
+       --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
+       8 30 || exit
 
 # ============================================================= #
 # To create partitions programatically (rather than manually)   #
@@ -89,7 +106,9 @@ dialog --defaultno --title "System information" --yesno "Hostname: ${hostname}\n
 # ============================================================= #
 
 # -- Clear cruft partitions and make GPT partition table -- #
-dialog --title "Partitions" --infobox "Unmounting any parititons from ${drive}..." 7 50
+dialog --title "Partitions" \
+       --infobox "Unmounting any parititons from ${drive}..." \
+       0 0
 swapoff -a >/dev/null 2>&1
 for i in {1..4}
 do
@@ -137,7 +156,9 @@ EOF
 partprobe
 
 # -- Create partition file systems -- #
-dialog --title "Arch install" --infobox "Format and mount partitions" 3 50
+dialog --title "Arch install" \
+       --infobox "Format and mount partitions" \
+       0 0
 yes | mkfs.fat -F32 ${drive}1
 yes | mkfs.ext4 ${drive}3
 yes | mkfs.ext4 ${drive}4
@@ -154,11 +175,15 @@ mount ${drive}4 /mnt/home
 # >/dev/null 2>&1
 
 # -- Refresh Arch keyring -- #
-dialog --title "Arch install" --infobox "Refreshing archlinux-keyring" 3 50
+dialog --title "Arch install" \
+       --infobox "Refreshing archlinux-keyring" \
+       0 0
 pacman -Sy --noconfirm archlinux-keyring 
 
 # -- Install Arch -- #
-dialog --title "Arch install" --infobox "Installing Arch via pacstrap" 3 50
+dialog --title "Arch install" \
+       --infobox "Installing Arch via pacstrap" \
+       0 0
 pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
 
 # -- Generate FSTAB -- #
@@ -173,10 +198,17 @@ rm tz.tmp
 mv comp /mnt/etc/hostname
 
 # -- Enter chroot environment -- #
-curl https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
+chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
+curl "$chroot_url" > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
 # && rm /mnt/chroot.sh
 
-# -- Post install user options -- #
-# dialog --defaultno --title "Install complete" --yesno "Reboot computer?" 3 30 && reboot
-# dialog --defaultno --title "Install complete" --yesno "Return to chroot environment?" 3 30 && arch-chroot /mnt
-# clear
+# -- Post install options -- #
+dialog --defaultno \
+       --title "Install complete" \
+       --yesno "Reboot computer?" \
+       0 0 && reboot
+dialog --defaultno \
+       --title "Install complete" \
+       --yesno "Return to chroot environment?" \
+       0 0 && arch-chroot /mnt
+clear
