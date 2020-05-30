@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# ---------------------------------------------------- #
-#               dotfiles-installer.sh                  #
-#     Released by Luke Smith <luke@lukesmith.xyz>      #
-# Adapted by Vlad Doster <vlad_doster@hms.harvard.edu> #
-#                License: GNU GPLv3                    #
-# ---------------------------------------------------- #
+# ----------------------------------------------------- #
+# dotfiles-installer.sh                                 #
+# Released by: Luke Smith <luke@lukesmith.xyz>          #
+# Adapted by: Vlad Doster <vlad_doster@hms.harvard.edu> #
+# License: GNU GPLv3                                    #
+# ----------------------------------------------------- #
 
 while getopts ":a:r:b:p:h" o; do case "${o}" in
   h) printf 'Optional arguments for custom use:\n  -r: Dotfiles repository (local file or url)\n  -p: Dependencies and programs csv (local file or url)\n  -a: AUR helper (must have pacman-like syntax)\n  -h: Show this message\n' && exit ;;
