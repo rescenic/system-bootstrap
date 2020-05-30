@@ -29,7 +29,7 @@ function clear_partition_cruft() { \
 		Y # confirmation
 		w # write the partition table
 		Y # confirmation
-		q # and we're done
+		q # exit gdisk
 	EOF
 
     update_kernel
