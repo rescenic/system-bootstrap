@@ -112,16 +112,17 @@ generate_fstab() { \
 }
 
 get_hostname() { \
-    dialog --no-cancel \
-           --inputbox "Enter a name for your computer." \
-           0 0 \
-           2> comp
+    dialog --title "Arch install" \
+           --no-cancel \
+	       --inputbox "Enter a name for your computer." \
+	       0 0 \
+	       2> comp
     hostname=$(cat comp)
 }
 
 get_partition_sizes() { \
-    dialog --no-cancel \
-           --title "Arch install" \
+    dialog --title "Arch install" \
+           --no-cancel \
            --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
            0 0 \
            2>psize
@@ -198,14 +199,13 @@ run_reflector() { \
 select_install_drive() { \
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
-    selection=$(dialog \
-      --menu "Please select:" 0 0 0 \
-      "${drives[@]}" 2>&1 > /dev/tty)
-
+    selection=$(dialog --title "Arch install" \
+                       --menu "Please select:" 0 0 0 \
+                       "${drives[@]}" 2>&1 > /dev/tty)
     drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
 
-    dialog --defaultno \
-           --title "Arch install" \
+    dialog --title "Arch install" \
+           --defaultno \
            --yesno "Install Arch on: /dev/${drive}" \
            0 0 || exit
     partition_prefix=$drive
