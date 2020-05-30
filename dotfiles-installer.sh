@@ -115,7 +115,19 @@ get_user_credentials() {
   done
 }
 
-git_pkg_make_install() {
+git_pkg_clone() {
+  dialog --title "Configuration files installer" \
+         --infobox "Downloading and installing configuration files..." \
+         0 0
+  [ -z "$3" ] && branch="master" || branch="$repo_branch"
+  dir=$(mktemp -d)
+  [ ! -d "$2" ] && mkdir -p "$2"
+  chown -R "$name":wheel "$dir" "$2"
+  sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" > /dev/null 2>&1
+  sudo -u "$name" cp -rfT "$dir" "$2"
+}
+
+git_pkg_install() {
   progname="$(basename "$1")"
   dir="$repodir/$progname"
   dialog --title "Configuration files installer" \
@@ -129,18 +141,6 @@ git_pkg_make_install() {
   make > /dev/null 2>&1
   make install > /dev/null 2>&1
   cd /tmp || return
-}
-
-git_pkg_clone() {
-  dialog --title "Configuration files installer" \
-         --infobox "Downloading and installing configuration files..." \
-         0 0
-  [ -z "$3" ] && branch="master" || branch="$repo_branch"
-  dir=$(mktemp -d)
-  [ ! -d "$2" ] && mkdir -p "$2"
-  chown -R "$name":wheel "$dir" "$2"
-  sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" > /dev/null 2>&1
-  sudo -u "$name" cp -rfT "$dir" "$2"
 }
 
 install_dependencies() {
@@ -163,7 +163,7 @@ install_user_programs() {
     echo "$comment" | grep "^\".*\"$" > /dev/null 2>&1 && comment="$(echo "$comment" | sed "s/\(^\"\|\"$\)//g")"
     case "$tag" in
       "A") aur_pkg_install "$program" "$comment" ;;
-      "G") git_pkg_make_install "$program" "$comment" ;;
+      "G") git_pkg_install "$program" "$comment" ;;
       "P") pip_pkg_install "$program" "$comment" ;;
       *) official_arch_pkg_install "$program" "$comment" ;;
     esac
