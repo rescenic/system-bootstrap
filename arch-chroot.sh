@@ -37,6 +37,7 @@ install_bootloader() { \
     drive="$1"
     bootloader_partition="$2"
     UUID=$(blkid -s PARTUUID -o value "$drive"3)
+    dialog --title "Arch chroot" --yesno "Install bootloader on ${bootloader_partition} with UUID ${UUID}?" 0 0 || exit
     dialog --title "Arch chroot" \
            --infobox "Installing bootloader on ${bootloader_partition} with UUID ${UUID}" \
            0 0
