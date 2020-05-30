@@ -5,8 +5,7 @@ catch() {
   # error handling goes here
   error=$(echo "$@")
   dialog \
-    --backtitle "$TITLE" \
-    --title "$TITLE Error" \
+    --title "Arch install" \
     --no-collapse \
     --msgbox "$error" \
     0 0
@@ -21,7 +20,7 @@ fi
 
 # -- Check internet connection -- #
 dialog \
-  --title "$TITLE" \
+  --title "Arch install" \
   --infobox "Doing preliminary checks..." \
   0 0
   msg=$(
@@ -29,8 +28,6 @@ dialog \
       pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
   )
 [[ -n $msg ]] && catch $msg  
-# ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null || $(echo "Are you sure there is an active internet connection?" && exit)
-# pacman -Sy --noconfirm dialog reflector >/dev/null 2>&1
 
 ################################
 #        Install script        #
@@ -47,7 +44,7 @@ drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print 
 
 # -- Confirm drive choice -- #
 dialog --defaultno \
-       --title "Installation drive" \
+       --title "Arch install" \
        --yesno "Install Arch on: /dev/${drive}" \
        6 50 || exit
 partition_prefix=$drive
@@ -78,7 +75,7 @@ hostname=$(cat comp)
 
 # -- Get timezone -- #
 dialog --defaultno \
-       --title "Time Zone select" \
+       --title "Arch install" \
        --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  \
        10 50 && \
        echo "America/New_York" > tz.tmp || tzselect > tz.tmp
@@ -181,8 +178,6 @@ mount ${drive}1 /mnt/boot
 mkdir -p /mnt/home
 mount ${drive}4 /mnt/home
 
-# >/dev/null 2>&1
-
 # -- Refresh Arch keyring -- #
 dialog --title "Arch install" \
        --infobox "Refreshing archlinux-keyring" \
@@ -203,21 +198,21 @@ genfstab -U -p /mnt >> /mnt/etc/fstab
 cat tz.tmp > /mnt/tzfinal.tmp
 rm tz.tmp
 
-# -- Set system hostname -- #
+# -- System hostname -- #
 mv comp /mnt/etc/hostname
 
-# -- Enter chroot environment -- #
+# -- Chroot environment -- #
 chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
 curl "$chroot_url" > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
-# && rm /mnt/chroot.sh
 
 # -- Post install options -- #
 dialog --defaultno \
-       --title "Install complete" \
+       --title "Arch install complete" \
        --yesno "Reboot computer?" \
        0 0 && reboot
 dialog --defaultno \
-       --title "Install complete" \
+       --title "Arch install complete" \
        --yesno "Return to chroot environment?" \
        0 0 && arch-chroot /mnt
+
 clear
