@@ -172,10 +172,9 @@ function preinstall_checks { \
         exit 1
     fi
 
-    dialog \
-      --title "Arch install" \
-      --infobox "Doing preliminary checks..." \
-      0 0
+    dialog --title "Arch install" \
+           --infobox "Doing preliminary checks..." \
+           0 0
       msg=$(
           ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) >/dev/null 2>&1 &&
           pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
