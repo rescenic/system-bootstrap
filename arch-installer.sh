@@ -166,7 +166,7 @@ postinstall_options() { \
            0 0 && arch-chroot /mnt
 }
 
-preinstall_checks { \
+preinstall_checks() { \
     if [ "$(id -u)" != "0" ]; then
         catch "This script requires it be run as root"
         exit 1
