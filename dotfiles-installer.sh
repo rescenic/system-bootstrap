@@ -20,7 +20,7 @@ aur_pkg_install() { \
 		 --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" \
 		 0 0
 	echo "$aurinstalled" | grep "^$1$" > /dev/null 2>&1 && return
-	sudo -u "$name" $aur_helper -S --noconfirm "$1" > /dev/null 2>&1
+	sudo -u "$name" "$aur_helper" -S --noconfirm "$1" > /dev/null 2>&1
 }
 
 # clean_installed_packages() {
@@ -219,17 +219,17 @@ set_postinstall_settings() { \
 	install_nvim_plugins || error "Couldn't install nvim plugins"
 	start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
-		   --infobox "Finally, installing $(libxft-bgra) to enable color emoji in suckless software without crashes." \
+		   --title "$TITLE" \
+		   --infobox "Finally, installing libxft-bgra to enable color emoji in suckless software without crashes." \
 		   0 0
-	yes | sudo -u "$name" $aur_helper -S libxft-bgra > /dev/null 2>&1
+	yes | sudo -u "$name" "$aur_helper" -S libxft-bgra > /dev/null 2>&1
 	system_beep_off || error "Couldn't turn off system beep, erghh!"
 	create_user_dirs || error "Couldn't make github  or downloads dir."
 }
 
 set_preinstall_settings() { \
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
 		   0 0
 	# Synchronize NTP servers
@@ -252,7 +252,7 @@ set_permissions() { \
 
 set_user_credentials() { \
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --infobox "Adding user \"$name\"..." \
 		   0 0
 	useradd -m -g wheel -s /bin/bash "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
@@ -272,7 +272,7 @@ start_pulse_audio_daemon() { \
 
 system_beep_off() { \
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --infobox "Getting rid of that retarded error beep sound..." \
 		   0 0
 	rmmod pcspkr || dialog --title "Configuration files installer" \
@@ -283,7 +283,7 @@ system_beep_off() { \
 
 user_confirm_install() { \
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --yes-label "Let's go!" \
 		   --no-label "No, nevermind!" \
 		   --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
@@ -292,7 +292,7 @@ user_confirm_install() { \
 
 refresh_arch_keyring() { \
 	dialog --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --infobox "Refreshing Arch Keyring..." \
 		   0 0
 	pacman --noconfirm -Sy archlinux-keyring > /dev/null 2>&1
@@ -300,14 +300,14 @@ refresh_arch_keyring() { \
 
 run_reflector() { \
 	dialog --backtitle "$BACKTITLE" \
-	       --title "$TITLE" \ 
+	       --title "$TITLE" \
 	       --yesno "Install and run reflector? It might speed up package downloads." \
 	       0 0
 	response=$?
 	case $response in
 	0)
 	dialog --backtitle "$BACKTITLE" \
-	       --title "$TITLE" \ 
+	       --title "$TITLE" \
 	       --infobox "Running reflector..." \
 	       0 0
 	  install_pkg reflector
@@ -323,7 +323,7 @@ user_exists_warning() {
 	! (id -u "$name" > /dev/null) 2>&1 ||
 	dialog --colors \
 	       --backtitle "$BACKTITLE" \
-		   --title "$TITLE" \ 
+		   --title "$TITLE" \
 		   --yes-label "CONTINUE" \
 		   --no-label "No wait..." \
 		   --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
