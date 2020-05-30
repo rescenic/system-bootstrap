@@ -20,7 +20,6 @@ function clear_partition_cruft() { \
     do
        umount --force ${drive}${i} >/dev/null 2>&1
     done
-    
 	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
 		o # clear the in memory partition table
 		Y # confirmation
@@ -28,7 +27,7 @@ function clear_partition_cruft() { \
 		Y # confirmation
 		q # and we're done
 	EOF
-    
+  
     update_kernel
 }
 
