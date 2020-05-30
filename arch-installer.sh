@@ -21,13 +21,13 @@ function clear_partition_cruft() { \
        umount --force ${drive}${i} >/dev/null 2>&1
     done
     
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
-      o # clear the in memory partition table
-      Y # confirmation
-      w # write the partition table
-      Y # confirmation
-      q # and we're done
-    EOF
+	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
+		o # clear the in memory partition table
+		Y # confirmation
+		w # write the partition table
+		Y # confirmation
+		q # and we're done
+	EOF
     
     update_kernel
 }
@@ -53,31 +53,31 @@ function create_partitions() { \
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | gdisk ${drive}
-      n # new partition
-      1 # 1st partition
-        # start at beginning of disk 
-      +512M # 512 MiB boot partition
-      ef00  # EFI system partition
-      n # Linux swap
-      2 # 2nd partition
-        # start immediately after preceding partition
-      +${SIZE[0]}G # user specified size
-      8200 # Linux swap
-      n # new partition
-      3 # 3rd partition
-        # start immediately after preceding partition
-      +${SIZE[1]}G # user specified size
-      8304 # Linux x86-64 root (/)
-      n # new partition
-      4 # 4th partition
-        # start immediately after preceding partition
-        # extend for rest of drive space
-      8302 # Linux /home
-      w # write GPT partition table
-      Y # confirmation
-      q # exit gdisk
-    EOF
+    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk ${drive}
+		n # new partition
+		1 # 1st partition
+		# start at beginning of disk 
+		+512M # 512 MiB boot partition
+		ef00  # EFI system partition
+		n # Linux swap
+		2 # 2nd partition
+		# start immediately after preceding partition
+		+${SIZE[0]}G # user specified size
+		8200 # Linux swap
+		n # new partition
+		3 # 3rd partition
+		# start immediately after preceding partition
+		+${SIZE[1]}G # user specified size
+		8304 # Linux x86-64 root (/)
+		n # new partition
+		4 # 4th partition
+		# start immediately after preceding partition
+		# extend for rest of drive space
+		8302 # Linux /home
+		w # write GPT partition table
+		Y # confirmation
+		q # exit gdisk
+	EOF
     
     update_kernel
 }
