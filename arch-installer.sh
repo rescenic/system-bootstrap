@@ -5,7 +5,6 @@
 # License: GNU GPLv3                                     #
 # ====================================================== #
 
-
 # ====== Variables ====== #
 BACKTITLE="System bootstrap"
 TITLE="Arch install"
