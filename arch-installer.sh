@@ -4,16 +4,15 @@
 # Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
 # License: GNU GPLv3                                     #
 # ====================================================== #
-# ======================= #
-#        Variables        #
-# ======================= #
 
+
+# ====== Variables ====== #
 BACKTITLE="System bootstrap"
 TITLE="Arch install"
 CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
 
 # ======================= #
-#     Dialog functions    #
+#       Dialog boxes      #
 # ======================= #
 display_info_box() {
     dialog \
