@@ -45,29 +45,69 @@ confirm_partition_sizes() {
         0 0 || exit
 }
 
+select_bootloader() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --menu "Choose a bootloader to install" \
+        0 0 \
+        2 1 Grub 2 Bootctl \
+        2> temp
+    if [ "$?" = "0" ]; then
+        _return=$(cat temp)
+        if [ "$_return" = "1" ]; then
+            bootloader="grub"
+	    create_partition_cmd="sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+        fi
+        if [ "$_return" = "2" ]; then
+            bootloader="bootctl"
+	    create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+        fi
+    else
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
+            --infobox "Installer exited because no bootloader was chosen." \
+            0 0
+        rm -f temp
+        exit
+    fi
+    rm -f temp
+}
+
 create_partitions() {
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
-    sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "User chose $bootloader so gdisk is using\n$create_partition_cmd" \
+        0 0
+    eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
+		n # grub partition
+		  # default number (grub)
+		# start at beginning of disk (grub)
+		+1M # 1 MiB partition (grub)
+		ef02 # (grub)
 		n # new partition
-		1 # 1st partition
+		  # 1st partition
 		# start at beginning of disk
 		+512M # 512 MiB boot partition
 		ef00  # EFI system partition
 		n # Linux swap
-		2 # 2nd partition
+		 # 2nd partition
 		# start immediately after preceding partition
 		+${SIZE[0]}G # user specified size
 		8200 # Linux swap
 		n # new partition
-		3 # 3rd partition
+		 # 3rd partition
 		# start immediately after preceding partition
 		+${SIZE[1]}G # user specified size
 		8304 # Linux x86-64 root (/)
 		n # new partition
-		4 # 4th partition
+		 # 4th partition
 		# start immediately after preceding partition
 		# extend for rest of drive space
 		8302 # Linux /home
@@ -104,7 +144,7 @@ create_partition_filesystems() {
 enter_chroot_env() {
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
     curl "$chroot_url" > /mnt/chroot.sh
-    arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
+    arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 $bootloader
 }
 
 error() {
