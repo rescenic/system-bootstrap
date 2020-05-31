@@ -89,12 +89,12 @@ install_dotfiles() {
 set_timezone() {
     TZuser=$(cat tzfinal.tmp)
     ln -sf /usr/share/zoneinfo/"$TZuser" /etc/localtime
-    hwclock --systohc
+    hwclock --systohc > /dev/null 2>&1
 }
 
 start_network_manager() {
-    systemctl enable NetworkManager
-    systemctl start NetworkManager
+ (systemctl enable NetworkManager
+    systemctl start NetworkManager) > /dev/null 2>&1
 }
 
 set_locale() {
@@ -103,7 +103,7 @@ set_locale() {
         echo "en_US.UTF-8 UTF-8"
         echo "en_US ISO-8859-1"
     } > /etc/locale.gen
-    locale-gen
+    locale-gen > /dev/null 2>&1
 }
 
 run_reflector() {
