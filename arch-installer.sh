@@ -11,7 +11,7 @@ clear_partition_cruft() {
         0 0
     swapoff -a > /dev/null 2>&1
     for i in {1..4}; do
-        umount --force "${drive}""${i}" 2>&1 /dev/null
+        umount --force "${drive}""${i}" > /dev/null 2>&1
     done
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
@@ -98,6 +98,7 @@ create_partitions() {
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
+    { 
     eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
 		n # grub partition
 		 # default number (grub)
@@ -128,7 +129,7 @@ create_partitions() {
 		Y # confirmation
 		q # exit gdisk
 	EOF
-	> /dev/null 2>&1
+	}> /dev/null 2>&1
     update_kernel
 }
 
@@ -152,7 +153,7 @@ create_partition_filesystems() {
     mount "${drive}${boot_partition}" /mnt/boot &&
     mkdir -p /mnt/home &&
     mount "${drive}${user_partition}" /mnt/home
- } &> /dev/null
+ } > /dev/null 2>&1
     update_kernel
 }
 
@@ -220,7 +221,7 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware >& /dev/null
+    { yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware } > /dev/null 2>&1
 }
 
 ntp_sync() {
@@ -247,7 +248,7 @@ postinstall_options() {
         0 0 && arch-chroot /mnt
 }
 
-preinstall_checks() {
+preinstall_checks() {2>&1 /dev/null
     if [ "$(id -u)" != "0" ]; then
         error "This script requires it be run as root"
         exit 1
@@ -280,7 +281,7 @@ run_reflector() {
         --title "$TITLE" \
         --infobox "Updating pacman mirrors..." \
         0 0
-    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist 2>&1 /dev/null
+    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist > /dev/null 2>&1
 }
 
 select_install_drive() {
