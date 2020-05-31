@@ -115,7 +115,7 @@ create_partition_filesystems() {
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
     curl "$CHROOT_URL" > /mnt/chroot.sh &&
-    arch-chroot mnt/ bash chroot.sh \
+    arch-chroot /mnt bash chroot.sh \
         "${drive}" \
         "${drive}${boot_partition}" \
         "${bootloader}"
@@ -135,7 +135,7 @@ error() {
 
 generate_fstab() {
     display_info_box "Generating fstab..."
-    genfstab -U -p /mnt > /mnt/etc/fstab
+    genfstab -pU /mnt > /mnt/etc/fstab
 }
 
 install_arch() {
@@ -312,7 +312,7 @@ user_select_timezone() {
         tzselect > tz.tmp
 }
 
-user_set_root_password() {
+user_select_root_password() {
     r_passwd=$(
         display_password_input "Enter root password"
 
@@ -330,7 +330,7 @@ user_set_root_password() {
             display_password_input "Confirm root password"
         )
     done
-    set_root_password "$r_passwd" 
+    export r_passwd="$r_passwd" 
 }
 # ================= #
 #   Install steps   #
@@ -354,6 +354,6 @@ generate_fstab
 install_arch
 set_timezone
 set_hostname
-user_set_root_password
+user_select_root_password
 enter_chroot_environment
 user_postinstall_options
