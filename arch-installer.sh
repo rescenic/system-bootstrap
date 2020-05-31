@@ -98,19 +98,14 @@ create_partitions() {
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
     # ============================================================= #
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "User chose $bootloader so gdisk is using\n$create_partition_cmd" \
-        0 0
     eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
 		n # grub partition
-		  # default number (grub)
+		 # default number (grub)
 		# start at beginning of disk (grub)
 		+1M # 1 MiB partition (grub)
 		ef02 # (grub)
 		n # new partition
-		  # 1st partition
+		 # 1st partition
 		# start at beginning of disk
 		+512M # 512 MiB boot partition
 		ef00  # EFI system partition
@@ -132,7 +127,7 @@ create_partitions() {
 		w # write GPT partition table
 		Y # confirmation
 		q # exit gdisk
-	EOF
+	EOF > /dev/null 2>&1
 
     update_kernel
 }
@@ -145,25 +140,25 @@ create_partition_filesystems() {
         --yesno "Does this look correct?\n${drive}${boot_partition}\n${drive}${swap_partition}\n${drive}${root_partition}\n${drive}${user_partition}\nPress no to exit" \
         0 0 || exit
 	
-    yes | mkfs.fat -F32 "${drive}${boot_partition}"
-    yes | mkfs.ext4 "${drive}${root_partition}"
-    yes | mkfs.ext4 "${drive}${user_partition}"
+    (yes | mkfs.fat -F32 "${drive}${boot_partition}" &&
+    yes | mkfs.ext4 "${drive}${root_partition}" &&
+    yes | mkfs.ext4 "${drive}${user_partition}" &&
     # Enable swap
-    mkswap "${drive}${swap_partition}"
-    swapon "${drive}${swap_partition}"
+    mkswap "${drive}${swap_partition}" &&
+    swapon "${drive}${swap_partition}" &&
     # Mount partitions
-    mount "${drive}${root_partition}" /mnt
-    mkdir -p /mnt/boot
-    mount "${drive}${boot_partition}" /mnt/boot
-    mkdir -p /mnt/home
-    mount "${drive}${user_partition}" /mnt/home
+    mount "${drive}${root_partition}" /mnt &&
+    mkdir -p /mnt/boot &&
+    mount "${drive}${boot_partition}" /mnt/boot &&
+    mkdir -p /mnt/home &&
+    mount "${drive}${user_partition}" /mnt/home) > /dev/null 2>&1
 
     update_kernel
 }
 
 enter_chroot_env() {
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
-    curl "$chroot_url" > /mnt/chroot.sh
+    curl "$chroot_url" > /mnt/chroot.sh > /dev/null 2>&1
     arch-chroot /mnt bash chroot.sh "${drive}" "${drive}${boot_partition}" "${bootloader}"
 }
 
@@ -225,7 +220,7 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
+    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware > /dev/null 2>&1
 }
 
 ntp_sync() {
@@ -265,7 +260,7 @@ preinstall_checks() {
         0 0
     msg=$(
         ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) > /dev/null 2>&1 &&
-            pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
+        pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
     )
     [[ -n $msg ]] && error "$msg"
 }
@@ -276,7 +271,7 @@ refresh_arch_keyring() {
         --title "$TITLE" \
         --infobox "Refreshing archlinux-keyring" \
         0 0
-    pacman -Sy --noconfirm archlinux-keyring
+    pacman -Sy --noconfirm archlinux-keyring > /dev/null 2>&1
 }
 
 run_reflector() {
@@ -285,7 +280,7 @@ run_reflector() {
         --title "$TITLE" \
         --infobox "Updating pacman mirrors..." \
         0 0
-    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist > /dev/null 2>&1
 }
 
 select_install_drive() {
@@ -306,10 +301,7 @@ select_install_drive() {
         --yesno "Install Arch on: /dev/${drive}" \
         0 0 || exit
     partition_prefix=$drive
-    if [[ $drive =~ ^nvme ]]; then
-        echo "Need to add p for nvme drive partitions"
-        partition_prefix=$drive"p"
-    fi
+    [[ $drive =~ ^nvme ]] && partition_prefix="${drive}p"
     drive="/dev/${partition_prefix}"
 }
 
@@ -318,7 +310,7 @@ set_hostname() {
 }
 
 set_timezone() {
-    cat tz.tmp > /mnt/tzfinal.tmp
+    cat tz.tmp > /mnt/tzfinal.tmp 
     rm tz.tmp
 }
 
