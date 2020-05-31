@@ -23,6 +23,16 @@ display_info_box() {
         0 0
 }
 
+display_password_input() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --no-cancel \
+        --passwordbox "$1" \
+        0 0 \
+        3>&1 1>&2 2>&3 3>&1
+}
+
 display_yes_no_box() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -175,6 +185,13 @@ set_hostname() {
     mv comp /mnt/etc/hostname
 }
 
+set_root_password() {
+    display_info_box "Set root password to $1"
+    arch-chroot /mnt echo "root:$1" | chpasswd || error "Couldn't set root password to $1"
+    display_info_box "Set root password to $1"
+    sleep 10 
+}
+
 set_timezone() {
     display_info_box "Setting timezone"
     cat tz.tmp > /mnt/tzfinal.tmp
@@ -303,47 +320,24 @@ user_select_timezone() {
 }
 
 user_set_root_password() {
-    root_password=$(
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --no-cancel \
-            --passwordbox "Enter a root password" \
-            0 0 \
-            3>&1 1>&2 2>&3 3>&1
+    r_passwd=$(
+        display_password_input "Enter root password"
+
     )
-    confirm_root_password=$(
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --no-cancel \
-            --passwordbox "Confirm root password" \
-            0 0 \
-            3>&1 1>&2 2>&3 3>&1
+    confirm_r_passwd=$(
+        display_password_input "Confirm root password"
     )
 
     while true; do
-        [[ $root_password != "" && $root_password == "$confirm_root_password" ]] && break
-        root_password=$(
-            dialog \
-                --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --no-cancel \
-                --passwordbox "Passwords do not match or are not present.\n\nEnter root password again." \
-                0 0 \
-                3>&1 1>&2 2>&3 3>&1
+        [[ $r_passwd != "" && $r_passwd == "$confirm_r_passwd" ]] && break
+        r_passwd=$(
+	    display_password_input "Passwords do not match or are not present.\n\nEnter root password again"
         )
-        root_password_confirm=$(
-            dialog \
-                --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --no-cancel \
-                --passwordbox "Confirm root password." \
-                0 0 \
-                3>&1 1>&2 2>&3 3>&1
+        confirm_r_passwd=$(
+            display_password_input "Confirm root password"
         )
     done
-    arch-chroot /mnt echo "root:${root_password}" | chpasswd
+    set_root_passwd r_passwd
 }
 # ================= #
 #   Install steps   #
