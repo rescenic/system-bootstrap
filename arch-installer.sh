@@ -343,7 +343,7 @@ user_set_root_password() {
                 3>&1 1>&2 2>&3 3>&1
         )
     done
-    arch-chroot /mnt/root echo "root:${root_password}" | chpasswd
+    arch-chroot /mnt echo "root:${root_password}" | chpasswd
 }
 # ================= #
 #   Install steps   #
