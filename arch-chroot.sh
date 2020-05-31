@@ -71,9 +71,9 @@ install_grub_bootloader() {
         --title "$TITLE" \
         --infobox "Installing "${BOOTLOADER}" on ${DRIVE}" \
         0 0
-    (pacman --noconfirm --needed -S grub efibootmgr
+    pacman --noconfirm --needed -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-    grub-mkconfig -o /boot/grub/grub.cfg) > /dev/null 2>&1
+    grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 install_dotfiles() {
@@ -93,8 +93,8 @@ set_timezone() {
 }
 
 start_network_manager() {
- (systemctl enable NetworkManager
-    systemctl start NetworkManager) > /dev/null 2>&1
+    systemctl enable NetworkManager
+    systemctl start NetworkManager
 }
 
 set_locale() {
