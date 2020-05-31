@@ -272,7 +272,7 @@ set_user_credentials() {
 
 start_pulse_audio_daemon() {
     killall pulseaudio || true
-    pulseaudio --start --daemonize
+    pulseaudio --system --start --daemonize
 }
 
 successful_install_alert() {
