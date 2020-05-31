@@ -114,11 +114,8 @@ create_partition_filesystems() {
 
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
-    curl "$CHROOT_URL" > /mnt/chroot.sh &&
-    arch-chroot /mnt bash chroot.sh \
-        "${drive}" \
-        "${drive}${boot_partition}" \
-        "${bootloader}"
+    curl "$CHROOT_URL" > /mnt/chroot.sh
+    arch-chroot /mnt bash chroot.sh "$drive" "$drive$boot_partition" "$bootloader"
 }
 
 error() {
@@ -306,21 +303,15 @@ user_select_timezone() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --yesno "Use default time zone(America/New_York)?
+        --yesno "Use default time zone (America/New_York)?
                 \nPress no to select a time zone" \
         0 0 && echo "America/New_York" > tz.tmp ||
         tzselect > tz.tmp
 }
 
 user_select_root_password() {
-    r_passwd=$(
-        display_password_input "Enter root password"
-
-    )
-    confirm_r_passwd=$(
-        display_password_input "Confirm root password"
-    )
-
+    r_passwd=$(display_password_input "Enter root password")
+    confirm_r_passwd=$(display_password_input "Confirm root password")
     while true; do
         [[ $r_passwd != "" && $r_passwd == "$confirm_r_passwd" ]] && break
         r_passwd=$(
