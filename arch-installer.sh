@@ -220,7 +220,7 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    (yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware) 2>&1 /dev/null
+    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware >& /dev/null
 }
 
 ntp_sync() {
