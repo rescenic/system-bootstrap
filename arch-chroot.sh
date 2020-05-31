@@ -132,7 +132,7 @@ run_reflector() {
 # ---------------------------- #
 get_dependencies
 run_reflector
-set_root_password
+# set_root_password
 set_locale
 set_timezone
 start_network_manager
