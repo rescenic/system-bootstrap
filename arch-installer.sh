@@ -283,7 +283,7 @@ set_root_password() {
     )
 
     while true; do
-        [[ $pass1 != "" && $pass1 == "$pass2" ]] && break
+        [[ $root_password != "" && $root_password == "$root_password_confirm" ]] && break
         root_password=$(
             dialog \
                 --backtitle "$BACKTITLE" \
