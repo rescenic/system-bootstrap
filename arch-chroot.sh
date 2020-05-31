@@ -20,11 +20,13 @@ get_dependencies() { \
 
 install_bootctl_bootloader() { \
     UUID=$(blkid -s PARTUUID -o value "$DRIVE"3)
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --yesno "Install Bootctl on ${BOOTLOADER_PARTITION} with UUID ${UUID}?" \
            0 0 || exit
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --infobox "Installing bootctl on ${BOOTLOADER_PARTITION} with UUID ${UUID}" \
            0 0
@@ -39,7 +41,8 @@ install_bootctl_bootloader() { \
 }
 
 install_bootloader() { \
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --menu "Choose a bootloader to install" \
            0 0 \
@@ -57,7 +60,8 @@ install_bootloader() { \
             install_bootctl_bootloader
         fi
     else
-        dialog --backtitle "$BACKTITLE" \
+        dialog \
+        --backtitle "$BACKTITLE" \
                --title "$TITLE" \
                --infobox "Installer exited because no bootloader was chosen." \
                0 0
@@ -68,11 +72,13 @@ install_bootloader() { \
 }
 
 install_grub_bootloader() { \
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --yesno "Install Grub on ${BOOTLOADER_PARTITION} with UUID ${UUID}?" \
            0 0 || exit
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --infobox "Installing grub on ${BOOTLOADER_PARTITION}" \
            0 0
@@ -82,7 +88,8 @@ install_grub_bootloader() { \
 }
 
 install_dotfiles() { \
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+    --backtitle "$BACKTITLE" \
            --title "$TITLE" \
            --yesno "Install dotfiles" \
            0 0 || return
