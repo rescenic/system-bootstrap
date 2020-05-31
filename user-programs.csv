@@ -46,7 +46,6 @@ A,libxft-bgra,"allows ST to have color emojis without crashing"
 #,#--Personal--#,
 ,docker,"is a way to pack, ship and run any application as a lightweight container."
 ,docker-compose,"allows for fast, isolated development environments using Docker"
-A,gitkraken, "is a program to manage git repositories"
 A,google-chrome,"is the only program in here your girlfriend has ever heard of."
 #,#--Accessing filesystems--#,
 ,dosfstools,"allows your computer to access dos-like filesystems."
