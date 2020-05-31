@@ -87,7 +87,7 @@ install_dotfiles() { \
            --yesno "Install dotfiles" \
            0 0 || return
     curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh 
-    bash dotfiles-installer.sh 
+    sudo bash dotfiles-installer.sh 
 }
 
 set_root_password() { \
