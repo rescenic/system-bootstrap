@@ -11,7 +11,7 @@ clear_partition_cruft() {
         0 0
     swapoff -a > /dev/null 2>&1
     for i in {1..4}; do
-        umount --force "${drive}""${i}" > /dev/null 2>&1
+        umount --force "${drive}""${i}" 2>&1 /dev/null
     done
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
@@ -127,8 +127,8 @@ create_partitions() {
 		w # write GPT partition table
 		Y # confirmation
 		q # exit gdisk
-	EOF > /dev/null 2>&1
-
+	EOF
+	> /dev/null 2>&1
     update_kernel
 }
 
@@ -151,8 +151,7 @@ create_partition_filesystems() {
     mkdir -p /mnt/boot &&
     mount "${drive}${boot_partition}" /mnt/boot &&
     mkdir -p /mnt/home &&
-    mount "${drive}${user_partition}" /mnt/home) > /dev/null 2>&1
-
+    mount "${drive}${user_partition}" /mnt/home) 2>&1 /dev/null
     update_kernel
 }
 
@@ -220,7 +219,7 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware > /dev/null 2>&1
+    yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware 2>&1 /dev/null
 }
 
 ntp_sync() {
@@ -271,7 +270,7 @@ refresh_arch_keyring() {
         --title "$TITLE" \
         --infobox "Refreshing archlinux-keyring" \
         0 0
-    pacman -Sy --noconfirm archlinux-keyring > /dev/null 2>&1
+    pacman -Sy --noconfirm archlinux-keyring 2>&1 /dev/null
 }
 
 run_reflector() {
@@ -280,7 +279,7 @@ run_reflector() {
         --title "$TITLE" \
         --infobox "Updating pacman mirrors..." \
         0 0
-    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist > /dev/null 2>&1
+    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist 2>&1 /dev/null
 }
 
 select_install_drive() {
