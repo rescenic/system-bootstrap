@@ -1,6 +1,6 @@
 #!/bin/bash
 # ====================================================== #
-# arch-chroot.sh                                         #
+# dotfiles-installer.sh                                  #
 # Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
 # License: GNU GPLv3                                     #
 # ====================================================== #
