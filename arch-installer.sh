@@ -1,4 +1,9 @@
 #!/bin/bash
+# ====================================================== #
+# arch-installer.sh                                      #
+# Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
+# License: GNU GPLv3                                     #
+# ====================================================== #
 
 BACKTITLE="System bootstrap"
 TITLE="Arch install"
@@ -19,7 +24,7 @@ display_info_box() {
 display_yes_no_box() {
     dialog \
         --backtitle "$BACKTITLE" \
-        --title "DON'T BE A BRAINLET!" \
+        --title "$TITLE" \
         --defaultno \
         --yesno "$1" \
         0 0 || exit
@@ -29,11 +34,7 @@ display_yes_no_box() {
 #   Installer functions   #
 # ======================= #
 clean_partition_cruft() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Unmounting any parititons from ${drive}..." \
-        0 0
+    display_info_box "Unmounting any parititons from ${drive}..."
     swapoff -a > /dev/null 2>&1
     for i in {1..5}; do
         umount --force "${drive}""${i}"
@@ -142,8 +143,8 @@ ntp_sync() {
 }
 
 preinstall_system_checks() {
+    display_info_box "Performing system checks..."
     [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
-    display_info_box "Doing preliminary checks..."
     msg=$(
         {
             ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
