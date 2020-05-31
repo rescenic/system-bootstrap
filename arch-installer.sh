@@ -98,13 +98,11 @@ create_partition_filesystems() {
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --defaultno \
-        --yesno "
-            Does this look correct?
+        --yesno "Does this look correct?
             \n${drive}${boot_partition}
             \n${drive}${swap_partition}
             \n${drive}${root_partition}
             \n${drive}${user_partition}
-            \nPress no to exit
             " \
         0 0 || exit
     yes | mkfs.fat -F32 "${drive}""${boot_partition}"
