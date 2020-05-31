@@ -271,8 +271,8 @@ set_user_credentials() {
 }
 
 start_pulse_audio_daemon() {
-    killall pulseaudio;
-    sudo -u "$name" pulseaudio --start
+    killall pulseaudio || true
+    sudo -u "$name" pulseaudio --start || true
 }
 
 successful_install_alert() {
