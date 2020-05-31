@@ -95,10 +95,10 @@ create_partitions() {
 
 create_partition_filesystems() {
     display_yes_no_box "Does this look correct?
-            		\n${drive}${boot_partition}
-		        \n${drive}${swap_partition}
-		        \n${drive}${root_partition}
-		        \n${drive}${user_partition}"
+            		\nBoot: ${drive}${boot_partition}
+		        \nSwap: ${drive}${swap_partition}
+		        \nRoot: ${drive}${root_partition}
+		        \nUser: ${drive}${user_partition}"
     yes | mkfs.fat -F32 "${drive}""${boot_partition}"
     yes | mkfs.ext4 "${drive}""${root_partition}"
     yes | mkfs.ext4 "${drive}""${user_partition}"
@@ -116,13 +116,11 @@ create_partition_filesystems() {
 
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
-    curl "$CHROOT_URL" > /mnt/chroot.sh
-    arch-chroot \
-        mnt/ \
-        bash chroot.sh \
-        "${drive}" \
-        "${drive}""${boot_partition}" \
-        "${bootloader}"
+    curl "$CHROOT_URL" > /mnt/chroot.sh &&
+    arch-chroot mnt/ bash chroot.sh
+#         "${drive}" \
+#         "$drive$boot_partition" \
+#         "$bootloader"
 }
 
 error() {
