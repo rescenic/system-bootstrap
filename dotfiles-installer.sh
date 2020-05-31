@@ -25,7 +25,7 @@ aur_pkg_install() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" \
+        --infobox "Installing \`$1\` from the AUR\n($n of $total)" \
         0 0
     echo "$aurinstalled" | grep "^$1$" > /dev/null 2>&1 && return
     sudo -u "$name" "$aur_helper" -S --noconfirm "$1" > /dev/null 2>&1
@@ -136,7 +136,7 @@ git_pkg_install() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" \
+        --infobox "Installing: \`$progname\` via \`git\` and \`make\`\n($n of $total)" \
         0 0
     sudo -u "$name" git clone --depth 1 "$1" "$dir" > /dev/null 2>&1 || {
         cd "$dir" || return
@@ -152,7 +152,7 @@ install_dependencies() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing dependencies for installing other software." \
+        --infobox "Installing dependencies for installation..." \
         0 0
     $(install_pkg dialog
     install_pkg curl
@@ -191,7 +191,7 @@ official_arch_pkg_install() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing \`$1\` ($n of $total).\n$1 $2" \
+        --infobox "Installing \`$1\`\n($n of $total)" \
         0 0
     install_pkg "$1"
 }
@@ -217,7 +217,7 @@ pip_pkg_install() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" \
+        --infobox "Installing Python package \`$1\`\n($n of $total)" \
         0 0
     command -v pip || install_pkg python-pip > /dev/null 2>&1
     yes | pip install "$1"
@@ -367,8 +367,8 @@ user_exists_warning() {
 welcome_screen() {
     dialog \
         --backtitle "$BACKTITLE" \
-        --title "Welcome!" \
-        --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
+            --title "$TITLE" \ 
+            --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
         0 0
 }
 
