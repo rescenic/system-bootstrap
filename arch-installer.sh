@@ -231,8 +231,10 @@ preinstall_checks() {
         --infobox "Doing preliminary checks..." \
         0 0
     msg=$(
-        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &&
-            pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
+        {
+	ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
+        pacman -Sy --quiet --noconfirm reflector
+	} > /dev/null 2>&1
     )
     [[ -n $msg ]] && error "$msg"
 }
