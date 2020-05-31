@@ -226,9 +226,9 @@ preinstall_checks() {
     display_info_box "Doing preliminary checks..."
     msg=$(
         {
-	ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
-        pacman -Sy --quiet --noconfirm reflector
-	} > /dev/null 2>&1
+            ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
+            pacman -Sy --quiet --noconfirm reflector
+        } > /dev/null 2>&1
     )
     [[ -n $msg ]] && error "$msg"
 }
@@ -240,7 +240,7 @@ refresh_arch_keyring() {
 
 run_reflector() {
     display_info_box "Updating pacman mirrors..." \
-    reflector \
+        reflector \
         --verbose \
         --latest 100 \
         --sort rate \
@@ -275,7 +275,7 @@ select_bootloader() {
             user_partition=4
         fi
     else
-	display_info_box "Installer exited because no bootloader was chosen."
+        display_info_box "Installer exited because no bootloader was chosen."
         rm -f temp
         exit
     fi
