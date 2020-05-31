@@ -9,8 +9,6 @@ BOOTLOADER_PARTITION="$2"
 BOOTLOADER=$3
 DRIVE="$1"
 
-DOTFILES_INSTALLER_URL=""
-
 if [ $# -ne 3 ]; then
     dialog \
         --backtitle "$BACKTITLE" \
