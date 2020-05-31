@@ -139,8 +139,8 @@ create_partition_filesystems() {
         --defaultno \
         --yesno "Does this look correct?\n${drive}${boot_partition}\n${drive}${swap_partition}\n${drive}${root_partition}\n${drive}${user_partition}\nPress no to exit" \
         0 0 || exit
-	
-    (yes | mkfs.fat -F32 "${drive}${boot_partition}" &&
+{
+    yes | mkfs.fat -F32 "${drive}${boot_partition}" &&
     yes | mkfs.ext4 "${drive}${root_partition}" &&
     yes | mkfs.ext4 "${drive}${user_partition}" &&
     # Enable swap
@@ -151,7 +151,8 @@ create_partition_filesystems() {
     mkdir -p /mnt/boot &&
     mount "${drive}${boot_partition}" /mnt/boot &&
     mkdir -p /mnt/home &&
-    mount "${drive}${user_partition}" /mnt/home) 2>&1 /dev/null
+    mount "${drive}${user_partition}" /mnt/home
+ } 2>&1 /dev/null
     update_kernel
 }
 
