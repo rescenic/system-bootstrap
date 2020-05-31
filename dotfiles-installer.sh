@@ -7,7 +7,7 @@
 # License: GNU GPLv3                                    #
 # ----------------------------------------------------- #
 
-add_dotfiles() {
+add_dotfiles() { \
   echo "$name"
   git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
   rm -f "/home/$name/README.md" "/home/$name/LICENSE"
@@ -112,7 +112,8 @@ get_user_credentials() {
 }
 
 git_pkg_clone() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Downloading and installing configuration files..." \
     0 0
@@ -127,7 +128,8 @@ git_pkg_clone() {
 git_pkg_install() {
   progname="$(basename "$1")"
   dir="$repodir/$progname"
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`.\n$(basename "$1") $2" \
     0 0
@@ -142,7 +144,8 @@ git_pkg_install() {
 }
 
 install_dependencies() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Installing dependencies for installing other software." \
     0 0
@@ -187,7 +190,8 @@ official_arch_pkg_install() {
 
 manual_install() {
   [ -f "/usr/bin/$1" ] || (
-    dialog --backtitle "$BACKTITLE" \
+    dialog \
+      --backtitle "$BACKTITLE" \
       --title "$TITLE" \
       --infobox "Installing \"$1\", an AUR helper..." \
       0 0
@@ -202,7 +206,8 @@ manual_install() {
 }
 
 pip_pkg_install() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Installing the Python package \`$1\` ($n of $total).\n $1 $2" \
     0 0
@@ -229,7 +234,8 @@ set_postinstall_settings() {
 }
 
 set_preinstall_settings() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
     0 0
@@ -252,7 +258,8 @@ set_permissions() {
 }
 
 set_user_credentials() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Adding user \"$name\"..." \
     0 0
@@ -272,7 +279,8 @@ start_pulse_audio_daemon() {
 }
 
 system_beep_off() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Getting rid of that retarded error beep sound..." \
     0 0
@@ -283,7 +291,8 @@ system_beep_off() {
 }
 
 user_confirm_install() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --yes-label "Let's go!" \
     --no-label "No, nevermind!" \
@@ -295,7 +304,8 @@ user_confirm_install() {
 }
 
 refresh_arch_keyring() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Refreshing Arch Keyring..." \
     0 0
@@ -303,7 +313,8 @@ refresh_arch_keyring() {
 }
 
 run_reflector() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --yesno "Install and run reflector? It might speed up package downloads." \
     0 0
@@ -325,7 +336,8 @@ run_reflector() {
 
 user_exists_warning() {
   ! (id -u "$name" > /dev/null) 2>&1 ||
-    dialog --colors \
+    dialog \
+      --colors \
       --backtitle "$BACKTITLE" \
       --title "$TITLE" \
       --yes-label "CONTINUE" \
@@ -335,7 +347,8 @@ user_exists_warning() {
 }
 
 welcome_screen() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "Welcome!" \
     --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
     0 0
