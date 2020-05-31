@@ -377,8 +377,8 @@ clear_partition_cruft
 create_partitions
 create_partition_filesystems
 refresh_arch_keyring
-install_arch
 generate_fstab
+install_arch
 set_timezone
 set_hostname
 set_root_password
