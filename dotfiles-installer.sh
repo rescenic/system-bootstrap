@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ====================================================== #
 # dotfiles-installer.sh                                  #
 # Created by: Luke Smith <luke@lukesmith.xyz>            #
@@ -6,12 +6,34 @@
 # License: GNU GPLv3                                     #
 # ====================================================== #
 # ====== Variables ====== #
+while getopts ":a:r:b:p:h" o; do case "${o}" in
+	h) printf "Optional arguments for custom use:\\n  -r: Dotfiles repository (local file or url)\\n  -p: Dependencies and programs csv (local file or url)\\n  -a: AUR helper (must have pacman-like syntax)\\n  -h: Show this message\\n" && exit ;;
+	r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfilesrepo" || exit ;;
+	b) repo_branch=${OPTARG} ;;
+	p) user_programs_file=${OPTARG} ;;
+	a) aur_helper=${OPTARG} ;;
+	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit ;;
+esac done
+
+[ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
+[ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
+[ -z "$aur_helper" ] && aur_helper="yay"
+[ -z "$repo_branch" ] && repo_branch="master"
+
 BACKTITLE="System bootstrap"
 TITLE="Configuration files installer"
-USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
+USER_PROGRAMS_PARSE_PATTERN="\"^[PGA]*,\""
 # ======================= #
 #       Dialog boxes      #
 # ======================= #
+display_info_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "$1" \
+        0 0
+}
+
 display_input_box() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -35,61 +57,33 @@ display_password_input() {
 #   Installer functions   #
 # ======================= #
 add_dotfiles() {
-    display_info_box "Installing $name's dotfiles"
+    display_info_box "Installing dotfiles for $name"
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
-    rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/.bash*"
-    cd /home/"$name" &&
-        git update-index --assume-unchanged "/home/$name/LICENSE" &&
-        git update-index --assume-unchanged "/home/$name/README.md"
+    rm -f "/home/$name/README.md" "/home/$name/LICENSE"
+    # make git ignore deleted LICENSE & README.md files
+    git update-index --assume-unchanged "/home/$name/README.md"
+    git update-index --assume-unchanged "/home/$name/LICENSE"
 }
 
 aur_pkg_install() {
     display_info_box "Installing \`$1\` from the AUR\n($n of $total)"
-    echo "$aurinstalled" | grep "^$1$" > /dev/null 2>&1 && return
-    sudo -u "$name" "$aur_helper" -S --noconfirm "$1" > /dev/null 2>&1
+    echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
+	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
 }
-
-# clean_installed_packages() {
-#   dialog --title "WARNING!" --yesno "Are you sure you want to clean the system of all non-essential packages?" 0 0
-#   response=$?
-#   case $response in
-#     0)
-#       # mark all packages as dependencies using command
-#       pacman -D --asdeps "$(pacman -Qe)"
-#       pacman -S --asexplicit --needed base linux linux-firmware
-#       pacman -Rsunc "$(pacman -Qtdq)"
-#       ;;
-#     1)
-#       return
-#       ;;
-#   esac
-# }
 
 create_user_dirs() {
-    mkdir -p /home/"${name}"/github
-    mkdir -p /home/"${name}"/downloads
-}
-
-display_info_box() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "$1" \
-        0 0
+    mkdir -p "/home/$name/github"
+    mkdir -p "/home/$name/downloads"
 }
 
 enable_docker() {
     # https://docs.docker.com/install/linux/linux-postinstall/
     systemctl enable docker.service
     systemctl start docker.service
-    usermod -aG docker "$USER"
+    usermod -aG docker "$name"
 }
 
-error() {
-    clear
-    printf 'ERROR:\n%s\n' "$1"
-    exit
-}
+error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
 get_user_credentials() {
     # Prompts user for new username and password.
@@ -112,39 +106,30 @@ git_pkg_clone() {
     dir=$(mktemp -d)
     [ ! -d "$2" ] && mkdir -p "$2"
     chown -R "$name":wheel "$dir" "$2"
-    sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" > /dev/null 2>&1
+    sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" >/dev/null 2>&1
     sudo -u "$name" cp -rfT "$dir" "$2"
 }
 
 git_pkg_install() {
-    progname="$(basename "$1")"
-    dir="$repodir/$progname"
-    display_info_box "Installing: \`$progname\` via \`git\` and \`make\`\n($n of $total)"
-    sudo -u "$name" git clone --depth 1 "$1" "$dir" > /dev/null 2>&1 || {
-        cd "$dir" || return
-        sudo -u "$name" git pull --force origin master
-    }
-    cd "$dir" || exit
-    make > /dev/null 2>&1
-    make install > /dev/null 2>&1
-    cd /tmp || return
-}
+	progname="$(basename "$1" .git)"
+	dir="$repodir/$progname"
+	display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
+	sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
+	cd "$dir" || exit
+	make >/dev/null 2>&1
+	make install >/dev/null 2>&1
+	cd /tmp || return ;}
 
 install_dependencies() {
     display_info_box "Installing dependencies for installation"
-    $(
-        install_pkg dialog
-        install_pkg curl
-        install_pkg base-devel
-        install_pkg git
-        install_pkg ntp
-    ) > /dev/null 2>&1
+    install_pkg curl
+    install_pkg base-devel
+    install_pkg git
+    install_pkg ntp
 }
 
-install_user_programs() {
-    ([ -f "$user_programs_file" ] &&
-        cp "$user_programs_file" /tmp/programs.csv) ||
-        curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
+install_user_programs() { \
+    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
     total=$(wc -l < /tmp/programs.csv)
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
@@ -156,17 +141,18 @@ install_user_programs() {
             "P") pip_pkg_install "$program" "$comment" ;;
             *) official_arch_pkg_install "$program" "$comment" ;;
         esac
-    done < /tmp/programs.csv
-}
+    done < /tmp/progs.csv ;}
 
 install_nvim_plugins() {
     display_info_box "Installing Neovim plugins"
-    nvim +PlugInstall +qall > /dev/null 2>&1
+    nvim +PlugInstall +qall
 }
 
 install_pkg() {
     pacman --noconfirm --needed -S "$1" > /dev/null 2>&1
 }
+
+installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
 
 official_arch_pkg_install() {
     display_info_box "Installing \`$1\`\n($n of $total)"
@@ -174,78 +160,70 @@ official_arch_pkg_install() {
 }
 
 manual_install() {
-    [ -f "/usr/bin/$1" ] || (
-        display_info_box "Installing \"$1\", an AUR helper..."
-        cd /tmp || exit
-        rm -rf /tmp/"$1"*
-        curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
-            sudo -u "$name" tar -xvf "$1".tar.gz > /dev/null 2>&1 &&
-            cd "$1" &&
-            sudo -u "$name" makepkg --noconfirm -si > /dev/null 2>&1
-        cd /tmp || return
-    )
-}
+	[ -f "/usr/bin/$1" ] || (
+	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
+	cd /tmp || exit
+	rm -rf /tmp/"$1"*
+	curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
+	sudo -u "$name" tar -xvf "$1".tar.gz >/dev/null 2>&1 &&
+	cd "$1" &&
+	sudo -u "$name" makepkg --noconfirm -si >/dev/null 2>&1
+	cd /tmp || return) ;}
 
 pip_pkg_install() {
-    display_info_box "Installing Python package \`$1\`\n($n of $total)"
-    command -v pip || install_pkg python-pip > /dev/null 2>&1
+    display_info_box "Installing the Python package \`$1\` ($n of $total). $1 $2"
+    command -v pip || install_pkg python-pip >/dev/null 2>&1
     yes | pip install "$1"
 }
 
 set_postinstall_settings() {
     # Zsh is default shell
-    #sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
     chsh -s /bin/zsh $name >/dev/null 2>&1
     sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
+    #sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
+    
     # Allows user to execute `shutdown`, `reboot`, updating, etc. without password
-    set_permissions "%wheel ALL=(ALL) ALL #dotfile-installer
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
+    set_permissions "%wheel ALL=(ALL) ALL #SYSBOOTSTRAP
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm"
+    
     enable_docker || error "Couldn't enable docker."
     install_nvim_plugins || error "Couldn't install nvim plugins"
     start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
-    yes | sudo -u "$name" "$aur_helper" -S libxft-bgra > /dev/null 2>&1
     system_beep_off || error "Couldn't turn off system beep, erghh!"
     create_user_dirs || error "Couldn't make github  or downloads dir."
 }
 
 set_preinstall_settings() {
     display_info_box "Synchronizing system time to ensure successful and secure installation of software..."
-    # synchronize NTP
-    ntp 0.us.pool.ntp.org > /dev/null 2>&1
+    ntpdate 0.us.pool.ntp.org >/dev/null 2>&1
     [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
-    # create fakeroot environment
+    
+    display_info_box "Creating fake root environment..."
     set_permissions "%wheel ALL=(ALL) NOPASSWD: ALL"
-    # make pacman/yay colorful and add eye candy to progress bar
-    grep "^Color" /etc/pacman.conf > /dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
-    grep "ILoveCandy" /etc/pacman.conf > /dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-    # enable all cores for compilation
+    
+    display_info_box "Make pacman more appealing on the eyes"
+    grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
+    grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
+    
+    display_info_box "Enable all cores in Make compilations"
     sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 }
 
 set_permissions() {
-    # Set special `sudoers` settings
-    sed -i "/#dotfile-installer/d" /etc/sudoers
-    echo "$* #dotfile-installer" >> /etc/sudoers
+    display_info_box "Set special 'sudoers' settings"
+    sed -i "/#SYSBOOTSTRAP/d" /etc/sudoers
+    echo "$* #SYSBOOTSTRAP" >> /etc/sudoers
 }
 
-set_user_credentials() {
+set_user_credentials() { \
     display_info_box "Adding user \"$name\"..."
-    useradd -m -g wheel -s /bin/zsh "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
-        mkdir -p /home/"$name" &&
-        chown "$name":wheel /home/"$name"
-    repodir="/home/$name/.local/src"
-    mkdir -p "$repodir"
-    chown -R "$name":wheel "$repodir"
+    useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 || 
+    usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
+    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel $(dirname "$repodir")
     echo "$name:$user_passwd" | chpasswd
-    unset user_passwd confirm_user_passwd
-}
+    unset user_passwd confirm_user_passwd ;}
 
-start_pulse_audio_daemon() {
-    $(
-        killall pulseaudio || true
-        pulseaudio --system --start --daemonize
-    ) > /dev/null 2>&1
-}
+start_pulse_audio_daemon() { killall pulseaudio; sudo -u "$name" pulseaudio --start; }
 
 successful_install_alert() {
     unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
@@ -274,11 +252,10 @@ user_confirm_install() {
         clear
         exit
     }
-}
 
-refresh_arch_keyring() {
+refresh_arch_keyring() { \
     display_info_box "Refreshing Arch keyring"
-    pacman --noconfirm -Sy archlinux-keyring > /dev/null 2>&1
+    pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 }
 
 run_reflector() {
@@ -324,21 +301,6 @@ welcome_screen() {
 # ---------------------------- #
 #            Install           #
 # ---------------------------- #
-while getopts ":a:r:b:p:h" o; do case "${o}" in
-    h) printf 'Optional arguments for custom use:\n  -r: Dotfiles repository (local file or url)\n  -p: Dependencies and programs csv (local file or url)\n  -a: AUR helper (must have pacman-like syntax)\n  -h: Show this message\n' && exit ;;
-    r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
-    b) repo_branch=${OPTARG} ;;
-    p) user_programs_file=${OPTARG} ;;
-    a) aur_helper=${OPTARG} ;;
-    *) printf 'Invalid option: -%s\n' "$OPTARG" && exit ;;
-esac; done
-
-[ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
-[ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
-[ -z "$aur_helper" ] && aur_helper="yay"
-[ -z "$repo_branch" ] && repo_branch="master"
-
-# clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
 install_dependencies
 welcome_screen || error "User exited welcome_screen()"
 get_user_credentials || error "Error in prompt_user_credentials()"
