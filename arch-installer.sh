@@ -6,6 +6,26 @@ TITLE="Arch install"
 CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
 
 # ======================= #
+#     Dialog functions    #
+# ======================= #
+display_info_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "$1" \
+        0 0
+}
+
+display_yes_no_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "DON'T BE A BRAINLET!" \
+        --defaultno \
+        --yesno "$1" \
+        0 0 || exit
+    return
+}
+# ======================= #
 #   Installer functions   #
 # ======================= #
 clean_partition_cruft() {
@@ -25,7 +45,6 @@ clean_partition_cruft() {
 		Y # confirmation
 		q # exit gdisk
 	EOF
-
     update_kernel
 }
 
@@ -64,17 +83,11 @@ create_partitions() {
 }
 
 create_partition_filesystems() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --defaultno \
-        --yesno "Does this look correct?
-            \n${drive}${boot_partition}
-            \n${drive}${swap_partition}
-            \n${drive}${root_partition}
-            \n${drive}${user_partition}
-            " \
-        0 0 || exit
+    display_yes_no_box "Does this look correct?
+            		\n${drive}${boot_partition}
+		        \n${drive}${swap_partition}
+		        \n${drive}${root_partition}
+		        \n${drive}${user_partition}"
     yes | mkfs.fat -F32 "${drive}""${boot_partition}"
     yes | mkfs.ext4 "${drive}""${root_partition}"
     yes | mkfs.ext4 "${drive}""${user_partition}"
@@ -88,24 +101,6 @@ create_partition_filesystems() {
     mkdir -p /mnt/home
     mount "${drive}""${user_partition}" /mnt/home
     update_kernel
-}
-
-display_info_box() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "$1" \
-        0 0
-}
-
-display_yes_no_box() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "DON'T BE A BRAINLET!" \
-        --defaultno \
-        --yesno "$1" \
-        0 0 || exit
-    return
 }
 
 enter_chroot_environment() {
