@@ -337,7 +337,7 @@ user_set_root_password() {
             display_password_input "Confirm root password"
         )
     done
-    set_root_passwd r_passwd
+    set_root_password r_passwd
 }
 # ================= #
 #   Install steps   #
