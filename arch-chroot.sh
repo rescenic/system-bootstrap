@@ -88,6 +88,11 @@ install_user_dotfiles() {
     sudo bash dotfiles-installer.sh
 }
 
+set_root_password() {
+    echo "root:${r_passwd}" | chpasswd
+    display_info_box "Successfully set root password"
+    sleep 10
+}
 set_sytem_timezone() {
     display_info_box "Synchronizing hardware clock"
     TZuser=$(cat tzfinal.tmp)
@@ -124,6 +129,7 @@ run_reflector() {
 # ---------------------------- #
 preinstall_setup
 run_reflector
+set_root_password
 set_sytem_locale
 set_sytem_timezone
 start_network_manager
