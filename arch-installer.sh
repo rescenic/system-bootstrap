@@ -355,7 +355,6 @@ set_root_password() {
                 3>&1 1>&2 2>&3 3>&1
         )
     done
-    arch-chroot /mnt echo "root:$root_password" | chpasswd
 }
 
 update_kernel() {
@@ -385,6 +384,7 @@ install_arch
 set_timezone
 set_hostname
 set_root_password
+arch-chroot /mnt echo "root:$root_password" | chpasswd
 enter_chroot_env
 postinstall_options
 clear
