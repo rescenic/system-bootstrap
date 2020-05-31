@@ -94,7 +94,8 @@ create_partition_filesystems() { \
 
 enter_chroot_env() { \
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
-    curl "$chroot_url" > /mnt/chroot.sh && arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
+    curl "$chroot_url" > /mnt/chroot.sh
+    arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
 }
 
 error() { \
@@ -225,10 +226,40 @@ set_timezone() { \
     rm tz.tmp
 }
 
+set_root_password() { \
+root_password=$(
+dialog \
+--no-cancel \
+--passwordbox "Enter a root password." \
+0 0 \
+3>&1 1>&2 2>&3 3>&1)
+root_password_confirm=$(dialog \
+--no-cancel \
+--passwordbox "Retype password." \
+0 0 \
+3>&1 1>&2 2>&3 3>&1)
+
+while true; do
+	[[ "$pass1" != "" && "$pass1" == "$pass2" ]] && break
+	root_password=$(
+	dialog \
+	--no-cancel \
+	--passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
+	0 0 \
+	3>&1 1>&2 2>&3 3>&1)
+	root_password_confirm=$(
+	dialog \
+	--no-cancel \
+	--passwordbox "Retype password." \
+	0 0 \
+	3>&1 1>&2 2>&3 3>&1)
+done
+arch-chroot /mnt echo "root:$root_password" | chpasswd  
+}
+
 update_kernel() { \
     partprobe
 }
-
 
 ################################
 #        Install script        #
@@ -250,6 +281,7 @@ install_arch
 generate_fstab
 set_timezone
 set_hostname
+set_root_password
 enter_chroot_env
 postinstall_options
 
