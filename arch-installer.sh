@@ -18,9 +18,6 @@ clean_partition_cruft() {
     for i in {1..5}; do
         umount --force "${drive}""${i}"
     done
-    # ============================================================= #
-    #   sed script strips off comments so logic is understandable   #
-    # ============================================================= #
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		o # clear the in memory partition table
 		Y # confirmation
@@ -33,9 +30,6 @@ clean_partition_cruft() {
 }
 
 create_partitions() {
-    # ============================================================= #
-    #   sed script strips off comments so logic is understandable   #
-    # ============================================================= #
     eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
 		n # grub partition
 		 # default number (grub)
@@ -149,7 +143,7 @@ install_arch() {
 
 ntp_sync() {
     display_info_box "Setting timedatectl to use ntp..."
-    timedatectl set-ntp true
+    timedatectl set-ntp true > /dev/null 2>&1
 }
 
 preinstall_system_checks() {
@@ -166,7 +160,7 @@ preinstall_system_checks() {
 
 refresh_arch_keyring() {
     display_info_box "Refreshing archlinux-keyring"
-    pacman -Sy --noconfirm archlinux-keyring
+    pacman -Sy --quiet --noconfirm archlinux-keyring > /dev/null 2>&1
 }
 
 run_reflector() {
@@ -192,7 +186,7 @@ set_timezone() {
 
 update_kernel() {
     display_info_box "Updating kernel"
-    partprobe
+    partprobe > /dev/null 2>&1
 }
 
 # ======================== #
@@ -306,7 +300,7 @@ user_select_timezone() {
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --yesno "Use default time zone(America/New_York)?
-                \nPress no for select your own time zone" \
+                \nPress no to select a time zone" \
         0 0 && echo "America/New_York" > tz.tmp ||
         tzselect > tz.tmp
 }
