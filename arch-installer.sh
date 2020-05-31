@@ -117,10 +117,10 @@ create_partition_filesystems() {
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
     curl "$CHROOT_URL" > /mnt/chroot.sh &&
-    arch-chroot mnt/ bash chroot.sh
-#         "${drive}" \
-#         "$drive$boot_partition" \
-#         "$bootloader"
+    arch-chroot mnt/ bash chroot.sh \
+        "${drive}" \
+        "${drive}${boot_partition}" \
+        "${bootloader}"
 }
 
 error() {
