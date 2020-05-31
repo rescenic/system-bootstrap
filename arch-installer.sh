@@ -67,10 +67,18 @@ select_bootloader() {
         if [ "$_return" = "1" ]; then
             bootloader="grub"
 	    create_partition_cmd="sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+	    boot_partition=2
+	    swap_partition=3
+	    root_partition=4
+	    user_partition=5
         fi
         if [ "$_return" = "2" ]; then
             bootloader="bootctl"
 	    create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+	    boot_partition=1
+	    swap_partition=2
+	    root_partition=3
+	    user_partition=4
         fi
     else
         dialog \
@@ -134,18 +142,19 @@ create_partition_filesystems() {
         --title "$TITLE" \
         --infobox "Format and mount partitions" \
         0 0
-    yes | mkfs.fat -F32 "${drive}"1
-    yes | mkfs.ext4 "${drive}"3
-    yes | mkfs.ext4 "${drive}"4
+	
+    yes | mkfs.fat -F32 "${drive}${boot_partition}"
+    yes | mkfs.ext4 "${drive}${root_partition}"
+    yes | mkfs.ext4 "${drive}${user_partition}"
     # Enable swap
-    mkswap "${drive}"2
-    swapon "${drive}"2
+    mkswap "${drive}${swap_partition}"
+    swapon "${drive}${swap_partition}"
     # Mount partitions
-    mount "${drive}"3 /mnt
+    mount "${drive}${root_partition}" /mnt
     mkdir -p /mnt/boot
-    mount "${drive}"1 /mnt/boot
+    mount "${drive}${boot_partition}" /mnt/boot
     mkdir -p /mnt/home
-    mount "${drive}"4 /mnt/home
+    mount "${drive}${user_partition}" /mnt/home
 
     update_kernel
 }
@@ -153,7 +162,7 @@ create_partition_filesystems() {
 enter_chroot_env() {
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
     curl "$chroot_url" > /mnt/chroot.sh
-    arch-chroot /mnt bash chroot.sh "$drive" "$drive"3 $bootloader
+    arch-chroot /mnt bash chroot.sh "${drive}" "${drive}${boot_partition}" "${bootloader}"
 }
 
 error() {
