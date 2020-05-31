@@ -3,7 +3,7 @@
 BACKTITLE="Arch installer"
 TITLE="Arch chroot"
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
     dialog \
         --backtitle "$BACKTITLE" \
         --title "BOOMER BRAINLET" \
@@ -14,13 +14,14 @@ fi
 
 DRIVE="$1"
 BOOTLOADER_PARTITION="$2"
+BOOTLOADER=$3
 
 get_dependencies() {
     pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager
 }
 
 install_bootctl_bootloader() {
-    UUID=$(blkid -s PARTUUID -o value "$DRIVE"3)
+    UUID=$(blkid -s PARTUUID -o value "$BOOTLOADER_PARTITION")
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -42,43 +43,32 @@ install_bootctl_bootloader() {
 }
 
 install_bootloader() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --menu "Choose a bootloader to install" \
-        0 0 \
-        2 1 Grub 2 Bootctl \
-        2> temp
-    if [ "$?" = "0" ]; then
-        _return=$(cat temp)
-        if [ "$_return" = "1" ]; then
-            install_grub_bootloader
-        fi
-        if [ "$_return" = "2" ]; then
-            install_bootctl_bootloader
-        fi
+   if [ "$BOOTLOADER" = "grub" ]; then
+    install_grub_bootloader
+   fi
+   if [ "$BOOTLOADER" = "bootctl" ]; then
+    install_bootctl_bootloader
+   fi
     else
         dialog \
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
-            --infobox "Installer exited because no bootloader was chosen." \
+            --infobox "Installer exited because no bootloader was chosen?" \
             0 0
-        rm -f temp
         exit
     fi
-    rm -f temp
 }
 
 install_grub_bootloader() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --yesno "Install Grub on ${BOOTLOADER_PARTITION} with UUID ${UUID}?" \
+        --yesno "Install ${BOOTLOADER}?" \
         0 0 || exit
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing grub on ${BOOTLOADER_PARTITION}" \
+        --infobox "Installing "${BOOTLOADER}" on ${DRUVE}" \
         0 0
     pacman --noconfirm --needed -S grub
     grub-install --target=i386-pc "$DRIVE"
