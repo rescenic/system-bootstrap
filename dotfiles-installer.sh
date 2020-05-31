@@ -65,10 +65,15 @@ add_dotfiles() {
     git update-index --assume-unchanged "/home/$name/LICENSE"
 }
 
+arch_pkg_install() {
+    display_info_box "Installing \`$1\`\n($n of $total)"
+    install_pkg "$1"
+}
+
 aur_pkg_install() {
     display_info_box "Installing \`$1\` from the AUR\n($n of $total)"
     echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
-	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
+    sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
 }
 
 create_user_dirs() {
@@ -128,6 +133,13 @@ install_dependencies() {
     install_pkg ntp
 }
 
+install_nvim_plugins() {
+    display_info_box "Installing Neovim plugins"
+    nvim +PlugInstall +qall
+}
+
+install_pkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
+
 install_user_programs() { \
     ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
     total=$(wc -l < /tmp/programs.csv)
@@ -139,25 +151,9 @@ install_user_programs() { \
             "A") aur_pkg_install "$program" "$comment" ;;
             "G") git_pkg_install "$program" "$comment" ;;
             "P") pip_pkg_install "$program" "$comment" ;;
-            *) official_arch_pkg_install "$program" "$comment" ;;
+            *) arch_pkg_install "$program" "$comment" ;;
         esac
     done < /tmp/progs.csv ;}
-
-install_nvim_plugins() {
-    display_info_box "Installing Neovim plugins"
-    nvim +PlugInstall +qall
-}
-
-install_pkg() {
-    pacman --noconfirm --needed -S "$1" > /dev/null 2>&1
-}
-
-installpkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
-
-official_arch_pkg_install() {
-    display_info_box "Installing \`$1\`\n($n of $total)"
-    install_pkg "$1"
-}
 
 manual_install() {
 	[ -f "/usr/bin/$1" ] || (
