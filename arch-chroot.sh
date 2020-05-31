@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BACKTITLE="Arch installer"
+BACKTITLE="System bootstrap"
 TITLE="Arch chroot"
 
 DOTFILES_INSTALLER_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh"
