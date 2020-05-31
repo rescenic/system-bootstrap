@@ -7,6 +7,11 @@
 # License: GNU GPLv3                                    #
 # ----------------------------------------------------- #
 
+BACKTITLE="System bootstrap"
+TITLE="Configuration files installer"
+
+USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
+
 add_dotfiles() {
     echo "$name"
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
@@ -149,15 +154,17 @@ install_dependencies() {
         --title "$TITLE" \
         --infobox "Installing dependencies for installing other software." \
         0 0
-    install_pkg dialog
+    $(install_pkg dialog
     install_pkg curl
     install_pkg base-devel
     install_pkg git
-    install_pkg ntp
+    install_pkg ntp) > /dev/null 2>&1
 }
 
 install_user_programs() {
-    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$grepseq" > /tmp/programs.csv
+    ([ -f "$user_programs_file" ] \
+    && cp "$user_programs_file" /tmp/programs.csv) \
+    || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
     total=$(wc -l < /tmp/programs.csv)
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
@@ -271,14 +278,15 @@ set_user_credentials() {
 }
 
 start_pulse_audio_daemon() {
-    killall pulseaudio || true
-    pulseaudio --system --start --daemonize
+    $(killall pulseaudio || true
+    pulseaudio --system --start --daemonize) > /dev/null 2>&1
 }
 
 successful_install_alert() {
     # Generate list of programs should be installed, but aren't
     unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
     dialog \
+        --backtitle "$BACKTITLE" \
         --title "Configuration files installed" \
         --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\nNumber of programs installed -> $total. \nPrograms that might not have gotten installed\n:$unsuccessfully_installed_programs" \
         0 0
@@ -292,6 +300,7 @@ system_beep_off() {
         0 0
     rmmod pcspkr || \
     dialog \
+        --backtitle "$BACKTITLE" \
         --title "Configuration files installer" \
         --infobox "pcspkr module not loaded, skipping..." \
         0 0
@@ -375,16 +384,10 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
     *) printf 'Invalid option: -%s\n' "$OPTARG" && exit ;;
 esac; done
 
-# parse package types in user-programs.csv
-grepseq='"^[PGA]*,"'
-
 [ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
 [ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
 [ -z "$aur_helper" ] && aur_helper="yay"
 [ -z "$repo_branch" ] && repo_branch="master"
-
-BACKTITLE="System bootstrap"
-TITLE="Configuration files installer"
 
 # clean_installed_packages || error "clean_installed_packages() could not clear non-essential packages"
 install_dependencies
