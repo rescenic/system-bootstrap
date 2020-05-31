@@ -59,15 +59,6 @@ error() {
     exit
 }
 
-successful_install_alert() {
-    # Generate list of programs should be installed, but aren't
-    unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
-    dialog \
-        --title "Configuration files installed" \
-        --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" \
-        0 0
-}
-
 get_user_credentials() {
     # Prompts user for new username and password.
     name=$(dialog \
@@ -157,7 +148,7 @@ install_dependencies() {
         --title "$TITLE" \
         --infobox "Installing dependencies for installing other software." \
         0 0
-    install_pkg dialog || error "Are you sure you're running  as the root user and have internet connectivity?"
+    install_pkg dialog
     install_pkg curl
     install_pkg base-devel
     install_pkg git
@@ -279,8 +270,17 @@ set_user_credentials() {
 }
 
 start_pulse_audio_daemon() {
-    killall pulseaudio
+    killall pulseaudio;
     sudo -u "$name" pulseaudio --start
+}
+
+successful_install_alert() {
+    # Generate list of programs should be installed, but aren't
+    unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
+    dialog \
+        --title "Configuration files installed" \
+        --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\nNumber of programs installed -> $total. \nPrograms that might not have gotten installed\n:$unsuccessfully_installed_programs" \
+        0 0
 }
 
 system_beep_off() {
@@ -289,7 +289,9 @@ system_beep_off() {
         --title "$TITLE" \
         --infobox "Getting rid of that retarded error beep sound..." \
         0 0
-    rmmod pcspkr || dialog --title "Configuration files installer" \
+    rmmod pcspkr || \
+    dialog \
+        --title "Configuration files installer" \
         --infobox "pcspkr module not loaded, skipping..." \
         0 0
     echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
@@ -326,7 +328,8 @@ run_reflector() {
     response=$?
     case $response in
         0)
-            dialog --backtitle "$BACKTITLE" \
+            dialog \
+                --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --infobox "Running reflector..." \
                 0 0
@@ -394,7 +397,6 @@ run_reflector || error "run_reflector() encountered an error"
 set_preinstall_settings || error "set_preinstall_settings() did not finish successfully"
 manual_install $aur_helper || error "Failed to install yay via manual_install()"
 install_user_programs || error "Error in install_user_programs()"
-echo "$name"
-add_dotfiles
+add_dotfiles || error "Error in add_dotfiles()"
 set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
 successful_install_alert || error "Unfortunately, the install failed..."
