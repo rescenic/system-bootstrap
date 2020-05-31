@@ -22,7 +22,7 @@ fi
 
 
 get_dependencies() {
-    pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager
+    pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager > /dev/null 2>&1
 }
 
 install_bootctl_bootloader() {
@@ -73,9 +73,9 @@ install_grub_bootloader() {
         --title "$TITLE" \
         --infobox "Installing "${BOOTLOADER}" on ${DRIVE}" \
         0 0
-    pacman --noconfirm --needed -S grub efibootmgr
+    (pacman --noconfirm --needed -S grub efibootmgr
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-    grub-mkconfig -o /boot/grub/grub.cfg
+    grub-mkconfig -o /boot/grub/grub.cfg) > /dev/null 2>&1
 }
 
 install_dotfiles() {
