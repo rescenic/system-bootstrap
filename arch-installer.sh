@@ -184,10 +184,9 @@ set_hostname() {
 }
 
 set_root_password() {
+    echo "root:$1" | arch-chroot /mnt chpasswd || error "Couldn't set root password to $1"
     display_info_box "Set root password to $1"
-    arch-chroot /mnt echo "root:$1" | chpasswd || error "Couldn't set root password to $1"
-    display_info_box "Set root password to $1"
-    sleep 10 
+    sleep 5 
 }
 
 set_timezone() {
@@ -335,7 +334,7 @@ user_set_root_password() {
             display_password_input "Confirm root password"
         )
     done
-    set_root_password $r_passwd
+    set_root_password "$r_passwd" 
 }
 # ================= #
 #   Install steps   #
