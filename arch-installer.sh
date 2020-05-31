@@ -93,7 +93,7 @@ create_partitions() {
 
 create_partition_filesystems() {
     display_yes_no_box "Does this look correct?
-            		\nBoot: ${drive}${boot_partition}
+            		\n\nBoot: ${drive}${boot_partition}
 		        \nSwap: ${drive}${swap_partition}
 		        \nRoot: ${drive}${root_partition}
 		        \nUser: ${drive}${user_partition}"
