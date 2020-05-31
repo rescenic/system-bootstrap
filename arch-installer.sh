@@ -108,7 +108,7 @@ error() { \
 }
 
 generate_fstab() { \
-    genfstab -U -p /mnt >> /mnt/etc/fstab
+    genfstab -U -p /mnt > /mnt/etc/fstab
 }
 
 get_hostname() { \
