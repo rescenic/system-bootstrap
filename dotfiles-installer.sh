@@ -1,17 +1,16 @@
 #!/bin/bash
-
-# ----------------------------------------------------- #
-# dotfiles-installer.sh                                 #
-# Released by: Luke Smith <luke@lukesmith.xyz>          #
-# Adapted by: Vlad Doster <vlad_doster@hms.harvard.edu> #
-# License: GNU GPLv3                                    #
-# ----------------------------------------------------- #
-
+# ====================================================== #
+# arch-chroot.sh                                         #
+# Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
+# License: GNU GPLv3                                     #
+# ====================================================== #
+# ====== Variables ====== #
 BACKTITLE="System bootstrap"
 TITLE="Configuration files installer"
-
 USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
-
+# ======================= #
+#   Installer functions   #
+# ======================= #
 add_dotfiles() {
     display_info_box "Installing $name's dotfiles"
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
