@@ -1,8 +1,12 @@
 #!/bin/bash
 
+BACKTITLE="Arch installer"
+TITLE="Arch install"
+
 clear_partition_cruft() {
     dialog \
-        --title "Partitions" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Unmounting any parititons from ${drive}..." \
         0 0
     swapoff -a > /dev/null 2>&1
@@ -34,8 +38,9 @@ confirm_install() {
 
 confirm_partition_sizes() {
     dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --defaultno \
-        --title "System information" \
         --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
         0 0 || exit
 }
@@ -76,7 +81,8 @@ create_partitions() {
 
 create_partition_filesystems() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Format and mount partitions" \
         0 0
     yes | mkfs.fat -F32 "${drive}"1
@@ -105,7 +111,8 @@ error() {
     # error handling goes here
     error=$(echo "$@")
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --no-collapse \
         --msgbox "$error" \
         0 0
@@ -118,7 +125,8 @@ generate_fstab() {
 
 get_hostname() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --no-cancel \
         --inputbox "Enter a name for your computer." \
         0 0 \
@@ -128,7 +136,8 @@ get_hostname() {
 
 get_partition_sizes() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --no-cancel \
         --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
         0 0 \
@@ -142,8 +151,9 @@ get_partition_sizes() {
 
 get_timezone() {
     dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --defaultno \
-        --title "Arch install" \
         --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone" \
         0 0 &&
         echo "America/New_York" > tz.tmp || tzselect > tz.tmp
@@ -151,7 +161,8 @@ get_timezone() {
 
 install_arch() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
     pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
@@ -159,7 +170,8 @@ install_arch() {
 
 ntp_sync() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Setting timedatectl to use ntp..." \
         0 0
     timedatectl set-ntp true
@@ -167,13 +179,15 @@ ntp_sync() {
 
 postinstall_options() {
     dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --defaultno \
-        --title "Arch install complete" \
         --yesno "Reboot computer?" \
         0 0 && reboot
     dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --defaultno \
-        --title "Arch install complete" \
         --yesno "Return to chroot environment?" \
         0 0 && arch-chroot /mnt
 }
@@ -185,7 +199,8 @@ preinstall_checks() {
     fi
 
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Doing preliminary checks..." \
         0 0
     msg=$(
@@ -197,7 +212,8 @@ preinstall_checks() {
 
 refresh_arch_keyring() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Refreshing archlinux-keyring" \
         0 0
     pacman -Sy --noconfirm archlinux-keyring
@@ -205,7 +221,8 @@ refresh_arch_keyring() {
 
 run_reflector() {
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --infobox "Updating pacman mirrors..." \
         0 0
     reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
@@ -215,14 +232,16 @@ select_install_drive() {
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
     selection=$(
-        dialog \
-            --title "Arch install" \
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
             --menu "Please select:" 0 0 0 \
             "${drives[@]}" 2>&1 > /dev/tty
     )
     drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
     dialog \
-        --title "Arch install" \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
         --defaultno \
         --yesno "Install Arch on: /dev/${drive}" \
         0 0 || exit
@@ -245,14 +264,18 @@ set_timezone() {
 
 set_root_password() {
     root_password=$(
-        dialog \
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
             --no-cancel \
             --passwordbox "Enter a root password." \
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
     root_password_confirm=$(
-        dialog \
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
             --no-cancel \
             --passwordbox "Retype password." \
             0 0 \
@@ -262,15 +285,19 @@ set_root_password() {
     while true; do
         [[ $pass1 != "" && $pass1 == "$pass2" ]] && break
         root_password=$(
-            dialog \
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
                 --no-cancel \
                 --passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
         )
         root_password_confirm=$(
-            dialog \
-                --no-cancel \
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \                
+	--no-cancel \
                 --passwordbox "Retype password." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
