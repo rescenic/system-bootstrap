@@ -28,6 +28,15 @@ clear_partition_cruft() {
     update_kernel
 }
 
+confirm_bootloader() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --defaultno \
+        --yesno "User chose $bootloader so gdisk is using\n$create_partition_cmd" \
+        0 0 || exit
+}
+
 confirm_install() {
     dialog \
         --title "DON'T BE A BRAINLET!" \
@@ -360,6 +369,8 @@ run_reflector
 get_hostname
 get_timezone
 ntp_sync
+select_bootloader
+confirm_bootloader
 get_partition_sizes
 confirm_partition_sizes
 clear_partition_cruft
