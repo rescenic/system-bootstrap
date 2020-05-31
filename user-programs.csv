@@ -39,6 +39,7 @@ A,zsh-fast-syntax-highlighting,"provides syntax highlighting in the shell."
 #,#--Fonts--#,
 ,adobe-source-code-pro-fonts,"is the main font used system wide"
 ,noto-fonts-emoji,"is an emoji font."
+A,libxft-bgra,"allows ST to have color emojis without crashing"
 #,#--Networking--#,
 ,networkmanager,"does exactly what it sounds like."
 ,socat,"is a socket utility."
