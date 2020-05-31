@@ -116,9 +116,9 @@ create_partition_filesystems() {
 
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
-    curl -L "${CHROOT_URL}" > /mnt/chroot.sh > /dev/null 2>&1
+    curl "$CHROOT_URL" > /mnt/chroot.sh
     arch-chroot \
-        /mnt \
+        mnt/ \
         bash chroot.sh \
         "${drive}" \
         "${drive}""${boot_partition}" \
@@ -335,7 +335,7 @@ user_set_root_password() {
             display_password_input "Confirm root password"
         )
     done
-    set_root_password r_passwd
+    set_root_password $r_passwd
 }
 # ================= #
 #   Install steps   #
