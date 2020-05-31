@@ -69,7 +69,7 @@ install_grub_bootloader() {
         --infobox "Installing "${BOOTLOADER}" on ${DRIVE}" \
         0 0
     pacman --noconfirm --needed -S grub efibootmgr
-    grub-install --target=x86_64-efi --efi-directory=/mnt/boot --bootloader-id=GRUB
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
     grub-mkconfig -o /boot/grub/grub.cfg
 }
 
