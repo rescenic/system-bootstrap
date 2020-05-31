@@ -4,17 +4,13 @@
 # Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
 # License: GNU GPLv3                                     #
 # ====================================================== #
-# ======================= #
-#        Variables        #
-# ======================= #
-
+# ====== Variables ====== #
 BACKTITLE="System bootstrap"
 TITLE="Arch chroot"
 BOOTLOADER_PARTITION="$2"
 BOOTLOADER=$3
 DRIVE="$1"
 DOTFILES_INSTALLER_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh"
-
 # ======================= #
 #     Dialog functions    #
 # ======================= #
