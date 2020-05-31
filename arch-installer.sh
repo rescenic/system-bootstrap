@@ -39,6 +39,7 @@ confirm_bootloader() {
 
 confirm_install() {
     dialog \
+        --backtitle "$BACKTITLE" \
         --title "DON'T BE A BRAINLET!" \
         --defaultno \
         --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
