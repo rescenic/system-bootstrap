@@ -3,6 +3,14 @@
 BACKTITLE="Arch installer"
 TITLE="Arch chroot"
 
+DOTFILES_INSTALLER_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh"
+
+BOOTLOADER_PARTITION="$2"
+BOOTLOADER=$3
+DRIVE="$1"
+
+DOTFILES_INSTALLER_URL=""
+
 if [ $# -ne 3 ]; then
     dialog \
         --backtitle "$BACKTITLE" \
@@ -12,9 +20,6 @@ if [ $# -ne 3 ]; then
     exit 1
 fi
 
-DRIVE="$1"
-BOOTLOADER_PARTITION="$2"
-BOOTLOADER=$3
 
 get_dependencies() {
     pacman -Sy --noconfirm dialog intel-ucode reflector networkmanager
@@ -79,7 +84,7 @@ install_dotfiles() {
         --title "$TITLE" \
         --yesno "Install dotfiles" \
         0 0 || return
-    curl -O https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh
+    curl -O "${DOTFILES_INSTALLER_URL}" 
     sudo bash dotfiles-installer.sh
 }
 
