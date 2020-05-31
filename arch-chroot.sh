@@ -45,11 +45,9 @@ install_bootctl_bootloader() {
 install_bootloader() {
    if [ "$BOOTLOADER" = "grub" ]; then
     install_grub_bootloader
-   fi
-   if [ "$BOOTLOADER" = "bootctl" ]; then
+   elif [ "$BOOTLOADER" = "bootctl" ]; then
     install_bootctl_bootloader
-   fi
-    else
+   else
         dialog \
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
