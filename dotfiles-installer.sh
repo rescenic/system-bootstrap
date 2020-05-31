@@ -13,7 +13,7 @@ TITLE="Configuration files installer"
 USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
 
 add_dotfiles() {
-    echo "$name"
+    display_info_box "Installing $name's dotfiles"
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
     rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/.bash*"
     cd /home/"$name" &&
@@ -22,11 +22,7 @@ add_dotfiles() {
 }
 
 aur_pkg_install() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing \`$1\` from the AUR\n($n of $total)" \
-        0 0
+    display_info_box "Installing \`$1\` from the AUR\n($n of $total)"
     echo "$aurinstalled" | grep "^$1$" > /dev/null 2>&1 && return
     sudo -u "$name" "$aur_helper" -S --noconfirm "$1" > /dev/null 2>&1
 }
@@ -50,6 +46,14 @@ aur_pkg_install() {
 create_user_dirs() {
     mkdir -p /home/"${name}"/github
     mkdir -p /home/"${name}"/downloads
+}
+
+display_info_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "$1" \
+        0 0
 }
 
 enable_docker() {
@@ -117,11 +121,7 @@ get_user_credentials() {
 }
 
 git_pkg_clone() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Downloading and installing configuration files..." \
-        0 0
+    display_info_box "Downloading and installing configuration files"
     [ -z "$3" ] && branch="master" || branch="$repo_branch"
     dir=$(mktemp -d)
     [ ! -d "$2" ] && mkdir -p "$2"
@@ -133,11 +133,7 @@ git_pkg_clone() {
 git_pkg_install() {
     progname="$(basename "$1")"
     dir="$repodir/$progname"
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing: \`$progname\` via \`git\` and \`make\`\n($n of $total)" \
-        0 0
+    display_info_box "Installing: \`$progname\` via \`git\` and \`make\`\n($n of $total)"
     sudo -u "$name" git clone --depth 1 "$1" "$dir" > /dev/null 2>&1 || {
         cd "$dir" || return
         sudo -u "$name" git pull --force origin master
@@ -149,11 +145,7 @@ git_pkg_install() {
 }
 
 install_dependencies() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing dependencies for installation..." \
-        0 0
+    display_info_box "Installing dependencies for installation"
     $(
         install_pkg dialog
         install_pkg curl
@@ -182,6 +174,7 @@ install_user_programs() {
 }
 
 install_nvim_plugins() {
+    display_info_box "Installing Neovim plugins"
     nvim +PlugInstall +qall > /dev/null 2>&1
 }
 
@@ -190,21 +183,13 @@ install_pkg() {
 }
 
 official_arch_pkg_install() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing \`$1\`\n($n of $total)" \
-        0 0
+    display_info_box "Installing \`$1\`\n($n of $total)"
     install_pkg "$1"
 }
 
 manual_install() {
     [ -f "/usr/bin/$1" ] || (
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --infobox "Installing \"$1\", an AUR helper..." \
-            0 0
+        display_info_box "Installing \"$1\", an AUR helper..."
         cd /tmp || exit
         rm -rf /tmp/"$1"*
         curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
@@ -216,11 +201,7 @@ manual_install() {
 }
 
 pip_pkg_install() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing Python package \`$1\`\n($n of $total)" \
-        0 0
+    display_info_box "Installing Python package \`$1\`\n($n of $total)"
     command -v pip || install_pkg python-pip > /dev/null 2>&1
     yes | pip install "$1"
 }
@@ -240,20 +221,16 @@ set_postinstall_settings() {
 }
 
 set_preinstall_settings() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Synchronizing system time to ensure successful and secure installation of software..." \
-        0 0
-    # Synchronize NTP servers
+    display_info_box "Synchronizing system time to ensure successful and secure installation of software..."
+    # synchronize NTP
     ntp 0.us.pool.ntp.org > /dev/null 2>&1
     [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
-    # AUR programs require a fakeroot environment
+    # create fakeroot environment
     set_permissions "%wheel ALL=(ALL) NOPASSWD: ALL"
-    # Make pacman/yay colorful and add eye candy on the progress bar
+    # make pacman/yay colorful and add eye candy to progress bar
     grep "^Color" /etc/pacman.conf > /dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
     grep "ILoveCandy" /etc/pacman.conf > /dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-    # Utilize all cores for compilation
+    # enable all cores for compilation
     sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 }
 
@@ -264,11 +241,7 @@ set_permissions() {
 }
 
 set_user_credentials() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Adding user \"$name\"..." \
-        0 0
+    display_info_box "Adding user \"$name\"..."
     useradd -m -g wheel -s /bin/bash "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
         mkdir -p /home/"$name" &&
         chown "$name":wheel /home/"$name"
@@ -287,7 +260,6 @@ start_pulse_audio_daemon() {
 }
 
 successful_install_alert() {
-    # Generate list of programs should be installed, but aren't
     unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
     dialog \
         --backtitle "$BACKTITLE" \
@@ -297,17 +269,9 @@ successful_install_alert() {
 }
 
 system_beep_off() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Getting rid of that retarded error beep sound..." \
-        0 0
+    display_info_box "Getting rid of that retarded error beep sound..."
     rmmod pcspkr ||
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "Configuration files installer" \
-            --infobox "pcspkr module not loaded, skipping..." \
-            0 0
+        display_info_box "pcspkr module not loaded, skipping..."
     echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
 
@@ -325,11 +289,7 @@ user_confirm_install() {
 }
 
 refresh_arch_keyring() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Refreshing Arch Keyring..." \
-        0 0
+    display_info_box "Refreshing Arch keyring"
     pacman --noconfirm -Sy archlinux-keyring > /dev/null 2>&1
 }
 
@@ -342,12 +302,9 @@ run_reflector() {
     response=$?
     case $response in
         0)
-            dialog \
-                --backtitle "$BACKTITLE" \
-                --title "$TITLE" \
-                --infobox "Running reflector..." \
-                0 0
+            display_info_box "Installing reflector"
             install_pkg reflector
+            display_info_box "Running reflector"
             reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
             ;;
         1)
