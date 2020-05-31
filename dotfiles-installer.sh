@@ -16,7 +16,8 @@ add_dotfiles() { \
 }
 
 aur_pkg_install() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Installing \`$1\` ($n of $total) from the AUR.\n$1 $2" \
     0 0
@@ -61,34 +62,39 @@ error() {
 successful_install_alert() {
   # Generate list of programs should be installed, but aren't
   unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
-  dialog --title "Configuration files installed" \
+  dialog \
+    --title "Configuration files installed" \
     --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\\nNumber of programs installed -> \\Zb$total\\Zn.\n\n\\ZbPrograms that might not have gotten installed\\Zn:\n$unsuccessfully_installed_programs" \
     0 0
 }
 
 get_user_credentials() {
   # Prompts user for new username and password.
-  name=$(dialog --backtitle "$BACKTITLE" \
+  name=$(dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --inputbox "First, please enter a name for the user account." \
     0 0 \
     3>&1 1>&2 2>&3 3>&1) || exit
   while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
-    name=$(dialog --backtitle "$BACKTITLE" \
+    name=$(dialog \
+      --backtitle "$BACKTITLE" \
       --title "$TITLE" \
       --no-cancel \
       --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." \
       0 0 \
       3>&1 1>&2 2>&3 3>&1)
   done
-  pass1=$(dialog --backtitle "$BACKTITLE" \
+  pass1=$(dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --no-cancel \
     --title "Configuration files installer" \
     --passwordbox "Enter a password for that user." \
     0 0 \
     3>&1 1>&2 2>&3 3>&1)
-  pass2=$(dialog --backtitle "$BACKTITLE" \
+  pass2=$(dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --no-cancel \
     --passwordbox "Retype password." \
@@ -96,13 +102,15 @@ get_user_credentials() {
     3>&1 1>&2 2>&3 3>&1)
   while ! [ "$pass1" = "$pass2" ]; do
     unset pass2
-    pass1=$(dialog --backtitle "$BACKTITLE" \
+    pass1=$(dialog \
+      --backtitle "$BACKTITLE" \
       --title "$TITLE" \
       --no-cancel \
       --passwordbox 'Passwords do not match.\n\nEnter password again.' \
       0 0 \
       3>&1 1>&2 2>&3 3>&1)
-    pass2=$(dialog --backtitle "$BACKTITLE" \
+    pass2=$(dialog \
+      --backtitle "$BACKTITLE" \
       --title "$TITLE" \
       --no-cancel \
       --passwordbox "Retype password." \
@@ -181,7 +189,8 @@ install_pkg() {
 }
 
 official_arch_pkg_install() {
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Installing \`$1\` ($n of $total).\n$1 $2" \
     0 0
@@ -224,7 +233,8 @@ set_postinstall_settings() {
   enabledocker || error "Couldn't enable docker."
   install_nvim_plugins || error "Couldn't install nvim plugins"
   start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
-  dialog --backtitle "$BACKTITLE" \
+  dialog \
+    --backtitle "$BACKTITLE" \
     --title "$TITLE" \
     --infobox "Finally, installing libxft-bgra to enable color emoji in suckless software without crashes." \
     0 0
