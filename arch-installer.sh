@@ -152,7 +152,7 @@ create_partition_filesystems() {
     mount "${drive}${boot_partition}" /mnt/boot &&
     mkdir -p /mnt/home &&
     mount "${drive}${user_partition}" /mnt/home
- } 2>&1 /dev/null
+ } &> /dev/null
     update_kernel
 }
 
