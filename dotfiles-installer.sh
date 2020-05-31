@@ -12,8 +12,8 @@ add_dotfiles() {
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
     rm -f "/home/$name/README.md" "/home/$name/LICENSE"
     cd /home/$name &&
-    git update-index --assume-unchanged "/home/$name/LICENSE"; &&
-    git update-index --assume-unchanged "/home/$name/README.md";
+    git update-index --assume-unchanged "/home/$name/LICENSE" &&
+    git update-index --assume-unchanged "/home/$name/README.md"
 }
 
 aur_pkg_install() {
