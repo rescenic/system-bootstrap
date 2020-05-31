@@ -230,14 +230,9 @@ set_postinstall_settings() {
     # Allows user to execute `shutdown`, `reboot`, updating, etc. without password
     set_permissions "%wheel ALL=(ALL) ALL #dotfile-installer
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm,/usr/bin/nmtui,/usr/bin/pycharm"
-    enabledocker || error "Couldn't enable docker."
+    enable_docker || error "Couldn't enable docker."
     install_nvim_plugins || error "Couldn't install nvim plugins"
     start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Finally, installing libxft-bgra to enable color emoji in suckless software without crashes." \
-        0 0
     yes | sudo -u "$name" "$aur_helper" -S libxft-bgra > /dev/null 2>&1
     system_beep_off || error "Couldn't turn off system beep, erghh!"
     create_user_dirs || error "Couldn't make github  or downloads dir."
