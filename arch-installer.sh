@@ -248,7 +248,7 @@ postinstall_options() {
         0 0 && arch-chroot /mnt
 }
 
-preinstall_checks() {2>&1 /dev/null
+preinstall_checks() { \
     if [ "$(id -u)" != "0" ]; then
         error "This script requires it be run as root"
         exit 1
@@ -260,8 +260,10 @@ preinstall_checks() {2>&1 /dev/null
         --infobox "Doing preliminary checks..." \
         0 0
     msg=$(
-        ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) > /dev/null 2>&1 &&
-        pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
+        (
+	ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) &&
+        pacman -Sy --quiet --noconfirm reflector
+	) > /dev/null 2>&1
     )
     [[ -n $msg ]] && error "$msg"
 }
