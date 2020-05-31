@@ -198,7 +198,7 @@ get_partition_sizes() {
         --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
         0 0 \
         2> psize
-    IFS=' ' read -ra SIZE <<< $(cat psize)
+    IFS=' ' read -ra SIZE <<< "$(cat psize)"
     re='^[0-9]+$'
     if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]]; then
         SIZE=(12 50)
@@ -221,7 +221,7 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    { yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware } > /dev/null 2>&1
+    (yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware) > /dev/null 2>&1
 }
 
 ntp_sync() {
@@ -260,9 +260,11 @@ preinstall_checks() { \
         --infobox "Doing preliminary checks..." \
         0 0
     msg=$(
-		ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) > /dev/null 2>&1
-        	pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
-	)
+        (
+	ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &&
+        pacman -Sy --quiet --noconfirm reflector
+	) > /dev/null 2>&1
+    )
     [[ -n $msg ]] && error "$msg"
 }
 
