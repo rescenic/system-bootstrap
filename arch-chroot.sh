@@ -126,9 +126,9 @@ run_reflector() {
         --save /etc/pacman.d/mirrorlist \
         > /dev/null 2>&1
 }
-# ---------------------------- #
+# ============================ #
 #            Install           #
-# ---------------------------- #
+# ============================ #
 preinstall_setup
 run_reflector
 set_root_password
