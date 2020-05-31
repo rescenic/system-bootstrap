@@ -105,7 +105,7 @@ create_partition_filesystems() {
 
 enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
-    curl -L "${CHROOT_URL}" > /mnt/chroot.sh
+    curl -L "${CHROOT_URL}" > /mnt/chroot.sh > /dev/null 2>&1
     arch-chroot \
         /mnt \
         bash chroot.sh \
