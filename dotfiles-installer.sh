@@ -9,7 +9,7 @@
 
 add_dotfiles() { \
 	git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
-	rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/Downloads"
+	rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 	git update-index --assume-unchanged "/home/$name/README.md"
 	git update-index --assume-unchanged "/home/$name/LICENSE"
 }
@@ -119,7 +119,7 @@ git_pkg_clone() { \
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2"
 	chown -R "$name":wheel "$dir" "$2"
-	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" > /dev/null 2>&1
+	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" >/dev/null 2>&1
 	sudo -u "$name" cp -rfT "$dir" "$2"
 }
 
@@ -372,6 +372,6 @@ run_reflector || error "run_reflector() encountered an error"
 set_preinstall_settings || error "set_preinstall_settings() did not finish successfully"
 manual_install $aur_helper || error "Failed to install yay via manual_install()"
 install_user_programs || error "Error in install_user_programs()"
-add_dotfiles || error "Error in add_dotfiles()"
+add_dotfiles
 set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
 successful_install_alert || error "Unfortunately, the install failed..."
