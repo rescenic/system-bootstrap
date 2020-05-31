@@ -5,7 +5,10 @@ TITLE="Arch install"
 
 CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
 
-clear_partition_cruft() {
+# ======================= #
+#   Installer functions   #
+# ======================= #
+clean_partition_cruft() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -27,33 +30,6 @@ clear_partition_cruft() {
 	EOF
 
     update_kernel
-}
-
-confirm_bootloader() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --defaultno \
-        --yesno "User chose $bootloader so gdisk is using\n$create_partition_cmd" \
-        0 0 || exit
-}
-
-confirm_install() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "DON'T BE A BRAINLET!" \
-        --defaultno \
-        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
-        0 0 || exit
-}
-
-confirm_partition_sizes() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --defaultno \
-        --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
-        0 0 || exit
 }
 
 create_partitions() {
@@ -128,7 +104,17 @@ display_info_box() {
         0 0
 }
 
-enter_chroot_env() {
+display_yes_no_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "DON'T BE A BRAINLET!" \
+        --defaultno \
+        --yesno "$1" \
+        0 0 || exit
+    return
+}
+
+enter_chroot_environment() {
     display_info_box "Preparing to enter chroot environment"
     curl -L "${CHROOT_URL}" > /mnt/chroot.sh
     arch-chroot \
@@ -156,44 +142,6 @@ generate_fstab() {
     genfstab -U -p /mnt > /mnt/etc/fstab
 }
 
-get_hostname() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --no-cancel \
-        --inputbox "Enter a name for your computer." \
-        0 0 \
-        2> comp
-    hostname=$(cat comp)
-}
-
-get_partition_sizes() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --no-cancel \
-        --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
-        0 0 \
-        2> psize
-    IFS=' ' read -ra SIZE <<< "$(cat psize)"
-    re='^[0-9]+$'
-    if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]]; then
-        SIZE=(2 10)
-    fi
-}
-
-get_timezone() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --yesno "
-            Use default time zone(America/New_York)?
-            \nPress no for select your own time zone
-            " \
-        0 0 && echo "America/New_York" > tz.tmp ||
-        tzselect > tz.tmp
-}
-
 install_arch() {
     display_info_box "Installing Arch via pacstrap"
     yes " " | pacstrap -i /mnt base base-devel linux linux-firmware linux-headers
@@ -204,22 +152,7 @@ ntp_sync() {
     timedatectl set-ntp true
 }
 
-postinstall_options() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --defaultno \
-        --yesno "Reboot computer?" \
-        0 0 && reboot
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --defaultno \
-        --yesno "Return to chroot environment?" \
-        0 0 && arch-chroot /mnt
-}
-
-preinstall_checks() {
+preinstall_system_checks() {
     [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
     display_info_box "Doing preliminary checks..."
     msg=$(
@@ -246,7 +179,53 @@ run_reflector() {
         > /dev/null 2>&1
 }
 
-select_bootloader() {
+set_hostname() {
+    display_info_box "Setting hostname"
+    mv comp /mnt/etc/hostname
+}
+
+set_timezone() {
+    display_info_box "Setting timezone"
+    cat tz.tmp > /mnt/tzfinal.tmp
+    rm tz.tmp
+}
+
+update_kernel() {
+    display_info_box "Updating kernel"
+    partprobe
+}
+
+# ======================== #
+#   User input functions   #
+# ======================== #
+user_confirm_bootloader() {
+	display_yes_no_box "User chose $bootloader so gdisk is using\n$create_partition_cmd"
+}
+
+user_confirm_install() {
+	display_yes_no_box "Continue only if you're a big-brane who doesn't mind deleting your entire ${drive} drive."
+}
+
+user_confirm_partition_sizes() {
+	display_yes_no_box "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"
+}
+
+user_postinstall_options() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --defaultno \
+        --yesno "Reboot computer?" \
+        0 0 && reboot
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --defaultno \
+        --yesno "Return to chroot environment?" \
+        0 0 && arch-chroot /mnt
+}
+
+user_select_bootloader() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -280,7 +259,18 @@ select_bootloader() {
     rm -f temp
 }
 
-select_install_drive() {
+user_select_hostname() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --no-cancel \
+        --inputbox "Enter a name for your computer." \
+        0 0 \
+        2> comp
+    hostname=$(cat comp)
+}
+
+user_select_install_drive() {
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
     selection=$(
@@ -291,28 +281,38 @@ select_install_drive() {
             "${drives[@]}" 2>&1 > /dev/tty
     )
     drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --yesno "Install Arch on: /dev/${drive}" \
-        0 0 || exit
+    display_yes_no_box "Install Arch on: /dev/${drive}?"
     partition_prefix=$drive
     [[ $drive =~ ^nvme ]] && partition_prefix="${drive}p"
     drive="/dev/${partition_prefix}"
 }
 
-set_hostname() {
-    display_info_box "Setting hostname"
-    mv comp /mnt/etc/hostname
+user_select_partition_sizes() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --no-cancel \
+        --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
+        0 0 \
+        2> psize
+    IFS=' ' read -ra SIZE <<< "$(cat psize)"
+    re='^[0-9]+$'
+    if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]]; then
+        SIZE=(2 10)
+    fi
 }
 
-set_timezone() {
-    display_info_box "Setting timezone"
-    cat tz.tmp > /mnt/tzfinal.tmp
-    rm tz.tmp
+user_select_timezone() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --yesno "Use default time zone(America/New_York)?
+                \nPress no for select your own time zone" \
+        	0 0 && echo "America/New_York" > tz.tmp ||
+        tzselect > tz.tmp
 }
 
-set_root_password() {
+user_set_root_password() {
     root_password=$(
         dialog \
             --backtitle "$BACKTITLE" \
@@ -353,28 +353,24 @@ set_root_password() {
                 3>&1 1>&2 2>&3 3>&1
         )
     done
+   arch-chroot /mnt/root echo "root:${root_password}" | chpasswd
 }
 
-update_kernel() {
-    display_info_box "Updating kernel"
-    partprobe
-}
-
-################################
-#        Install script        #
-################################
-preinstall_checks
-select_install_drive
-confirm_install
+# ================= #
+#   Install steps   #
+# ================= #
+preinstall_system_checks
+user_select_install_drive
+user_confirm_install
 run_reflector
-get_hostname
-get_timezone
+user_select_hostname
+user_select_timezone
 ntp_sync
-select_bootloader
-confirm_bootloader
-get_partition_sizes
-confirm_partition_sizes
-clear_partition_cruft
+user_select_bootloader
+user_confirm_bootloader
+user_select_partition_sizes
+user_confirm_partition_sizes
+clean_partition_cruft
 create_partitions
 create_partition_filesystems
 refresh_arch_keyring
@@ -382,8 +378,6 @@ generate_fstab
 install_arch
 set_timezone
 set_hostname
-set_root_password
-arch-chroot /mnt echo "root:$root_password" | chpasswd
-enter_chroot_env
-postinstall_options
-clear
+user_set_root_password
+enter_chroot_environment
+user_postinstall_options
