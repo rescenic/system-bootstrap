@@ -232,9 +232,9 @@ select_install_drive() {
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
     selection=$(
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
             --menu "Please select:" 0 0 0 \
             "${drives[@]}" 2>&1 > /dev/tty
     )
@@ -264,18 +264,18 @@ set_timezone() {
 
 set_root_password() {
     root_password=$(
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
             --no-cancel \
             --passwordbox "Enter a root password." \
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
     root_password_confirm=$(
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
             --no-cancel \
             --passwordbox "Retype password." \
             0 0 \
@@ -285,19 +285,19 @@ set_root_password() {
     while true; do
         [[ $pass1 != "" && $pass1 == "$pass2" ]] && break
         root_password=$(
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
+            dialog \
+                --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
                 --no-cancel \
                 --passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
         )
         root_password_confirm=$(
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \                
-	--no-cancel \
+            dialog \
+                --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
+                --no-cancel \
                 --passwordbox "Retype password." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
