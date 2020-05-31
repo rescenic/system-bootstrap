@@ -66,11 +66,11 @@ install_grub_bootloader() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Installing "${BOOTLOADER}" on ${DRUVE}" \
+        --infobox "Installing "${BOOTLOADER}" on ${DRIVE}" \
         0 0
-    pacman --noconfirm --needed -S grub
-    grub-install --target=i386-pc "$DRIVE"
-    grub-mkconfig -o /boot/grub/grub.
+    pacman --noconfirm --needed -S grub efibootmgr
+    grub-install --target=x86_64-efi --efi-directory=/mnt/boot --bootloader-id=GRUB
+    grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 install_dotfiles() {
