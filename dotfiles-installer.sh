@@ -17,8 +17,8 @@ add_dotfiles() {
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
     rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/.bash*"
     cd /home/"$name" &&
-    git update-index --assume-unchanged "/home/$name/LICENSE" &&
-    git update-index --assume-unchanged "/home/$name/README.md"
+        git update-index --assume-unchanged "/home/$name/LICENSE" &&
+        git update-index --assume-unchanged "/home/$name/README.md"
 }
 
 aur_pkg_install() {
@@ -154,17 +154,19 @@ install_dependencies() {
         --title "$TITLE" \
         --infobox "Installing dependencies for installation..." \
         0 0
-    $(install_pkg dialog
-    install_pkg curl
-    install_pkg base-devel
-    install_pkg git
-    install_pkg ntp) > /dev/null 2>&1
+    $(
+        install_pkg dialog
+        install_pkg curl
+        install_pkg base-devel
+        install_pkg git
+        install_pkg ntp
+    ) > /dev/null 2>&1
 }
 
 install_user_programs() {
-    ([ -f "$user_programs_file" ] \
-    && cp "$user_programs_file" /tmp/programs.csv) \
-    || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
+    ([ -f "$user_programs_file" ] &&
+        cp "$user_programs_file" /tmp/programs.csv) ||
+        curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
     total=$(wc -l < /tmp/programs.csv)
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
@@ -278,8 +280,10 @@ set_user_credentials() {
 }
 
 start_pulse_audio_daemon() {
-    $(killall pulseaudio || true
-    pulseaudio --system --start --daemonize) > /dev/null 2>&1
+    $(
+        killall pulseaudio || true
+        pulseaudio --system --start --daemonize
+    ) > /dev/null 2>&1
 }
 
 successful_install_alert() {
@@ -298,12 +302,12 @@ system_beep_off() {
         --title "$TITLE" \
         --infobox "Getting rid of that retarded error beep sound..." \
         0 0
-    rmmod pcspkr || \
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "Configuration files installer" \
-        --infobox "pcspkr module not loaded, skipping..." \
-        0 0
+    rmmod pcspkr ||
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "Configuration files installer" \
+            --infobox "pcspkr module not loaded, skipping..." \
+            0 0
     echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
 
@@ -367,8 +371,8 @@ user_exists_warning() {
 welcome_screen() {
     dialog \
         --backtitle "$BACKTITLE" \
-            --title "$TITLE" \ 
-            --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
+        --title "$TITLE" \
+        --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
         0 0
 }
 

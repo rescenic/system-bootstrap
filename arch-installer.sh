@@ -3,6 +3,8 @@
 BACKTITLE="System bootstrap"
 TITLE="Arch install"
 
+CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
+
 clear_partition_cruft() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -10,12 +12,11 @@ clear_partition_cruft() {
         --infobox "Unmounting any parititons from ${drive}..." \
         0 0
     swapoff -a > /dev/null 2>&1
-    for i in {1..4}; do
-        umount --force "${drive}""${i}" > /dev/null 2>&1
+    for i in {1..5}; do
+        umount --force "${drive}""${i}"
     done
     # ============================================================= #
-    # The sed script strips off all the comments so that we can     #
-    # document what we're doing in-line with the actual commands    #
+    #   sed script strips off comments so logic is understandable   #
     # ============================================================= #
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		o # clear the in memory partition table
@@ -55,50 +56,10 @@ confirm_partition_sizes() {
         0 0 || exit
 }
 
-select_bootloader() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --menu "Choose a bootloader to install" \
-        0 0 \
-        2 1 Grub 2 Bootctl \
-        2> temp
-    if [ "$?" = "0" ]; then
-        _return=$(cat temp)
-        if [ "$_return" = "1" ]; then
-            bootloader="grub"
-	    create_partition_cmd="sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
-	    boot_partition=2
-	    swap_partition=3
-	    root_partition=4
-	    user_partition=5
-        fi
-        if [ "$_return" = "2" ]; then
-            bootloader="bootctl"
-	    create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
-	    boot_partition=1
-	    swap_partition=2
-	    root_partition=3
-	    user_partition=4
-        fi
-    else
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --infobox "Installer exited because no bootloader was chosen." \
-            0 0
-        rm -f temp
-        exit
-    fi
-    rm -f temp
-}
-
 create_partitions() {
     # ============================================================= #
-    # The sed script strips off all the comments so that we can     #
-    # document what we're doing in-line with the actual commands    #
+    #   sed script strips off comments so logic is understandable   #
     # ============================================================= #
-    { 
     eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
 		n # grub partition
 		 # default number (grub)
@@ -129,7 +90,6 @@ create_partitions() {
 		Y # confirmation
 		q # exit gdisk
 	EOF
-	}> /dev/null 2>&1
     update_kernel
 }
 
@@ -138,29 +98,38 @@ create_partition_filesystems() {
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --defaultno \
-        --yesno "Does this look correct?\n${drive}${boot_partition}\n${drive}${swap_partition}\n${drive}${root_partition}\n${drive}${user_partition}\nPress no to exit" \
+        --yesno "
+            Does this look correct?
+            \n${drive}${boot_partition}
+            \n${drive}${swap_partition}
+            \n${drive}${root_partition}
+            \n${drive}${user_partition}
+            \nPress no to exit
+            " \
         0 0 || exit
-{
-    yes | mkfs.fat -F32 "${drive}${boot_partition}" &&
-    yes | mkfs.ext4 "${drive}${root_partition}" &&
-    yes | mkfs.ext4 "${drive}${user_partition}" &&
+    yes | mkfs.fat -F32 "${drive}""${boot_partition}"
+    yes | mkfs.ext4 "${drive}""${root_partition}"
+    yes | mkfs.ext4 "${drive}""${user_partition}"
     # Enable swap
-    mkswap "${drive}${swap_partition}" &&
-    swapon "${drive}${swap_partition}" &&
+    mkswap "${drive}""${swap_partition}"
+    swapon "${drive}""${swap_partition}"
     # Mount partitions
-    mount "${drive}${root_partition}" /mnt &&
-    mkdir -p /mnt/boot &&
-    mount "${drive}${boot_partition}" /mnt/boot &&
-    mkdir -p /mnt/home &&
-    mount "${drive}${user_partition}" /mnt/home
- } > /dev/null 2>&1
+    mount "${drive}""${root_partition}" /mnt
+    mkdir -p /mnt/boot
+    mount "${drive}""${boot_partition}" /mnt/boot
+    mkdir -p /mnt/home
+    mount "${drive}""${user_partition}" /mnt/home
     update_kernel
 }
 
 enter_chroot_env() {
-    chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
-    curl "$chroot_url" > /mnt/chroot.sh
-    arch-chroot /mnt bash chroot.sh "${drive}" "${drive}${boot_partition}" "${bootloader}"
+    curl -L "${CHROOT_URL}" > /mnt/chroot.sh
+    arch-chroot \
+        /mnt \
+        bash chroot.sh \
+        "${drive}" \
+        "${drive}""${boot_partition}" \
+        "${bootloader}"
 }
 
 error() {
@@ -201,7 +170,7 @@ get_partition_sizes() {
     IFS=' ' read -ra SIZE <<< "$(cat psize)"
     re='^[0-9]+$'
     if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]]; then
-        SIZE=(12 50)
+        SIZE=(2 10)
     fi
 }
 
@@ -210,9 +179,12 @@ get_timezone() {
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --defaultno \
-        --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone" \
-        0 0 &&
-        echo "America/New_York" > tz.tmp || tzselect > tz.tmp
+        --yesno "
+            Do you want use the default time zone(America/New_York)?\n
+            Press no for select your own time zone
+            " \
+        0 0 && echo "America/New_York" > tz.tmp ||
+        tzselect > tz.tmp
 }
 
 install_arch() {
@@ -221,7 +193,8 @@ install_arch() {
         --title "$TITLE" \
         --infobox "Installing Arch via pacstrap" \
         0 0
-    (yes " " | pacstrap -i /mnt base base-devel linux linux-headers linux-firmware) > /dev/null 2>&1
+    yes " " |
+        pacstrap -i /mnt base base-devel linux linux-firmware linux-headers
 }
 
 ntp_sync() {
@@ -248,11 +221,9 @@ postinstall_options() {
         0 0 && arch-chroot /mnt
 }
 
-preinstall_checks() { \
-    if [ "$(id -u)" != "0" ]; then
-        error "This script requires it be run as root"
+preinstall_checks() {
+    [[ "$(id -u)" != "0" ]] && error "This script requires be run as root" &&
         exit 1
-    fi
 
     dialog \
         --backtitle "$BACKTITLE" \
@@ -260,10 +231,8 @@ preinstall_checks() { \
         --infobox "Doing preliminary checks..." \
         0 0
     msg=$(
-        (
-	ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &&
-        pacman -Sy --quiet --noconfirm reflector
-	) > /dev/null 2>&1
+        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" &&
+            pacman -Sy --quiet --noconfirm reflector
     )
     [[ -n $msg ]] && error "$msg"
 }
@@ -274,7 +243,7 @@ refresh_arch_keyring() {
         --title "$TITLE" \
         --infobox "Refreshing archlinux-keyring" \
         0 0
-    pacman -Sy --noconfirm archlinux-keyring 2>&1 /dev/null
+    pacman -Sy --noconfirm archlinux-keyring
 }
 
 run_reflector() {
@@ -283,7 +252,50 @@ run_reflector() {
         --title "$TITLE" \
         --infobox "Updating pacman mirrors..." \
         0 0
-    reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist > /dev/null 2>&1
+    reflector \
+        --verbose \
+        --latest 100 \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist \
+        > /dev/null 2>&1
+}
+
+select_bootloader() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --menu "Choose a bootloader to install" \
+        0 0 \
+        2 1 Grub 2 Bootctl \
+        2> temp
+    if [ "$?" = "0" ]; then
+        _return=$(cat temp)
+        if [ "$_return" = "1" ]; then
+            bootloader="grub"
+            create_partition_cmd="sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+            boot_partition=2
+            swap_partition=3
+            root_partition=4
+            user_partition=5
+        fi
+        if [ "$_return" = "2" ]; then
+            bootloader="bootctl"
+            create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
+            boot_partition=1
+            swap_partition=2
+            root_partition=3
+            user_partition=4
+        fi
+    else
+        dialog \
+            --backtitle "$BACKTITLE" \
+            --title "$TITLE" \
+            --infobox "Installer exited because no bootloader was chosen." \
+            0 0
+        rm -f temp
+        exit
+    fi
+    rm -f temp
 }
 
 select_install_drive() {
@@ -313,7 +325,7 @@ set_hostname() {
 }
 
 set_timezone() {
-    cat tz.tmp > /mnt/tzfinal.tmp 
+    cat tz.tmp > /mnt/tzfinal.tmp
     rm tz.tmp
 }
 
@@ -323,7 +335,7 @@ set_root_password() {
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
             --no-cancel \
-            --passwordbox "Enter a root password." \
+            --passwordbox "Enter a root password" \
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
@@ -332,7 +344,7 @@ set_root_password() {
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
             --no-cancel \
-            --passwordbox "Retype password." \
+            --passwordbox "Retype root password" \
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
@@ -344,7 +356,7 @@ set_root_password() {
                 --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --no-cancel \
-                --passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
+                --passwordbox "Passwords do not match or are not present.\n\nEnter root password again." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
         )
