@@ -121,7 +121,7 @@ get_user_credentials() {
 }
 
 git_pkg_clone() {
-    display_info_box "Downloading and installing configuration files"
+    display_info_box "Downloading configuration files"
     [ -z "$3" ] && branch="master" || branch="$repo_branch"
     dir=$(mktemp -d)
     [ ! -d "$2" ] && mkdir -p "$2"
