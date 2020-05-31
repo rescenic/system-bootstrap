@@ -187,7 +187,6 @@ get_timezone() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --defaultyes \
         --yesno "
             Use default time zone(America/New_York)?
             \nPress no for select your own time zone
@@ -296,7 +295,6 @@ select_install_drive() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --defaultyes \
         --yesno "Install Arch on: /dev/${drive}" \
         0 0 || exit
     partition_prefix=$drive
