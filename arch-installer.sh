@@ -129,6 +129,7 @@ display_info_box() {
 }
 
 enter_chroot_env() {
+    display_info_box "Preparing to enter chroot environment"
     curl -L "${CHROOT_URL}" > /mnt/chroot.sh
     arch-chroot \
         /mnt \
