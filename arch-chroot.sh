@@ -64,7 +64,7 @@ install_grub_bootloader() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --yesno "Install ${BOOTLOADER}?" \
+        --yesno "Installing "${BOOTLOADER}" on ${DRIVE}" \
         0 0 || exit
     dialog \
         --backtitle "$BACKTITLE" \
