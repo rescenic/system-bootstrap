@@ -1,7 +1,8 @@
 #!/bin/bash
 # ====================================================== #
 # dotfiles-installer.sh                                  #
-# Released by: Vlad Doster <vlad_doster@hms.harvard.edu> #
+# Created by: Luke Smith <luke@lukesmith.xyz>            #
+# Modified by: Vlad Doster <vlad_doster@hms.harvard.edu> #
 # License: GNU GPLv3                                     #
 # ====================================================== #
 # ====== Variables ====== #
