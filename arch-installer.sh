@@ -162,10 +162,9 @@ run_reflector() {
     display_info_box "Updating pacman mirrors..."
     reflector \
         --verbose \
-        --latest 100 \
+        --latest 200 \
         --sort rate \
-        --save /etc/pacman.d/mirrorlist \
-        > /dev/null 2>&1
+        --save /etc/pacman.d/mirrorlist > /dev/null 2>&1
 }
 
 set_hostname() {
