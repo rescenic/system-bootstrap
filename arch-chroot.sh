@@ -108,7 +108,8 @@ set_locale() {
 }
 
 run_reflector() {
-    reflector --verbose \
+    reflector \
+        --verbose \
         --latest 25 \
         --sort rate \
         --save /etc/pacman.d/mirrorlist \
