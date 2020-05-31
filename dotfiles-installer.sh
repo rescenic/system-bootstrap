@@ -9,6 +9,28 @@ BACKTITLE="System bootstrap"
 TITLE="Configuration files installer"
 USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
 # ======================= #
+#       Dialog boxes      #
+# ======================= #
+display_input_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --no-cancel \
+        --inputbox "$1" \
+        0 0 \
+        3>&1 1>&2 2>&3 3>&1
+}
+
+display_password_input() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --no-cancel \
+        --passwordbox "$1" \
+        0 0 \
+        3>&1 1>&2 2>&3 3>&1
+}
+# ======================= #
 #   Installer functions   #
 # ======================= #
 add_dotfiles() {
@@ -70,52 +92,16 @@ error() {
 
 get_user_credentials() {
     # Prompts user for new username and password.
-    name=$(dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --inputbox "First, please enter a name for the user account." \
-        0 0 \
-        3>&1 1>&2 2>&3 3>&1) || exit
+    name=$(display_input_box "First, please enter a name for the user account.") || exit
     while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
-        name=$(dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --no-cancel \
-            --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." \
-            0 0 \
-            3>&1 1>&2 2>&3 3>&1)
+        name=$(display_input_box  "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _.")
     done
-    pass1=$(dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --no-cancel \
-        --title "Configuration files installer" \
-        --passwordbox "Enter a password for that user." \
-        0 0 \
-        3>&1 1>&2 2>&3 3>&1)
-    pass2=$(dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --no-cancel \
-        --passwordbox "Retype password." \
-        0 0 \
-        3>&1 1>&2 2>&3 3>&1)
-    while ! [ "$pass1" = "$pass2" ]; do
-        unset pass2
-        pass1=$(dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --no-cancel \
-            --passwordbox 'Passwords do not match.\n\nEnter password again.' \
-            0 0 \
-            3>&1 1>&2 2>&3 3>&1)
-        pass2=$(dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --no-cancel \
-            --passwordbox "Retype password." \
-            0 0 \
-            3>&1 1>&2 2>&3 3>&1)
+    user_passwd=$(display_password_input "Enter a password for that user.")
+    confirm_user_passwd=$(display_password_input "Retype password.")
+    while ! [ "$user_passwd" = "$confirm_user_passwd" ]; do
+        unset confirm_user_passwd
+        user_passwd=$(display_password_input "Passwords do not match.\n\nEnter password again")
+        confirm_user_passwd=$(display_password_input "Retype password.")
     done
 }
 
@@ -241,14 +227,14 @@ set_permissions() {
 
 set_user_credentials() {
     display_info_box "Adding user \"$name\"..."
-    useradd -m -g wheel -s /bin/bash "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
+    useradd -m -g wheel -s /bin/zsh "$name" > /dev/null 2>&1 || usermod -a -G wheel "$name" &&
         mkdir -p /home/"$name" &&
         chown "$name":wheel /home/"$name"
     repodir="/home/$name/.local/src"
     mkdir -p "$repodir"
     chown -R "$name":wheel "$repodir"
-    echo "$name:$pass1" | chpasswd
-    unset pass1 pass2
+    echo "$name:$user_passwd" | chpasswd
+    unset user_passwd confirm_user_passwd
 }
 
 start_pulse_audio_daemon() {
