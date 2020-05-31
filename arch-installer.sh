@@ -140,8 +140,9 @@ create_partition_filesystems() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --infobox "Format and mount partitions" \
-        0 0
+        --defaultno \
+        --yesno "Does this look correct?\n${drive}${boot_partition}\n${drive}${swap_partition}\n${drive}${root_partition}\n${drive}${user_partition}\nPress no to exit" \
+        0 0 || exit
 	
     yes | mkfs.fat -F32 "${drive}${boot_partition}"
     yes | mkfs.ext4 "${drive}${root_partition}"
