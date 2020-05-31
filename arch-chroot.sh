@@ -39,13 +39,14 @@ display_yes_no_box() {
 #   Installer functions   #
 # ======================= #
 preinstall_setup() {
+    pacman -Sy --noconfirm --quiet \
+        dialog > /dev/null 2>&1
     if [ $# -ne 3 ]; then
         display_info_box "Chroot didnt get right # args."
         exit 1
     fi
     display_info_box "Setting up installation dependencies"
     pacman -Sy --noconfirm --quiet \
-        dialog \
         intel-ucode \
         reflector \
         networkmanager \
