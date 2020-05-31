@@ -242,15 +242,14 @@ user_select_bootloader() {
             swap_partition=3
             root_partition=4
             user_partition=5
-        fi
-        if [ "$_return" = "2" ]; then
+      elif [ "$_return" = "2" ]; then
             bootloader="bootctl"
             create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
             boot_partition=1
             swap_partition=2
             root_partition=3
             user_partition=4
-        fi
+       fi
     else
         display_info_box "Installer exited because no bootloader was chosen."
         rm -f temp
@@ -322,7 +321,7 @@ user_set_root_password() {
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
-    root_password_confirm=$(
+    confirm_root_password=$(
         dialog \
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
@@ -333,7 +332,7 @@ user_set_root_password() {
     )
 
     while true; do
-        [[ $root_password != "" && $root_password == "$root_password_confirm" ]] && break
+        [[ $root_password != "" && $root_password == "$confirm_root_password" ]] && break
         root_password=$(
             dialog \
                 --backtitle "$BACKTITLE" \
