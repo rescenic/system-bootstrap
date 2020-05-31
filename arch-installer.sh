@@ -159,8 +159,8 @@ refresh_arch_keyring() {
 }
 
 run_reflector() {
-    display_info_box "Updating pacman mirrors..." \
-        reflector \
+    display_info_box "Updating pacman mirrors..."
+    reflector \
         --verbose \
         --latest 100 \
         --sort rate \
