@@ -122,6 +122,14 @@ create_partition_filesystems() {
     update_kernel
 }
 
+display_info_box() {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "$1" \
+        0 0
+}
+
 enter_chroot_env() {
     curl -L "${CHROOT_URL}" > /mnt/chroot.sh
     arch-chroot \
@@ -145,6 +153,7 @@ error() {
 }
 
 generate_fstab() {
+    display_info_box "Generating fstab..."
     genfstab -U -p /mnt > /mnt/etc/fstab
 }
 
@@ -178,31 +187,22 @@ get_timezone() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --defaultno \
+        --defaultyes \
         --yesno "
-            Do you want use the default time zone(America/New_York)?\n
-            Press no for select your own time zone
+            Use default time zone(America/New_York)?
+            \nPress no for select your own time zone
             " \
         0 0 && echo "America/New_York" > tz.tmp ||
         tzselect > tz.tmp
 }
 
 install_arch() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Installing Arch via pacstrap" \
-        0 0
-    yes " " |
-        pacstrap -i /mnt base base-devel linux linux-firmware linux-headers
+    display_info_box "Installing Arch via pacstrap"
+    yes " " | pacstrap -i /mnt base base-devel linux linux-firmware linux-headers
 }
 
 ntp_sync() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Setting timedatectl to use ntp..." \
-        0 0
+    display_info_box "Setting timedatectl to use ntp..."
     timedatectl set-ntp true
 }
 
@@ -222,14 +222,8 @@ postinstall_options() {
 }
 
 preinstall_checks() {
-    [[ "$(id -u)" != "0" ]] && error "This script requires be run as root" &&
-        exit 1
-
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Doing preliminary checks..." \
-        0 0
+    [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
+    display_info_box "Doing preliminary checks..."
     msg=$(
         {
 	ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
@@ -240,20 +234,12 @@ preinstall_checks() {
 }
 
 refresh_arch_keyring() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Refreshing archlinux-keyring" \
-        0 0
+    display_info_box "Refreshing archlinux-keyring"
     pacman -Sy --noconfirm archlinux-keyring
 }
 
 run_reflector() {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --infobox "Updating pacman mirrors..." \
-        0 0
+    display_info_box "Updating pacman mirrors..." \
     reflector \
         --verbose \
         --latest 100 \
@@ -289,11 +275,7 @@ select_bootloader() {
             user_partition=4
         fi
     else
-        dialog \
-            --backtitle "$BACKTITLE" \
-            --title "$TITLE" \
-            --infobox "Installer exited because no bootloader was chosen." \
-            0 0
+	display_info_box "Installer exited because no bootloader was chosen."
         rm -f temp
         exit
     fi
@@ -314,7 +296,7 @@ select_install_drive() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-        --defaultno \
+        --defaultyes \
         --yesno "Install Arch on: /dev/${drive}" \
         0 0 || exit
     partition_prefix=$drive
@@ -323,10 +305,12 @@ select_install_drive() {
 }
 
 set_hostname() {
+    display_info_box "Setting hostname"
     mv comp /mnt/etc/hostname
 }
 
 set_timezone() {
+    display_info_box "Setting timezone"
     cat tz.tmp > /mnt/tzfinal.tmp
     rm tz.tmp
 }
@@ -346,7 +330,7 @@ set_root_password() {
             --backtitle "$BACKTITLE" \
             --title "$TITLE" \
             --no-cancel \
-            --passwordbox "Retype root password" \
+            --passwordbox "Confirm root password" \
             0 0 \
             3>&1 1>&2 2>&3 3>&1
     )
@@ -367,7 +351,7 @@ set_root_password() {
                 --backtitle "$BACKTITLE" \
                 --title "$TITLE" \
                 --no-cancel \
-                --passwordbox "Retype password." \
+                --passwordbox "Confirm root password." \
                 0 0 \
                 3>&1 1>&2 2>&3 3>&1
         )
@@ -375,6 +359,7 @@ set_root_password() {
 }
 
 update_kernel() {
+    display_info_box "Updating kernel"
     partprobe
 }
 
