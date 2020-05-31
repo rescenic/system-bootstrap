@@ -1,13 +1,13 @@
 #!/bin/bash
 
-clear_partition_cruft() { \
-    dialog --title "Partitions" \
-           --infobox "Unmounting any parititons from ${drive}..." \
-           0 0
-    swapoff -a >/dev/null 2>&1
-    for i in {1..4}
-    do
-       umount --force "${drive}""${i}" >/dev/null 2>&1
+clear_partition_cruft() {
+    dialog \
+        --title "Partitions" \
+        --infobox "Unmounting any parititons from ${drive}..." \
+        0 0
+    swapoff -a > /dev/null 2>&1
+    for i in {1..4}; do
+        umount --force "${drive}""${i}" > /dev/null 2>&1
     done
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
@@ -24,21 +24,23 @@ clear_partition_cruft() { \
     update_kernel
 }
 
-confirm_install() { \
-	dialog --title "DON'T BE A BRAINLET!" \
-       --defaultno \
-       --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
-       0 0 || exit
+confirm_install() {
+    dialog \
+        --title "DON'T BE A BRAINLET!" \
+        --defaultno \
+        --yesno "Only run this script if you're a big-brane who doesn't mind deleting your entire ${drive} drive." \
+        0 0 || exit
 }
 
-confirm_partition_sizes() { \
-    dialog --defaultno \
-           --title "System information" \
-           --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
-           0 0 || exit
+confirm_partition_sizes() {
+    dialog \
+        --defaultno \
+        --title "System information" \
+        --yesno "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?" \
+        0 0 || exit
 }
 
-create_partitions() { \
+create_partitions() {
     # ============================================================= #
     # The sed script strips off all the comments so that we can     #
     # document what we're doing in-line with the actual commands    #
@@ -72,10 +74,11 @@ create_partitions() { \
     update_kernel
 }
 
-create_partition_filesystems() { \
-    dialog --title "Arch install" \
-           --infobox "Format and mount partitions" \
-           0 0
+create_partition_filesystems() {
+    dialog \
+        --title "Arch install" \
+        --infobox "Format and mount partitions" \
+        0 0
     yes | mkfs.fat -F32 "${drive}"1
     yes | mkfs.ext4 "${drive}"3
     yes | mkfs.ext4 "${drive}"4
@@ -92,172 +95,191 @@ create_partition_filesystems() { \
     update_kernel
 }
 
-enter_chroot_env() { \
+enter_chroot_env() {
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
     curl "$chroot_url" > /mnt/chroot.sh
     arch-chroot /mnt bash chroot.sh "$drive" "$drive"3
 }
 
-error() { \
-  # error handling goes here
-  error=$(echo "$@")
-  dialog --title "Arch install" \
-         --no-collapse \
-         --msgbox "$error" \
-         0 0
-  exit
+error() {
+    # error handling goes here
+    error=$(echo "$@")
+    dialog \
+        --title "Arch install" \
+        --no-collapse \
+        --msgbox "$error" \
+        0 0
+    exit
 }
 
-generate_fstab() { \
+generate_fstab() {
     genfstab -U -p /mnt > /mnt/etc/fstab
 }
 
-get_hostname() { \
-    dialog --title "Arch install" \
-           --no-cancel \
-	       --inputbox "Enter a name for your computer." \
-	       0 0 \
-	       2> comp
+get_hostname() {
+    dialog \
+        --title "Arch install" \
+        --no-cancel \
+        --inputbox "Enter a name for your computer." \
+        0 0 \
+        2> comp
     hostname=$(cat comp)
 }
 
-get_partition_sizes() { \
-    dialog --title "Arch install" \
-           --no-cancel \
-           --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
-           0 0 \
-           2>psize
+get_partition_sizes() {
+    dialog \
+        --title "Arch install" \
+        --no-cancel \
+        --inputbox "Enter partitionsize in gb, separated by space (swap & root)." \
+        0 0 \
+        2> psize
     IFS=' ' read -ra SIZE <<< $(cat psize)
     re='^[0-9]+$'
-    if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]] ; then
-        SIZE=(12 50);
+    if ! [ ${#SIZE[@]} -eq 2 ] || ! [[ ${SIZE[0]} =~ $re ]] || ! [[ ${SIZE[1]} =~ $re ]]; then
+        SIZE=(12 50)
     fi
 }
 
-get_timezone() { \
-    dialog --defaultno \
-           --title "Arch install" \
-           --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone"  \
-           0 0 && \
-           echo "America/New_York" > tz.tmp || tzselect > tz.tmp
+get_timezone() {
+    dialog \
+        --defaultno \
+        --title "Arch install" \
+        --yesno "Do you want use the default time zone(America/New_York)?.\n\nPress no for select your own time zone" \
+        0 0 &&
+        echo "America/New_York" > tz.tmp || tzselect > tz.tmp
 }
 
-install_arch() { \
-    dialog --title "Arch install" \
-           --infobox "Installing Arch via pacstrap" \
-           0 0
+install_arch() {
+    dialog \
+        --title "Arch install" \
+        --infobox "Installing Arch via pacstrap" \
+        0 0
     pacstrap -i /mnt base base-devel linux linux-headers linux-firmware
 }
 
-ntp_sync() { \
-    dialog --title "Arch install" \
-           --infobox "Setting timedatectl to use ntp..." \
-           0 0
+ntp_sync() {
+    dialog \
+        --title "Arch install" \
+        --infobox "Setting timedatectl to use ntp..." \
+        0 0
     timedatectl set-ntp true
 }
 
-postinstall_options() { \
-    dialog --defaultno \
-           --title "Arch install complete" \
-           --yesno "Reboot computer?" \
-           0 0 && reboot
-    dialog --defaultno \
-           --title "Arch install complete" \
-           --yesno "Return to chroot environment?" \
-           0 0 && arch-chroot /mnt
+postinstall_options() {
+    dialog \
+        --defaultno \
+        --title "Arch install complete" \
+        --yesno "Reboot computer?" \
+        0 0 && reboot
+    dialog \
+        --defaultno \
+        --title "Arch install complete" \
+        --yesno "Return to chroot environment?" \
+        0 0 && arch-chroot /mnt
 }
 
-preinstall_checks() { \
+preinstall_checks() {
     if [ "$(id -u)" != "0" ]; then
         error "This script requires it be run as root"
         exit 1
     fi
 
-    dialog --title "Arch install" \
-           --infobox "Doing preliminary checks..." \
-           0 0
-      msg=$(
-          ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) >/dev/null 2>&1 &&
-          pacman -Sy --quiet --noconfirm reflector >/dev/null 2>&1
-      )
+    dialog \
+        --title "Arch install" \
+        --infobox "Doing preliminary checks..." \
+        0 0
+    msg=$(
+        ping -q -w 1 -c 1 $(ip r | grep default | cut -d ' ' -f 3) > /dev/null 2>&1 &&
+            pacman -Sy --quiet --noconfirm reflector > /dev/null 2>&1
+    )
     [[ -n $msg ]] && error "$msg"
 }
 
-refresh_arch_keyring() { \
-    dialog --title "Arch install" \
-           --infobox "Refreshing archlinux-keyring" \
-           0 0
+refresh_arch_keyring() {
+    dialog \
+        --title "Arch install" \
+        --infobox "Refreshing archlinux-keyring" \
+        0 0
     pacman -Sy --noconfirm archlinux-keyring
 }
 
-run_reflector() { \
-    dialog --title "Arch install" \
-           --infobox "Updating pacman mirrors..." \
-           0 0
+run_reflector() {
+    dialog \
+        --title "Arch install" \
+        --infobox "Updating pacman mirrors..." \
+        0 0
     reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
 }
 
-select_install_drive() { \
+select_install_drive() {
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
-    selection=$(dialog --title "Arch install" \
-                       --menu "Please select:" 0 0 0 \
-                       "${drives[@]}" 2>&1 > /dev/tty)
+    selection=$(
+        dialog \
+            --title "Arch install" \
+            --menu "Please select:" 0 0 0 \
+            "${drives[@]}" 2>&1 > /dev/tty
+    )
     drive=$(lsblk -d -o name | tail -n +2 | awk -v var="$selection" 'NR==var {print $1}')
-
-    dialog --title "Arch install" \
-           --defaultno \
-           --yesno "Install Arch on: /dev/${drive}" \
-           0 0 || exit
+    dialog \
+        --title "Arch install" \
+        --defaultno \
+        --yesno "Install Arch on: /dev/${drive}" \
+        0 0 || exit
     partition_prefix=$drive
-    if [[ "$drive" =~ ^nvme ]]; then
+    if [[ $drive =~ ^nvme ]]; then
         echo "Need to add p for nvme drive partitions"
         partition_prefix=$drive"p"
     fi
     drive="/dev/${partition_prefix}"
 }
 
-set_hostname() { \
+set_hostname() {
     mv comp /mnt/etc/hostname
 }
 
-set_timezone() { \
+set_timezone() {
     cat tz.tmp > /mnt/tzfinal.tmp
     rm tz.tmp
 }
 
-set_root_password() { \
-root_password=$(
-dialog \
---no-cancel \
---passwordbox "Enter a root password." \
-0 0 \
-3>&1 1>&2 2>&3 3>&1)
-root_password_confirm=$(dialog \
---no-cancel \
---passwordbox "Retype password." \
-0 0 \
-3>&1 1>&2 2>&3 3>&1)
+set_root_password() {
+    root_password=$(
+        dialog \
+            --no-cancel \
+            --passwordbox "Enter a root password." \
+            0 0 \
+            3>&1 1>&2 2>&3 3>&1
+    )
+    root_password_confirm=$(
+        dialog \
+            --no-cancel \
+            --passwordbox "Retype password." \
+            0 0 \
+            3>&1 1>&2 2>&3 3>&1
+    )
 
-while true; do
-	[[ "$pass1" != "" && "$pass1" == "$pass2" ]] && break
-	root_password=$(
-	dialog \
-	--no-cancel \
-	--passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
-	0 0 \
-	3>&1 1>&2 2>&3 3>&1)
-	root_password_confirm=$(
-	dialog \
-	--no-cancel \
-	--passwordbox "Retype password." \
-	0 0 \
-	3>&1 1>&2 2>&3 3>&1)
-done
-arch-chroot /mnt echo "root:$root_password" | chpasswd  
+    while true; do
+        [[ $pass1 != "" && $pass1 == "$pass2" ]] && break
+        root_password=$(
+            dialog \
+                --no-cancel \
+                --passwordbox "Passwords do not match or are not present.\n\nEnter password again." \
+                0 0 \
+                3>&1 1>&2 2>&3 3>&1
+        )
+        root_password_confirm=$(
+            dialog \
+                --no-cancel \
+                --passwordbox "Retype password." \
+                0 0 \
+                3>&1 1>&2 2>&3 3>&1
+        )
+    done
+    arch-chroot /mnt echo "root:$root_password" | chpasswd
 }
 
-update_kernel() { \
+update_kernel() {
     partprobe
 }
 
@@ -284,5 +306,4 @@ set_hostname
 set_root_password
 enter_chroot_env
 postinstall_options
-
 clear
