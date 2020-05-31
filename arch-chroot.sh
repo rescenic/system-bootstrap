@@ -83,10 +83,6 @@ install_dotfiles() {
     sudo bash dotfiles-installer.sh
 }
 
-set_root_password() {
-    passwd
-}
-
 set_timezone() {
     TZuser=$(cat tzfinal.tmp)
     ln -sf /usr/share/zoneinfo/"$TZuser" /etc/localtime
@@ -121,7 +117,6 @@ run_reflector() {
 # ---------------------------- #
 get_dependencies
 run_reflector
-# set_root_password
 set_locale
 set_timezone
 start_network_manager
