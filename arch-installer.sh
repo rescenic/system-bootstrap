@@ -199,15 +199,15 @@ update_kernel() {
 #   User input functions   #
 # ======================== #
 user_confirm_bootloader() {
-	display_yes_no_box "User chose $bootloader so gdisk is using\n$create_partition_cmd"
+    display_yes_no_box "User chose $bootloader so gdisk is using\n$create_partition_cmd"
 }
 
 user_confirm_install() {
-	display_yes_no_box "Continue only if you're a big-brane who doesn't mind deleting your entire ${drive} drive."
+    display_yes_no_box "Continue only if you're a big-brane who doesn't mind deleting your entire ${drive} drive."
 }
 
 user_confirm_partition_sizes() {
-	display_yes_no_box "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"
+    display_yes_no_box "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"
 }
 
 user_postinstall_options() {
@@ -242,14 +242,14 @@ user_select_bootloader() {
             swap_partition=3
             root_partition=4
             user_partition=5
-      elif [ "$_return" = "2" ]; then
+        elif [ "$_return" = "2" ]; then
             bootloader="bootctl"
             create_partition_cmd="sed -e '/grub/d' -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/'"
             boot_partition=1
             swap_partition=2
             root_partition=3
             user_partition=4
-       fi
+        fi
     else
         display_info_box "Installer exited because no bootloader was chosen."
         rm -f temp
@@ -307,7 +307,7 @@ user_select_timezone() {
         --title "$TITLE" \
         --yesno "Use default time zone(America/New_York)?
                 \nPress no for select your own time zone" \
-        	0 0 && echo "America/New_York" > tz.tmp ||
+        0 0 && echo "America/New_York" > tz.tmp ||
         tzselect > tz.tmp
 }
 
@@ -352,7 +352,7 @@ user_set_root_password() {
                 3>&1 1>&2 2>&3 3>&1
         )
     done
-   arch-chroot /mnt/root echo "root:${root_password}" | chpasswd
+    arch-chroot /mnt/root echo "root:${root_password}" | chpasswd
 }
 
 # ================= #
