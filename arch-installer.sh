@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BACKTITLE="Arch installer"
+BACKTITLE="System bootstrap"
 TITLE="Arch install"
 
 clear_partition_cruft() {
