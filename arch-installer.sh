@@ -159,7 +159,7 @@ create_partition_filesystems() {
 
 enter_chroot_env() {
     chroot_url="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/arch-chroot.sh"
-    curl "$chroot_url" > /mnt/chroot.sh > /dev/null 2>&1
+    curl "$chroot_url" > /mnt/chroot.sh
     arch-chroot /mnt bash chroot.sh "${drive}" "${drive}${boot_partition}" "${bootloader}"
 }
 
