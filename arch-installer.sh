@@ -47,7 +47,7 @@ clean_partition_cruft() {
     display_info_box "Unmounting any parititons from ${drive}..."
     swapoff -a > /dev/null 2>&1
     for i in {1..5}; do
-        umount --force "${drive}""${i}"
+        umount --force "${drive}""${i}" || true
     done
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		o # clear the in memory partition table
