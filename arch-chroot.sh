@@ -10,6 +10,7 @@ TITLE="Arch chroot"
 BOOTLOADER_PARTITION="$2"
 BOOTLOADER=$3
 DRIVE="$1"
+NUM_EXPECTED_ARGS=3
 DOTFILES_INSTALLER_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/dotfiles-installer.sh"
 # ======================= #
 #     Dialog functions    #
@@ -37,8 +38,8 @@ display_yes_no_box() {
 preinstall_setup() {
     pacman -Sy --noconfirm --quiet \
         dialog > /dev/null 2>&1
-    if [ $# -ne 3 ]; then
-        display_info_box "Chroot didnt get right # args."
+    if [ $# -ne "$NUM_EXPECTED_ARGS" ]; then
+        display_info_box "Chroot expected $NUM_EXPECTED_ARGS args, but got $#"
         exit 1
     fi
     display_info_box "Setting up installation dependencies"
