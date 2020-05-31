@@ -11,7 +11,7 @@ add_dotfiles() {
     echo "$name"
     git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
     rm -f "/home/$name/README.md" "/home/$name/LICENSE"
-    cd /home/$name &&
+    cd /home/"$name" &&
     git update-index --assume-unchanged "/home/$name/LICENSE" &&
     git update-index --assume-unchanged "/home/$name/README.md"
 }
