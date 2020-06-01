@@ -57,12 +57,12 @@ display_password_input() {
 #   Installer functions   #
 # ======================= #
 add_dotfiles() {
-    display_info_box "Downloading and installing config files..."
+    display_info_box "Downloading and installing config files at /home/$name..."
     user_home_dir="/home/$name"
     dir=$(mktemp -d)
     [ ! -d "$user_home_dir" ] && mkdir -p "$user_home_dir"
     chown -R "$name":wheel "$dir" "$user_home_dir"
-    sudo -u "$name" git clone --recursive --branch "$repo_branch" --depth 1 "$dotfiles_repo" "$dir" >/dev/null 2>&1
+    sudo -u "$name" git clone --recursive --branch "$repo_branch" --depth 1 "$dotfiles_repo" "$dir"
     sudo -u "$name" cp -rfT "$dir" "$user_home_dir"
     rm -f "$user_home_dir/README.md" "$user_home_dir/LICENSE"
     # make git ignore deleted LICENSE & README.md files
