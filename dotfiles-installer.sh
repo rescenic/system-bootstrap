@@ -294,7 +294,7 @@ refresh_arch_keyring || error "Error automatically refreshing Arch keyring. Cons
 run_reflector || error "run_reflector() encountered an error"
 set_preinstall_settings || error "set_preinstall_settings() did not finish successfully"
 manual_install $aur_helper || error "Failed to install yay via manual_install()"
-install_user_programs || error "Error in install_user_programs()"
-add_dotfiles || error "Error in add_dotfiles()"
-set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
+install_user_programs
+add_dotfiles
+set_postinstall_settings
 successful_install_alert || error "Unfortunately, the install failed. Better luck next time."
