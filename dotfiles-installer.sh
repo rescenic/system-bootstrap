@@ -8,13 +8,13 @@ set -e
 # ====================================================== #
 # ====== Variables ====== #
 while getopts ":a:r:b:p:h" o; do case "${o}" in
-	h) printf "Optional arguments for custom use:\\n  -r: Dotfiles repository (local file or url)\\n  -p: Dependencies and programs csv (local file or url)\\n  -a: AUR helper (must have pacman-like syntax)\\n  -h: Show this message\\n" && exit ;;
-	r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
-	b) repo_branch=${OPTARG} ;;
-	p) user_programs_file=${OPTARG} ;;
-	a) aur_helper=${OPTARG} ;;
-	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit ;;
-esac done
+    h) printf 'Optional arguments for custom use:\n  -r: Dotfiles repository (local file or url)\n  -p: Dependencies and programs csv (local file or url)\n  -a: AUR helper (must have pacman-like syntax)\n  -h: Show this message\n' && exit ;;
+    r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
+    b) repo_branch=${OPTARG} ;;
+    p) user_programs_file=${OPTARG} ;;
+    a) aur_helper=${OPTARG} ;;
+    *) printf 'Invalid option: -%s\n' "$OPTARG" && exit ;;
+esac; done
 
 [ -z "$dotfiles_repo" ] && dotfiles_repo="https://github.com/vladdoster/dotfiles.git"
 [ -z "$user_programs_file" ] && user_programs_file="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master/user-programs.csv"
@@ -23,7 +23,7 @@ esac done
 
 BACKTITLE="System bootstrap"
 TITLE="Configuration files installer"
-USER_PROGRAMS_PARSE_PATTERN="\"^[PGA]*,\""
+USER_PROGRAMS_PARSE_PATTERN='"^[PGA]*,"'
 # ======================= #
 #       Dialog boxes      #
 # ======================= #
@@ -103,13 +103,17 @@ enable_multicore_make_compilations() {
     sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 }
 
-error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
+error() {
+    clear
+    printf 'ERROR:\n%s\n' "$1"
+    exit
+}
 
 get_user_credentials() {
     # Prompts user for new username and password.
     name=$(display_input_box "First, please enter a name for the user account.") || exit
-    while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" > /dev/null 2>&1; do
-        name=$(display_input_box  "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _.")
+    while ! echo "$name" | grep "^[a-z_][a-z0-9_-]*$" >/dev/null 2>&1; do
+        name=$(display_input_box "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _.")
     done
     user_passwd=$(display_password_input "Enter a password for that user.")
     confirm_user_passwd=$(display_password_input "Retype password.")
@@ -124,11 +128,15 @@ git_pkg_install() {
     progname="$(basename "$1")"
     dir="$repodir/$progname"
     display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
-    sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
+    sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || {
+        cd "$dir" || return
+        sudo -u "$name" git pull --force origin master
+    }
     cd "$dir" || exit
     make >/dev/null 2>&1
     make install >/dev/null 2>&1
-    cd /tmp || return ;}        
+    cd /tmp || return
+}
 
 install_dependencies() {
     display_info_box "Installing dependencies for installation"
@@ -143,11 +151,11 @@ install_nvim_plugins() {
     nvim +PlugInstall +qall
 }
 
-install_pkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
+install_pkg() { pacman --noconfirm --needed -S "$1" >/dev/null 2>&1; }
 
-install_user_programs() { \
-    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/user_programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/user_programs.csv
-    total=$(wc -l < /tmp/user_programs.csv)
+install_user_programs() {
+    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/user_programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" >/tmp/user_programs.csv
+    total=$(wc -l </tmp/user_programs.csv)
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
         n=$((n + 1))
@@ -158,18 +166,21 @@ install_user_programs() { \
             "P") pip_pkg_install "$program" "$comment" ;;
             *) arch_pkg_install "$program" "$comment" ;;
         esac
-    done < /tmp/user_programs.csv ;}
+    done </tmp/user_programs.csv
+}
 
 manual_install() {
-	[ -f "/usr/bin/$1" ] || (
-	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
-	cd /tmp || exit
-	rm -rf /tmp/"$1"*
-	curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
-	sudo -u "$name" tar -xvf "$1".tar.gz >/dev/null 2>&1 &&
-	cd "$1" &&
-	sudo -u "$name" makepkg --noconfirm -si >/dev/null 2>&1
-	cd /tmp || return) ;}
+    [ -f "/usr/bin/$1" ] || (
+        dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
+        cd /tmp || exit
+        rm -rf /tmp/"$1"*
+        curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
+            sudo -u "$name" tar -xvf "$1".tar.gz >/dev/null 2>&1 &&
+            cd "$1" &&
+            sudo -u "$name" makepkg --noconfirm -si >/dev/null 2>&1
+        cd /tmp || return
+    )
+}
 
 pip_pkg_install() {
     display_info_box "Installing the Python package \`$1\` ($n of $total). $1 $2"
@@ -188,11 +199,11 @@ set_postinstall_settings() {
     chsh -s /bin/zsh "$name" >/dev/null 2>&1
     sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
     #sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
-    
+
     # Allows user to execute `shutdown`, `reboot`, updating, etc. without password
     set_permissions "%wheel ALL=(ALL) ALL #SYSBOOTSTRAP
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm"
-    
+
     enable_docker || error "Couldn't enable docker."
     install_nvim_plugins || error "Couldn't install nvim plugins"
     start_pulse_audio_daemon || error "Couldn't start Pulse audio daemon"
@@ -211,21 +222,27 @@ set_preinstall_settings() {
 set_permissions() {
     display_info_box "Set special 'sudoers' settings"
     sed -i "/#SYSBOOTSTRAP/d" /etc/sudoers
-    echo "$* #SYSBOOTSTRAP" >> /etc/sudoers
+    echo "$* #SYSBOOTSTRAP" >>/etc/sudoers
 }
 
-set_user_credentials() { \
+set_user_credentials() {
     display_info_box "Adding user \"$name\"..."
-    useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 || 
-    usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
-    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel $(dirname "$repodir")
+    useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 ||
+        usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
+    repodir="/home/$name/.local/src"
+    mkdir -p "$repodir"
+    chown -R "$name":wheel $(dirname "$repodir")
     echo "$name:$user_passwd" | chpasswd
-    unset user_passwd confirm_user_passwd ;}
+    unset user_passwd confirm_user_passwd
+}
 
-start_pulse_audio_daemon() { killall pulseaudio; sudo -u "$name" pulseaudio --start; }
+start_pulse_audio_daemon() {
+    killall pulseaudio
+    sudo -u "$name" pulseaudio --start
+}
 
 successful_install_alert() {
-    unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" > /dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
+    unsuccessfully_installed_programs=$(printf "\n" && echo "$(curl -s "${user_programs_file}" | sed '/^#/d')" | while IFS=, read -r tag program comment; do if [[ $tag == 'G' ]]; then printf "%s\n" "$program"; elif [[ "$(pacman -Qi "$program" >/dev/null)" ]]; then printf "%s\n" "$program"; fi; done)
     dialog \
         --backtitle "$BACKTITLE" \
         --title "Configuration files installed" \
@@ -242,7 +259,7 @@ system_beep_off() {
     display_info_box "Getting rid of that retarded error beep sound..."
     rmmod pcspkr ||
         display_info_box "pcspkr module not loaded, skipping..."
-    echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
+    echo "blacklist pcspkr" >/etc/modprobe.d/nobeep.conf
 }
 
 user_confirm_install() {
@@ -252,10 +269,13 @@ user_confirm_install() {
         --yes-label "Let's go!" \
         --no-label "No, nevermind!" \
         --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
-        0 0 || { clear; exit; }
+        0 0 || {
+        clear
+        exit
+    }
 }
-        
-refresh_arch_keyring() { \
+
+refresh_arch_keyring() {
     display_info_box "Refreshing Arch keyring"
     pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 }
@@ -264,7 +284,7 @@ run_reflector() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
-	--defaultno \
+        --defaultno \
         --yesno "Install and run reflector? It might speed up package downloads." \
         0 0
     response=$?
@@ -282,7 +302,7 @@ run_reflector() {
 }
 
 user_exists_warning() {
-    ! (id -u "$name" > /dev/null) 2>&1 ||
+    ! (id -u "$name" >/dev/null) 2>&1 ||
         dialog \
             --colors \
             --backtitle "$BACKTITLE" \
