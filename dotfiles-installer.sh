@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # ====================================================== #
 # dotfiles-installer.sh                                  #
 # Created by: Luke Smith <luke@lukesmith.xyz>            #
