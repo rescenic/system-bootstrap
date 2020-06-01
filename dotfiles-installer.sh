@@ -58,7 +58,7 @@ display_password_input() {
 #   Installer functions   #
 # ======================= #
 add_dotfiles() {
-    display_info_box "Downloading and installing config files at /home/$name..."
+#     display_info_box "Downloading and installing config files at /home/$name..."
     user_home_dir="/home/$name"
     dir=$(mktemp -d)
     [ ! -d "$user_home_dir" ] && mkdir -p "$user_home_dir"
