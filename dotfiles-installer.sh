@@ -320,9 +320,9 @@ welcome_screen() {
         --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
         0 0
 }
-# ---------------------------- #
-#            Install           #
-# ---------------------------- #
+# ======================= #
+#         Install         #
+# ======================= #
 install_dependencies
 welcome_screen || error "User exited welcome_screen()"
 get_user_credentials || error "Error in prompt_user_credentials()"
