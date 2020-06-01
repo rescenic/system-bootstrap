@@ -57,12 +57,17 @@ display_password_input() {
 #   Installer functions   #
 # ======================= #
 add_dotfiles() {
-    display_info_box "Installing dotfiles for $name"
-    git_pkg_clone "$dotfiles_repo" "/home/$name" "$repo_branch"
-    rm -f "/home/$name/README.md" "/home/$name/LICENSE"
+    display_info_box "Downloading and installing config files..."
+    user_home_dir="/home/$name"
+    dir=$(mktemp -d)
+    [ ! -d "$user_home_dir" ] && mkdir -p "$user_home_dir"
+    chown -R "$name":wheel "$dir" "$user_home_dir"
+    sudo -u "$name" git clone --recursive --branch "$repo_branch" --depth 1 "$dotfiles_repo" "$dir" >/dev/null 2>&1
+    sudo -u "$name" cp -rfT "$dir" "$user_home_dir"
+    rm -f "$user_home_dir/README.md" "$user_home_dir/LICENSE"
     # make git ignore deleted LICENSE & README.md files
-    git update-index --assume-unchanged "/home/$name/README.md"
-    git update-index --assume-unchanged "/home/$name/LICENSE"
+    git update-index --assume-unchanged "$user_home_dir/README.md"
+    git update-index --assume-unchanged "$user_home_dir/LICENSE"
 }
 
 arch_pkg_install() {
@@ -103,16 +108,6 @@ get_user_credentials() {
         user_passwd=$(display_password_input "Passwords do not match.\n\nEnter password again")
         confirm_user_passwd=$(display_password_input "Retype password.")
     done
-}
-
-git_pkg_clone() {
-    display_info_box "Downloading configuration files"
-    [ -z "$3" ] && branch="master" || branch="$repo_branch"
-    dir=$(mktemp -d)
-    [ ! -d "$2" ] && mkdir -p "$2"
-    chown -R "$name":wheel "$dir" "$2"
-    sudo -u "$name" git clone --recursive -b "$branch" --depth 1 "$1" "$dir" >/dev/null 2>&1
-    sudo -u "$name" cp -rfT "$dir" "$2"
 }
 
 git_pkg_install() {
