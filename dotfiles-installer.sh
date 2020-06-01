@@ -121,14 +121,14 @@ get_user_credentials() {
 }
 
 git_pkg_install() {
-	progname="$(basename "$1" .git)"
-	dir="$repodir/$progname"
-	display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
-	sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
-	cd "$dir" || exit
-	make >/dev/null 2>&1
-	make install >/dev/null 2>&1
-	cd /tmp || return ;}
+    progname="$(basename "$1" .git)"
+    dir="$repodir/$progname"
+    display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
+    sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
+    cd "$dir" || exit
+    make >/dev/null 2>&1
+    make install >/dev/null 2>&1
+    cd /tmp || return ;}        
 
 install_dependencies() {
     display_info_box "Installing dependencies for installation"
@@ -151,7 +151,7 @@ install_user_programs() { \
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
         n=$((n + 1))
-        echo "$comment" | grep "^\".*\"$" > /dev/null 2>&1 && comment="$(echo "$comment" | sed "s/\(^\"\|\"$\)//g")"
+        echo "$comment" | grep "^\".*\"$" >/dev/null 2>&1 && comment="$(echo "$comment" | sed "s/\(^\"\|\"$\)//g")"
         case "$tag" in
             "A") aur_pkg_install "$program" "$comment" ;;
             "G") git_pkg_install "$program" "$comment" ;;
