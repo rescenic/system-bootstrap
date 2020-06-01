@@ -81,6 +81,11 @@ aur_pkg_install() {
     sudo -u "$name" "$aur_helper" -S --noconfirm "$1" >/dev/null 2>&1
 }
 
+create_fake_root_install_env() {
+    display_info_box "Creating fake root environment..."
+    set_permissions "%wheel ALL=(ALL) NOPASSWD: ALL"
+}
+
 create_user_dirs() {
     mkdir -p "/home/$name/github"
     mkdir -p "/home/$name/downloads"
@@ -91,6 +96,11 @@ enable_docker() {
     systemctl enable docker.service
     systemctl start docker.service
     usermod -aG docker "$name"
+}
+
+enable_multicore_make_compilations() {
+    display_info_box "Enable all cores in Make compilations"
+    sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 }
 
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
@@ -167,6 +177,12 @@ pip_pkg_install() {
     yes | pip install "$1"
 }
 
+prettify_pacman() {
+    display_info_box "Make pacman more appealing on the eyes"
+    grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
+    grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
+}
+
 set_postinstall_settings() {
     # Zsh is default shell
     chsh -s /bin/zsh "$name" >/dev/null 2>&1
@@ -185,19 +201,11 @@ set_postinstall_settings() {
 }
 
 set_preinstall_settings() {
-    display_info_box "Synchronizing system time to ensure successful and secure installation of software..."
-    ntpdate 0.us.pool.ntp.org >/dev/null 2>&1
     [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers
-    
-    display_info_box "Creating fake root environment..."
-    set_permissions "%wheel ALL=(ALL) NOPASSWD: ALL"
-    
-    display_info_box "Make pacman more appealing on the eyes"
-    grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color$/Color/" /etc/pacman.conf
-    grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-    
-    display_info_box "Enable all cores in Make compilations"
-    sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
+    synchronize_clocks_with_ntp || error "Couldnt sync clocks with NTP"
+    create_fake_root_install_env || error "Couldnt create fake root env for install"
+    prettify_pacman || error "Could not prettify pacman"
+    enable_multicore_make_compilations || error "Couldnt enable multicore Make compilations"
 }
 
 set_permissions() {
@@ -224,6 +232,12 @@ successful_install_alert() {
         --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\nNumber of programs installed -> $total. \nPrograms that might not have gotten installed\n:$unsuccessfully_installed_programs" \
         0 0
 }
+
+synchronize_clocks_with_ntp() {
+    display_info_box "Synchronizing system time to ensure successful and secure installation of software..."
+    ntpdate 0.us.pool.ntp.org >/dev/null 2>&1
+}
+
 system_beep_off() {
     display_info_box "Getting rid of that retarded error beep sound..."
     rmmod pcspkr ||
@@ -294,7 +308,7 @@ refresh_arch_keyring || error "Error automatically refreshing Arch keyring. Cons
 run_reflector || error "run_reflector() encountered an error"
 set_preinstall_settings || error "set_preinstall_settings() did not finish successfully"
 manual_install $aur_helper || error "Failed to install yay via manual_install()"
-install_user_programs
-add_dotfiles
-set_postinstall_settings
+install_user_programs || error "Error in install_user_programs()"
+add_dotfiles || error "Error in add_dotfiles()"
+set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
 successful_install_alert || error "Unfortunately, the install failed. Better luck next time."
