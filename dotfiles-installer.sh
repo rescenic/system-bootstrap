@@ -67,8 +67,8 @@ add_dotfiles() {
     sudo -u "$name" cp -rfT "$dir" "$user_home_dir"
     rm -f "$user_home_dir/README.md" "$user_home_dir/LICENSE"
     # make git ignore deleted LICENSE & README.md files
-    git update-index --assume-unchanged "$user_home_dir/README.md"
-    git update-index --assume-unchanged "$user_home_dir/LICENSE"
+#     git update-index --assume-unchanged "$user_home_dir/README.md"
+#     git update-index --assume-unchanged "$user_home_dir/LICENSE"
 }
 
 arch_pkg_install() {
