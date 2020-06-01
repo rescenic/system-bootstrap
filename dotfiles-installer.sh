@@ -122,7 +122,7 @@ get_user_credentials() {
 
 git_pkg_install() {
     progname="$(basename "$1" .git)"
-    dir="$repodir/$progname"
+    dir="$repodir/$progname.git"
     display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
     sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
     cd "$dir" || exit
@@ -218,7 +218,7 @@ set_user_credentials() { \
     display_info_box "Adding user \"$name\"..."
     useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 || 
     usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
-    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel "$(dirname "$repodir")"
+    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel $(dirname "$repodir")
     echo "$name:$user_passwd" | chpasswd
     unset user_passwd confirm_user_passwd ;}
 
@@ -244,6 +244,7 @@ system_beep_off() {
         display_info_box "pcspkr module not loaded, skipping..."
     echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
+
 user_confirm_install() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -258,6 +259,7 @@ refresh_arch_keyring() { \
     display_info_box "Refreshing Arch keyring"
     pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 }
+
 run_reflector() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -278,6 +280,7 @@ run_reflector() {
             ;;
     esac
 }
+
 user_exists_warning() {
     ! (id -u "$name" > /dev/null) 2>&1 ||
         dialog \
@@ -289,6 +292,7 @@ user_exists_warning() {
             --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
             0 0
 }
+
 welcome_screen() {
     dialog \
         --backtitle "$BACKTITLE" \
