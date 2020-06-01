@@ -262,6 +262,7 @@ run_reflector() {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
+	--defaultno \
         --yesno "Install and run reflector? It might speed up package downloads." \
         0 0
     response=$?
