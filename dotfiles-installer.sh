@@ -146,8 +146,8 @@ install_nvim_plugins() {
 install_pkg(){ pacman --noconfirm --needed -S "$1" >/dev/null 2>&1 ;}
 
 install_user_programs() { \
-    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/programs.csv
-    total=$(wc -l < /tmp/programs.csv)
+    ([ -f "$user_programs_file" ] && cp "$user_programs_file" /tmp/user_programs.csv) || curl -Ls "$user_programs_file" | sed '/^#/d' | eval grep "$USER_PROGRAMS_PARSE_PATTERN" > /tmp/user_programs.csv
+    total=$(wc -l < /tmp/user_programs.csv)
     aurinstalled=$(pacman -Qqm)
     while IFS=, read -r tag program comment; do
         n=$((n + 1))
@@ -158,7 +158,7 @@ install_user_programs() { \
             "P") pip_pkg_install "$program" "$comment" ;;
             *) arch_pkg_install "$program" "$comment" ;;
         esac
-    done < /tmp/progs.csv ;}
+    done < /tmp/user_programs.csv ;}
 
 manual_install() {
 	[ -f "/usr/bin/$1" ] || (
