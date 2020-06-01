@@ -122,7 +122,7 @@ get_user_credentials() {
 
 git_pkg_install() {
     progname="$(basename "$1")"
-    dir="$repodir/$progname.git"
+    dir="$repodir/$progname"
     display_info_box "Installing \`$progname\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
     sudo -u "$name" git clone --depth 1 "$1" "$dir" >/dev/null 2>&1 || { cd "$dir" || return ; sudo -u "$name" git pull --force origin master;}
     cd "$dir" || exit
