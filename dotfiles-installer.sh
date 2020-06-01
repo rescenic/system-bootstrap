@@ -8,7 +8,7 @@
 # ====== Variables ====== #
 while getopts ":a:r:b:p:h" o; do case "${o}" in
 	h) printf "Optional arguments for custom use:\\n  -r: Dotfiles repository (local file or url)\\n  -p: Dependencies and programs csv (local file or url)\\n  -a: AUR helper (must have pacman-like syntax)\\n  -h: Show this message\\n" && exit ;;
-	r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfilesrepo" || exit ;;
+	r) dotfiles_repo=${OPTARG} && git ls-remote "$dotfiles_repo" || exit ;;
 	b) repo_branch=${OPTARG} ;;
 	p) user_programs_file=${OPTARG} ;;
 	a) aur_helper=${OPTARG} ;;
@@ -73,7 +73,7 @@ arch_pkg_install() {
 aur_pkg_install() {
     display_info_box "Installing \`$1\` from the AUR\n($n of $total)"
     echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
-    sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
+    sudo -u "$name" "$aur_helper" -S --noconfirm "$1" >/dev/null 2>&1
 }
 
 create_user_dirs() {
@@ -174,7 +174,7 @@ pip_pkg_install() {
 
 set_postinstall_settings() {
     # Zsh is default shell
-    chsh -s /bin/zsh $name >/dev/null 2>&1
+    chsh -s /bin/zsh "$name" >/dev/null 2>&1
     sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
     #sed -i "s/^$name:\(.*\):\/bin\/.*/$name:\1:\/bin\/zsh/" /etc/passwd
     
@@ -215,7 +215,7 @@ set_user_credentials() { \
     display_info_box "Adding user \"$name\"..."
     useradd -m -g wheel -s /bin/bash "$name" >/dev/null 2>&1 || 
     usermod -a -G wheel "$name" && mkdir -p /home/"$name" && chown "$name":wheel /home/"$name"
-    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel $(dirname "$repodir")
+    repodir="/home/$name/.local/src"; mkdir -p "$repodir"; chown -R "$name":wheel "$(dirname "$repodir")"
     echo "$name:$user_passwd" | chpasswd
     unset user_passwd confirm_user_passwd ;}
 
@@ -229,14 +229,12 @@ successful_install_alert() {
         --msgbox "If no hidden errors, dotfile-installer.sh completed successfully.\nNumber of programs installed -> $total. \nPrograms that might not have gotten installed\n:$unsuccessfully_installed_programs" \
         0 0
 }
-
 system_beep_off() {
     display_info_box "Getting rid of that retarded error beep sound..."
     rmmod pcspkr ||
         display_info_box "pcspkr module not loaded, skipping..."
     echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf
 }
-
 user_confirm_install() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -244,16 +242,13 @@ user_confirm_install() {
         --yes-label "Let's go!" \
         --no-label "No, nevermind!" \
         --yesno "The rest of the installation will now be totally automated, so sit back and relax.\\n\\nNow just press <Let's go!> and the system will begin installation!" \
-        0 0 || {
-        clear
-        exit
-    }
-
+        0 0 || { clear; exit; }
+}
+        
 refresh_arch_keyring() { \
     display_info_box "Refreshing Arch keyring"
     pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 }
-
 run_reflector() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -266,14 +261,13 @@ run_reflector() {
             display_info_box "Installing reflector"
             install_pkg reflector
             display_info_box "Running reflector"
-            reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist &> /dev/null
+            reflector --verbose --latest 100 --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
             ;;
         1)
             return
             ;;
     esac
 }
-
 user_exists_warning() {
     ! (id -u "$name" > /dev/null) 2>&1 ||
         dialog \
@@ -285,7 +279,6 @@ user_exists_warning() {
             --yesno "User already exists on this system. Continuing will overwrite conflicting files." \
             0 0
 }
-
 welcome_screen() {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -293,7 +286,6 @@ welcome_screen() {
         --msgbox "Welcome! This script automatically installs a fully-featured Arch Linux desktop." \
         0 0
 }
-
 # ---------------------------- #
 #            Install           #
 # ---------------------------- #
@@ -310,4 +302,4 @@ manual_install $aur_helper || error "Failed to install yay via manual_install()"
 install_user_programs || error "Error in install_user_programs()"
 add_dotfiles || error "Error in add_dotfiles()"
 set_postinstall_settings || error "set_postinstall_settings() did not finish successfully"
-successful_install_alert || error "Unfortunately, the install failed..."
+successful_install_alert || error "Unfortunately, the install failed. Better luck next time."
