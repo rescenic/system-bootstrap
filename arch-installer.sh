@@ -45,7 +45,8 @@ function clean_partition_cruft {
     display_info_box "Unmounting any parititons from ${drive}..."
     swapoff -a
     totalPartitions=$(grep -c '"${drive}"[0-9]' /proc/partitions)
-    for i in {1.."$totalPartitions"}; do
+    
+    for i in $(eval echo "{1..$totalPartitions}"); do
         display_info_box "Unmounting parititon "$i" from ${drive}..."
 	umount --force "${drive}""${i}"
     done
