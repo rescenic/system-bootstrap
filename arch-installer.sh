@@ -118,7 +118,7 @@ function create_partition_filesystems {
 function enter_chroot_environment {
     display_info_box "Preparing to enter chroot environment"
     curl "$CHROOT_URL" > /mnt/chroot.sh
-    arch-chroot /mnt bash chroot.sh "$drive" "$drive$boot_partition" "$bootloader"
+    arch-chroot /mnt bash chroot.sh "$drive" "$drive""$boot_partition" "$bootloader"
 }
 
 function error {
@@ -126,7 +126,7 @@ function error {
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --no-collapse \
-        --msgbox "$1"\
+        --msgbox "$1" \
         0 0
     exit
 }
@@ -148,9 +148,9 @@ function ntp_sync {
 
 function preinstall_system_checks {
     display_info_box "Performing system checks..."
-    [[ "$(id -u)" == "0" ]] || error "This script requires be run as root"
-    ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" >/dev/null 2>&1
-    pacman -Sy --noconfirm reflector >/dev/null 2>&1
+    [[ "$(id -u)" == "0" ]] || display_info_box "This script requires be run as root"
+    ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" || display_info_box "This script requires an internet connection"
+    pacman -Sy --noconfirm reflector || error "This script requires reflector be run"
 }
 
 function refresh_arch_keyring {
@@ -341,25 +341,3 @@ set_hostnam
 user_select_root_password
 enter_chroot_environment
 user_postinstall_options
-# preinstall_system_checks >/dev/null
-# user_select_install_drive >/dev/null
-# user_confirm_install >/dev/null
-# run_reflector >/dev/null
-# user_select_hostname >/dev/null
-# user_select_timezone >/dev/null
-# ntp_sync >/dev/null
-# user_select_bootloader >/dev/null
-# user_confirm_bootloader >/dev/null
-# user_select_partition_sizes >/dev/null
-# user_confirm_partition_sizes >/dev/null
-# clean_partition_cruft >/dev/null
-# create_partitions >/dev/null
-# create_partition_filesystems >/dev/null
-# refresh_arch_keyring >/dev/null
-# generate_fstab >/dev/null
-# install_arch >/dev/null
-# set_timezone >/dev/null
-# set_hostname >/dev/null
-# user_select_root_password >/dev/null
-# enter_chroot_environment >/dev/null
-# user_postinstall_options >/dev/null
