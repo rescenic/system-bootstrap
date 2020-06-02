@@ -11,6 +11,15 @@ CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master
 # ======================= #
 #       Dialog boxes      #
 # ======================= #
+function display_error {
+    dialog \
+        --backtitle "$BACKTITLE" \
+        --title "$TITLE" \
+        --infobox "$1" \
+        0 0
+    exit 1
+}
+
 function display_info_box {
     dialog \
         --backtitle "$BACKTITLE" \
@@ -121,16 +130,6 @@ function enter_chroot_environment {
     arch-chroot /mnt bash chroot.sh "$drive" "$drive""$boot_partition" "$bootloader"
 }
 
-function error {
-    dialog \
-        --backtitle "$BACKTITLE" \
-        --title "$TITLE" \
-        --no-collapse \
-        --msgbox "$1" \
-        0 0
-    exit
-}
-
 function generate_fstab {
     display_info_box "Generating fstab..."
     genfstab -pU /mnt > /mnt/etc/fstab
@@ -148,9 +147,13 @@ function ntp_sync {
 
 function preinstall_system_checks {
     display_info_box "Performing system checks..."
-    [[ "$(id -u)" == "0" ]] || display_info_box "This script requires be run as root"
-    ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" || display_info_box "This script requires an internet connection"
-    pacman -Sy --noconfirm reflector || error "This script requires reflector be run"
+    if [[ "$(id -u)" == "0" ]]; then
+    	display_error "This script should be run as root"
+    elif ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
+  	pacman -Sy --noconfirm reflector >/dev/null 2>&1 || display_error "This script requires reflector"
+    else
+    	display_error "This script requires an active internet connection"
+    fi  
 }
 
 function refresh_arch_keyring {
