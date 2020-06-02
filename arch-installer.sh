@@ -11,7 +11,7 @@ CHROOT_URL="https://raw.githubusercontent.com/vladdoster/system-bootstrap/master
 # ======================= #
 #       Dialog boxes      #
 # ======================= #
-display_info_box() {
+function display_info_box {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -19,7 +19,7 @@ display_info_box() {
         0 0
 }
 
-display_password_input() {
+function display_password_input {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -29,7 +29,7 @@ display_password_input() {
         3>&1 1>&2 2>&3 3>&1
 }
 
-display_yes_no_box() {
+function display_yes_no_box {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -41,11 +41,13 @@ display_yes_no_box() {
 # ======================= #
 #   Installer functions   #
 # ======================= #
-clean_partition_cruft() {
+function clean_partition_cruft {
     display_info_box "Unmounting any parititons from ${drive}..."
-    swapoff -a > /dev/null 2>&1
-    for i in {1..5}; do
-        umount --force "${drive}""${i}" || true
+    swapoff -a
+    totalPartitions=$(grep -c '"${drive}"[0-9]' /proc/partitions)
+    for i in {1.."$totalPartitions"}; do
+        display_info_box "Unmounting parititon "$i" from ${drive}..."
+	umount --force "${drive}""${i}"
     done
     sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' <<- EOF | gdisk "${drive}"
 		o # clear the in memory partition table
@@ -57,7 +59,7 @@ clean_partition_cruft() {
     update_kernel
 }
 
-create_partitions() {
+function create_partitions {
     eval "$create_partition_cmd" <<- EOF | gdisk "${drive}"
 		n # grub partition
 		 # default number (grub)
@@ -91,7 +93,7 @@ create_partitions() {
     update_kernel
 }
 
-create_partition_filesystems() {
+function create_partition_filesystems {
     display_yes_no_box "Does this look correct?
             		\n\nBoot: ${drive}${boot_partition}
 		        \nSwap: ${drive}${swap_partition}
@@ -112,13 +114,13 @@ create_partition_filesystems() {
     update_kernel
 }
 
-enter_chroot_environment() {
+function enter_chroot_environment {
     display_info_box "Preparing to enter chroot environment"
     curl "$CHROOT_URL" > /mnt/chroot.sh
     arch-chroot /mnt bash chroot.sh "$drive" "$drive$boot_partition" "$bootloader"
 }
 
-error() {
+function error {
     # error handling goes here
     error=$(echo "$@")
     dialog \
@@ -130,61 +132,58 @@ error() {
     exit
 }
 
-generate_fstab() {
+function generate_fstab {
     display_info_box "Generating fstab..."
     genfstab -pU /mnt > /mnt/etc/fstab
 }
 
-install_arch() {
+function install_arch {
     display_info_box "Installing Arch via pacstrap"
     yes " " | pacstrap -i /mnt base base-devel linux linux-firmware linux-headers
 }
 
-ntp_sync() {
+function ntp_sync {
     display_info_box "Setting timedatectl to use ntp..."
     timedatectl set-ntp true
 }
 
-preinstall_system_checks() {
+function preinstall_system_checks {
     display_info_box "Performing system checks..."
     [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
     msg=$(
-        {
-            ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
-            pacman -Sy --quiet --noconfirm reflector
-        }
+        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
+        yes " " | pacman -Sy --quiet --noconfirm reflector
     )
     [[ -n $msg ]] && error "$msg"
 }
 
-refresh_arch_keyring() {
+function refresh_arch_keyring {
     display_info_box "Refreshing archlinux-keyring"
-    pacman -Sy --quiet --noconfirm archlinux-keyring > /dev/null 2>&1
-}
+    pacman --noconfirm -Sy archlinux-keyring
 
-run_reflector() {
+function run_reflector () {
     display_info_box "Updating pacman mirrors..."
     reflector --latest 1000 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 }
 
-set_hostname() {
+function set_hostname {
     display_info_box "Setting hostname"
     mv comp /mnt/etc/hostname
 }
 
-set_root_password() {
+function set_root_password {
     echo "root:$1" | arch-chroot /mnt chpasswd || error "Couldn't set root password to $1"
     display_info_box "Set root password to $1"
     sleep 5 
 }
 
-set_timezone() {
+function set_timezone {
     display_info_box "Setting timezone"
     cat tz.tmp > /mnt/tzfinal.tmp
     rm tz.tmp
 }
 
-update_kernel() {
+function update_kernel {
     display_info_box "Updating kernel"
     partprobe
 }
@@ -192,19 +191,19 @@ update_kernel() {
 # ======================== #
 #   User input functions   #
 # ======================== #
-user_confirm_bootloader() {
+function user_confirm_bootloader {
     display_yes_no_box "User chose $bootloader so gdisk is using\n$create_partition_cmd"
 }
 
-user_confirm_install() {
+function user_confirm_install {
     display_yes_no_box "Continue only if you're a big-brane who doesn't mind deleting your entire ${drive} drive."
 }
 
-user_confirm_partition_sizes() {
+function user_confirm_partition_sizes {
     display_yes_no_box "Hostname: ${hostname}\nDrive: ${drive}\nSwap: ${SIZE[0]} GiB\nRoot: ${SIZE[1]} GiB\nIs this correct?"
 }
 
-user_postinstall_options() {
+function user_postinstall_options {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -219,7 +218,7 @@ user_postinstall_options() {
         0 0 && arch-chroot /mnt
 }
 
-user_select_bootloader() {
+function user_select_bootloader {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -252,7 +251,7 @@ user_select_bootloader() {
     rm -f temp
 }
 
-user_select_hostname() {
+function user_select_hostname {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -263,7 +262,7 @@ user_select_hostname() {
     hostname=$(cat comp)
 }
 
-user_select_install_drive() {
+function user_select_install_drive {
     drives=()
     drives+=($(lsblk -d -o name | tail -n +2 | awk '{print NR " " $1}'))
     selection=$(
@@ -280,7 +279,7 @@ user_select_install_drive() {
     drive="/dev/${partition_prefix}"
 }
 
-user_select_partition_sizes() {
+function user_select_partition_sizes {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -295,7 +294,7 @@ user_select_partition_sizes() {
     fi
 }
 
-user_select_timezone() {
+function user_select_timezone {
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
@@ -305,7 +304,7 @@ user_select_timezone() {
         tzselect > tz.tmp
 }
 
-user_select_root_password() {
+function user_select_root_password {
     r_passwd=$(display_password_input "Enter root password")
     confirm_r_passwd=$(display_password_input "Confirm root password")
     while true; do
@@ -322,6 +321,7 @@ user_select_root_password() {
 # ================= #
 #   Install steps   #
 # ================= #
+{
 preinstall_system_checks
 user_select_install_drive
 user_confirm_install
@@ -344,3 +344,4 @@ set_hostname
 user_select_root_password
 enter_chroot_environment
 user_postinstall_options
+} >/dev/null
