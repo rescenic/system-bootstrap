@@ -142,7 +142,7 @@ install_arch() {
 
 ntp_sync() {
     display_info_box "Setting timedatectl to use ntp..."
-    timedatectl set-ntp true > /dev/null 2>&1
+    timedatectl set-ntp true
 }
 
 preinstall_system_checks() {
@@ -152,7 +152,7 @@ preinstall_system_checks() {
         {
             ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
             pacman -Sy --quiet --noconfirm reflector
-        } > /dev/null 2>&1
+        }
     )
     [[ -n $msg ]] && error "$msg"
 }
