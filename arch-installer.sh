@@ -164,11 +164,7 @@ refresh_arch_keyring() {
 
 run_reflector() {
     display_info_box "Updating pacman mirrors..."
-    reflector \
-        --verbose \
-        --latest 200 \
-        --sort rate \
-        --save /etc/pacman.d/mirrorlist
+    reflector --protocol https --sort rate --save /etc/pacman.d/mirrorlist --verbose
 }
 
 set_hostname() {
