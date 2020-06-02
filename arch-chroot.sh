@@ -123,8 +123,7 @@ run_reflector() {
         --verbose \
         --latest 200 \
         --sort rate \
-        --save /etc/pacman.d/mirrorlist \
-        > /dev/null 2>&1
+        --save /etc/pacman.d/mirrorlist
 }
 # ============================ #
 #            Install           #
