@@ -152,8 +152,8 @@ function preinstall_system_checks {
     display_info_box "Performing system checks..."
     [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
     msg=$(
-        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"
-        yes " " | pacman -Sy --quiet --noconfirm reflector
+        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"  >/dev/null
+        pacman -Sy --noconfirm reflector
     )
     [[ -n $msg ]] && error "$msg"
 }
