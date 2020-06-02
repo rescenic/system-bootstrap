@@ -120,6 +120,7 @@ function run_reflector {
 # ============================ #
 #            Install           #
 # ============================ #
+{
 preinstall_setup
 run_reflector
 set_root_password
@@ -128,3 +129,4 @@ set_system_timezone
 start_network_manager
 install_system_bootloader
 install_user_dotfiles
+} >/dev/null
