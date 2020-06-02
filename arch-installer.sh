@@ -122,13 +122,11 @@ function enter_chroot_environment {
 }
 
 function error {
-    # error handling goes here
-    error=$(echo "$@")
     dialog \
         --backtitle "$BACKTITLE" \
         --title "$TITLE" \
         --no-collapse \
-        --msgbox "$error" \
+        --msgbox "$1"\
         0 0
     exit
 }
@@ -150,22 +148,19 @@ function ntp_sync {
 
 function preinstall_system_checks {
     display_info_box "Performing system checks..."
-    [[ "$(id -u)" != "0" ]] && error "This script requires be run as root"
-    msg=$(
-        ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)"  >/dev/null
-        pacman -Sy --noconfirm reflector
-    )
-    [[ -n $msg ]] && error "$msg"
+    [[ "$(id -u)" == "0" ]] || error "This script requires be run as root"
+    ping -q -w 1 -c 1 "$(ip r | grep default | cut -d ' ' -f 3)" >/dev/null 2>&1
+    pacman -Sy --noconfirm reflector >/dev/null 2>&1
 }
 
 function refresh_arch_keyring {
     display_info_box "Refreshing archlinux-keyring"
-    pacman --noconfirm -Sy archlinux-keyring
+    pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
 ]
 
 function run_reflector () {
     display_info_box "Updating pacman mirrors..."
-    reflector --latest 1000 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+    reflector --latest 1000 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
 }
 
 function set_hostname {
@@ -187,7 +182,7 @@ function set_timezone {
 
 function update_kernel {
     display_info_box "Updating kernel"
-    partprobe
+    partprobe >/dev/null 2>&1
 }
 
 # ======================== #
