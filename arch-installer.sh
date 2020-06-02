@@ -190,7 +190,7 @@ set_timezone() {
 
 update_kernel() {
     display_info_box "Updating kernel"
-    partprobe > /dev/null 2>&1
+    partprobe
 }
 
 # ======================== #
