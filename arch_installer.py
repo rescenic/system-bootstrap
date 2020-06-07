@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# wizard.py --- A dialog program show user options of system-bootstrap
+# arch_installer.py --- dialog program that takes user input and uses it to install Arch Linux
 
 import getopt
 import locale
@@ -13,23 +13,24 @@ import sys
 import textwrap
 import time
 import traceback
+from collections import namedtuple
 from textwrap import dedent, indent
 
+import blkinfo
 import dialog
-from arch_installer import ArchInstaller
 from base import BaseDialog, DialogContextManager
 from dialog import DialogBackendVersion
+from humanfriendly import format_size
 
+default_debug_filename = "arch_installer.debug"
 progname = os.path.basename(sys.argv[0])
 progversion = "0.0.1"
 version_blurb = """ \
 This is free software; see the source for copying conditions. \
 There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."""
 
-default_debug_filename = "wizard.debug"
-
 usage = """Usage: {progname} [option ...]
-Program to allow user to perform various operations regarding Arch Linux.
+Program that installs Arch Linux.
 
 Options:
       --debug                  enable logging of all dialog command lines
@@ -42,19 +43,35 @@ Options:
     progname=progname, debug_file=default_debug_filename
 )
 
-params = {}
+help_msg = """\
+I can hear your cry for help, and would really like to help you. However, I \
+am afraid there is not much I can do for you here; you will have to decide \
+for yourself on this matter.
+
+Keep in mind that you can always rely on me. \
+You have all my support, be brave!"""
+
+params = {
+    "debug": False,
+    "debug_expand_file_opt": False,
+    "debug_filename": default_debug_filename,
+    "progversion": progversion,
+}
 
 d = None
 
-tw = textwrap.TextWrapper(width=78, break_long_words=False, break_on_hyphens=True)
+tw = textwrap.TextWrapper(width=78, break_long_words=True, break_on_hyphens=True)
 
 
-class Wizard:
+class ArchInstaller:
+    """ArchInstaller."""
+
     def __init__(self):
+        """__init__."""
         global d
         self.Dialog_instance = dialog.Dialog(dialog="dialog")
         d = BaseDialog(self.Dialog_instance)
-        backtitle = "Arch Wizard"
+        backtitle = "Arch Installer"
         d.set_background_title(backtitle)
         self.max_lines, self.max_cols = d.maxsize(backtitle=backtitle)
         self.min_rows, self.min_cols = 24, 80
@@ -66,6 +83,7 @@ class Wizard:
         ) = self.get_term_size_and_backend_version()
 
     def setup_debug(self):
+        """setup_debug."""
         if params["debug"]:
             debug_file = open(params["debug_filename"], "w")
             d.setup_debug(
@@ -76,6 +94,7 @@ class Wizard:
             return DialogContextManager()
 
     def get_term_size_and_backend_version(self):
+        """get_term_size_and_backend_version."""
         backend_version = d.cached_backend_version
         if not backend_version:
             print(
@@ -107,99 +126,89 @@ class Wizard:
         return (term_rows, term_cols, backend_version)
 
     def run(self):
+        """run."""
         with self.wizard_context:
-            self.decide_fate()
+            self.welcome_user()
+            self.get_installation_drive()
 
-    def decide_fate(self):
+    def welcome_user(self):
+        """welcome_user."""
         d.msgbox(
             """
-                Hello, and welcome to the System-Boostrap {pydlg_version}.
+                Hello, and welcome to the Arch Installer {pydlg_version}.
 
                 This script is being run by a Python interpreter identified as follows: {py_version}
             """.format(
-                pydlg_version=dialog.__version__, py_version=indent(sys.version, "  "),
+                pydlg_version=params["progversion"],
+                py_version=indent(sys.version, "  "),
             ),
             width=60,
-            height=17,
+            height=15,
         )
-        self.get_fate()
-        d.clear_screen()
+        return
 
-    def get_fate(self):
-        text = """Choose wisely."""
+    def get_installation_drive(self):
+        """get_installation_drive."""
+        text = "Select a drive to install Arch on"
+        Drive = namedtuple("Drive", ["name", "size", "partitions"])
         while True:
+            drives = [
+                Drive(
+                    name=drive.get("name"),
+                    size=format_size(int(drive.get("size"))),
+                    partitions=drive.get("children"),
+                )
+                for drive in blkinfo.BlkDiskInfo().get_disks()
+            ]
             code, tag = d.menu(
                 text,
                 height=15,
-                width=70,
+                width=50,
+                menu_height=7,
                 choices=[
                     (
-                        "Install Arch Linux",
-                        "Installs Arch Linux using user input.",
-                        "Installs a fresh Arch Linux system.",
-                    ),
-                    (
-                        "Create Arch ISO",
-                        "A disk preloaded with this wizard.",
-                        "Creates a bootable ISO of Arch preloaded with dependencies needed to use this wizard.",
-                    ),
-                    (
-                        "Install dotfiles",
-                        "Have vlad's or your own dotfiles installed.",
-                        "Installs dotfiles for a given user.",
-                    ),
+                        drive.name,
+                        "{0!r} is {1} and has {2} partitions".format(
+                            drive.name, drive.size, len(drive.partitions),
+                        ),
+                    )
+                    for drive in drives
                 ],
-                title="Choose your destiny...",
-                help_button=True,
-                item_help=True,
-                help_tags=True,
+                title="Arch Installer",
+                help_button=False,
+                item_help=False,
+                help_tags=False,
             )
 
-            if code == "help":
-                d.msgbox(
-                    "You asked for help concerning the item identified by "
-                    "tag {0!r}.".format(tag),
-                    height=8,
-                    width=40,
-                )
-            else:
+            if code:
                 break
         while True:
             reply = d.yes_no_help(
                 "\nYou have chosen " "{0!r}, continue?".format(tag),
                 yes_label="Yes",
                 no_label="No",
-                help_label="Please help me!",
+                help_label="Help!",
                 height=10,
-                width=60,
+                width=50,
                 title="An Important Question",
             )
             if reply == "yes":
-                if tag == "Install Arch Linux":
-                    ArchInstaller().run()
                 return True
             elif reply == "no":
-                self.get_fate()
+                self.get_installation_drive()
             elif reply == "help":
                 d.msgbox(
-                    """\
-I can hear your cry for help, and would really like to help you. However, I \
-am afraid there is not much I can do for you here; you will have to decide \
-for yourself on this matter.
-
-Keep in mind that you can always rely on me. \
-You have all my support, be brave!""",
-                    height=15,
-                    width=60,
-                    title="From Your Faithful Servant",
+                    help_msg, height=15, width=60, title="From Your Faithful Servant",
                 )
             else:
-                assert (
-                    False
-                ), "Unexpected reply from WizardDialog.yes_no_help(): " + repr(reply)
+                assert False, (
+                    "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
+                    + repr(reply)
+                )
 
 
 def process_command_line():
+    """process_command_line."""
     global params
 
     try:
@@ -252,6 +261,7 @@ def process_command_line():
 
 
 def main():
+    """main."""
     locale.setlocale(locale.LC_ALL, "")
 
     what_to_do, code = process_command_line()
@@ -259,7 +269,7 @@ def main():
         sys.exit(code)
 
     try:
-        app = Wizard()
+        app = ArchInstaller()
         app.run()
     except dialog.error as exc_instance:
         if not isinstance(

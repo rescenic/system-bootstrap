@@ -1,10 +1,19 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# demo.py --- Demonstration program and cheap test suite for pythondialog
+# base.py --- A dialog class to be used by all dialog programs in system-bootstrap
 
-import sys, os, locale, stat, time, getopt, subprocess, traceback, textwrap
+import getopt
+import locale
+import os
 import pprint
+import stat
+import subprocess
+import sys
+import textwrap
+import time
+import traceback
+
 import dialog
 from dialog import DialogBackendVersion
 
@@ -14,9 +23,18 @@ class BaseDialog:
     """
 
     def __init__(self, Dialog_instance):
+        """__init__.
+
+        :param Dialog_instance:
+        """
         self.dlg = Dialog_instance
 
     def check_exit_request(self, code, ignore_Cancel=False):
+        """check_exit_request.
+
+        :param code:
+        :param ignore_Cancel:
+        """
         if code == self.CANCEL and ignore_Cancel:
             # Ignore the Cancel button, i.e., don't interpret it as an exit
             # request; instead, let the caller handle CANCEL himself.
@@ -26,7 +44,7 @@ class BaseDialog:
             button_name = {self.CANCEL: "Cancel", self.ESC: "Escape"}
             msg = (
                 "You pressed {0} in the last dialog box. Do you want "
-                "to exit this demo?".format(button_name[code])
+                "really want to exit?".format(button_name[code])
             )
             if self.dlg.yesno(msg) == self.OK:
                 sys.exit(0)
@@ -40,6 +58,11 @@ class BaseDialog:
         """
 
         def wrapper(*args, **kwargs):
+            """wrapper.
+
+            :param args:
+            :param kwargs:
+            """
             while True:
                 res = method(*args, **kwargs)
 
@@ -57,6 +80,10 @@ class BaseDialog:
         return wrapper
 
     def __getattr__(self, name):
+        """__getattr__.
+
+        :param name:
+        """
         obj = getattr(self.dlg, name)
         if hasattr(obj, "is_widget") and getattr(obj, "is_widget"):
             return self.widget_loop(obj)
@@ -64,6 +91,7 @@ class BaseDialog:
             return obj
 
     def clear_screen(self):
+        """clear_screen."""
         program = "clear"
 
         try:
@@ -121,8 +149,15 @@ class BaseDialog:
 
 
 class DialogContextManager:
+    """DialogContextManager."""
+
     def __enter__(self):
+        """__enter__."""
         return self
 
     def __exit__(self, *exc):
+        """__exit__.
+
+        :param exc:
+        """
         return False
