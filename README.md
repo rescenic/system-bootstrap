@@ -14,6 +14,13 @@ An everyday desktop evironment geared towards **productivity**,  **software deve
     - [Dynamic menu](https://tools.suckless.org/dmenu/)
     - [Simple Terminal](https://st.suckless.org/)
 
+
+### Rewrite to use Python for every aspect of the install:
+- [blkinfo](https://github.com/grinrag/blkinfo)
+- [pyparted](https://github.com/dcantrell/pyparted)
+- [pydialog](https://github.com/nicr9/pydialog)
+
+
 ### Installation:
 
 **cURL & run the wizard**:
