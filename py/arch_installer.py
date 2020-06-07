@@ -2,6 +2,28 @@
 # -*- coding: utf-8 -*-
 
 # arch_installer.py --- dialog program that takes user input and uses it to install Arch Linux
+# - [] preinstall_system_checks
+# - [] user_select_install_drive
+# - [] user_confirm_install
+# - [] run_reflector
+# - [] user_select_hostname
+# - [] user_select_timezone
+# - [] ntp_sync
+# - [] user_select_bootloader
+# - [] user_confirm_bootloader
+# - [] user_select_partition_sizes
+# - [] user_confirm_partition_sizes
+# - [] clean_partition_cruft
+# - [] create_partitions
+# - [] create_partition_filesystems
+# - [] refresh_arch_keyring
+# - [] generate_fstab
+# - [] install_arch
+# - [] set_timezone
+# - [] set_hostnam
+# - [] user_select_root_password
+# - [] enter_chroot_environment
+# - [] user_postinstall_options
 
 import getopt
 import locale
