@@ -21,6 +21,7 @@ import dialog
 from base import BaseDialog, DialogContextManager
 from dialog import DialogBackendVersion
 from humanfriendly import format_size
+from werkzeug.utils import secure_filename
 
 default_debug_filename = "arch_installer.debug"
 progname = os.path.basename(sys.argv[0])
@@ -43,7 +44,7 @@ Options:
     progname=progname, debug_file=default_debug_filename
 )
 
-help_msg = """\
+help_msg = """\from werkzeug.utils import secure_filename
 I can hear your cry for help, and would really like to help you. However, I \
 am afraid there is not much I can do for you here; you will have to decide \
 for yourself on this matter.
@@ -63,7 +64,7 @@ d = None
 tw = textwrap.TextWrapper(width=78, break_long_words=True, break_on_hyphens=True)
 
 
-class ArchInstaller:
+class ArchInstaller(object):
     """ArchInstaller."""
 
     def __init__(self):
@@ -81,6 +82,10 @@ class ArchInstaller:
             self.term_cols,
             self.backend_version,
         ) = self.get_term_size_and_backend_version()
+
+        # User install options
+        self.install_drive = None
+        self.hostname = None
 
     def setup_debug(self):
         """setup_debug."""
@@ -125,18 +130,23 @@ class ArchInstaller:
 
         return (term_rows, term_cols, backend_version)
 
+    def simple_msg(msg):
+        d.msgbox(
+            msg, height=15, width=60, title="From Your Faithful Servant",
+        )
+
     def run(self):
         """run."""
         with self.wizard_context:
             self.welcome_user()
             self.get_installation_drive()
+            self.get_hostname()
 
     def welcome_user(self):
         """welcome_user."""
         d.msgbox(
             """
-                Hello, and welcome to the Arch Installer {pydlg_version}.
-
+                Hello, and welcome to the Arch Installer {pydlg_version}.\n
                 This script is being run by a Python interpreter identified as follows: {py_version}
             """.format(
                 pydlg_version=params["progversion"],
@@ -193,6 +203,7 @@ class ArchInstaller:
                 title="An Important Question",
             )
             if reply == "yes":
+                self.install_drive = tag
                 return True
             elif reply == "no":
                 self.get_installation_drive()
@@ -205,6 +216,27 @@ class ArchInstaller:
                     "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
                     + repr(reply)
                 )
+
+    def get_hostname(self):
+        init_str = ""
+        while True:
+            code, answer = d.inputbox(
+                "What should system hostname be?",
+                init=init_str,
+                title="Set system hostname",
+                help_button=True,
+            )
+            if code == "help":
+                d.msgbox(
+                    "The hostname entered "
+                    "so far will be {0!r}.".format(secure_filename(answer)),
+                    title="Set system hostname help",
+                )
+                init_str = answer
+            else:
+                break
+        self.hostname = secure_filename(answer)
+        return answer
 
 
 def process_command_line():
