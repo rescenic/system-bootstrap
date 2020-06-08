@@ -5,7 +5,6 @@ An everyday desktop evironment geared towards **productivity**,  **software deve
 ### Included:
 
 1. Arch Linux installer asks for input, has sensible defaults, and does the heavy lifting for you.
-    - Uses [systemd-boot](https://wiki.archlinux.org/index.php/systemd-boot) boot manager
     - Seperate root/user partitions
     - Install `bootctl` or `grub`
     - Default swap partition size based on system RAM
