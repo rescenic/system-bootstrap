@@ -253,14 +253,6 @@ class ArchInstaller(object):
             return True
         elif reply == "no":
             d.msgbox("Selecting timezone...", height=10, width=60, title="Tz selection")
-        elif reply == "help":
-            d.msgbox(
-                help_msg, height=15, width=60, title="From Your Faithful Servant",
-            )
-        else:
-            assert (
-                False
-            ), "Unexpected reply from ArchInstallerDialog.yes_no_help(): " + repr(reply)
 
     def get_installation_drive(self):
         """get_installation_drive."""
