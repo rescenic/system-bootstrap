@@ -3,11 +3,11 @@
 
 # arch_installer.py --- dialog program that takes user input and uses it to install Arch Linux
 # - [] preinstall_system_checks
-# - [] user_select_install_drive
-# - [] user_confirm_install
-# - [] run_reflector
-# - [] user_select_hostname
-# - [] user_select_timezone
+# - [x] user_select_install_drive
+# - [x] user_confirm_install
+# - [x] run_reflector
+# - [x] user_select_hostname
+# - [x] user_select_timezone
 # - [] ntp_sync
 # - [] user_select_bootloader
 # - [] user_confirm_bootloader
@@ -20,7 +20,7 @@
 # - [] generate_fstab
 # - [] install_arch
 # - [] set_timezone
-# - [] set_hostnam
+# - [] set_hostname
 # - [] user_select_root_password
 # - [] enter_chroot_environment
 # - [] user_postinstall_options
@@ -36,6 +36,7 @@ import textwrap
 import time
 import traceback
 from collections import namedtuple
+from subprocess import Popen
 from textwrap import dedent, indent
 
 import blkinfo
@@ -43,6 +44,7 @@ import dialog
 from base import BaseDialog, DialogContextManager
 from dialog import DialogBackendVersion
 from humanfriendly import format_size
+from tzlocal import get_localzone
 from werkzeug.utils import secure_filename
 
 default_debug_filename = "arch_installer.debug"
@@ -66,7 +68,7 @@ Options:
     progname=progname, debug_file=default_debug_filename
 )
 
-help_msg = """\from werkzeug.utils import secure_filename
+help_msg = """\
 I can hear your cry for help, and would really like to help you. However, I \
 am afraid there is not much I can do for you here; you will have to decide \
 for yourself on this matter.
@@ -152,7 +154,7 @@ class ArchInstaller(object):
 
         return (term_rows, term_cols, backend_version)
 
-    def simple_msg(msg):
+    def simple_msg(self, msg):
         d.msgbox(
             msg, height=15, width=60, title="From Your Faithful Servant",
         )
@@ -161,8 +163,10 @@ class ArchInstaller(object):
         """run."""
         with self.wizard_context:
             self.welcome_user()
+            self.run_reflector()
             self.get_installation_drive()
             self.get_hostname()
+            self.get_timezone()
 
     def welcome_user(self):
         """welcome_user."""
@@ -178,6 +182,85 @@ class ArchInstaller(object):
             height=15,
         )
         return
+
+    def run_reflector(self):
+        while True:
+            reply = d.yes_no_help(
+                "\nRun {0!r}? It helps speed up package installs".format("reflector"),
+                title="Speed up package downloads",
+                height=10,
+                width=50,
+            )
+            if reply == "yes":
+                d.infobox(
+                    "Running {0!r}".format("reflector"),
+                    title="Reflector",
+                    height=7,
+                    width=30,
+                )
+                reflector_cmd = "reflector --latest 200 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
+                start = time.time()
+                output = subprocess.run(
+                    reflector_cmd, shell=True, check=True, capture_output=False
+                )
+                end = time.time()
+                total_time = round(end - start, 2)
+                if output.returncode != 0:
+                    d.msgbox(
+                        "Reflector failed to run properly...skipping\n{}".format(
+                            output
+                        ),
+                        title="Unsuccessful {0!r} run",
+                        height=7,
+                        width=50,
+                    )
+                else:
+                    d.msgbox(
+                        "Reflector finished successfully in {} seconds...".format(
+                            total_time
+                        ),
+                        title="Successful {0!r} run",
+                        height=7,
+                        width=50,
+                    )
+                    return True
+            elif reply == "no":
+                return
+            elif reply == "help":
+                d.msgbox(
+                    help_msg, height=15, width=60, title="From Your Faithful Servant",
+                )
+            else:
+                assert False, (
+                    "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
+                    + repr(reply)
+                )
+
+    def get_timezone(self):
+        current_tz = str(get_localzone())
+        reply = d.yes_no(
+            """\nYou seem to be in the {0!r} timezone.\nSet it as system timezone?""".format(
+                current_tz
+            ),
+            height=10,
+            width=60,
+            yes_label="Use {}".format(current_tz),
+            no_label="Select differnt timezone",
+            title="What timezone are you in?",
+        )
+        if reply == "yes":
+            self.timezone = current_tz
+            return True
+        elif reply == "no":
+            d.msgbox("Selecting timezone...", height=10, width=60, title="Tz selection")
+        elif reply == "help":
+            d.msgbox(
+                help_msg, height=15, width=60, title="From Your Faithful Servant",
+            )
+        else:
+            assert (
+                False
+            ), "Unexpected reply from ArchInstallerDialog.yes_no_help(): " + repr(reply)
 
     def get_installation_drive(self):
         """get_installation_drive."""
@@ -207,37 +290,21 @@ class ArchInstaller(object):
                     for drive in drives
                 ],
                 title="Arch Installer",
-                help_button=False,
-                item_help=False,
-                help_tags=False,
             )
 
             if code:
                 break
-        while True:
-            reply = d.yes_no_help(
-                "\nYou have chosen " "{0!r}, continue?".format(tag),
-                yes_label="Yes",
-                no_label="No",
-                help_label="Help!",
-                height=10,
-                width=50,
-                title="An Important Question",
-            )
-            if reply == "yes":
-                self.install_drive = tag
-                return True
-            elif reply == "no":
-                self.get_installation_drive()
-            elif reply == "help":
-                d.msgbox(
-                    help_msg, height=15, width=60, title="From Your Faithful Servant",
-                )
-            else:
-                assert False, (
-                    "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
-                    + repr(reply)
-                )
+        reply = d.yes_no(
+            "\nYou have chosen " "{0!r}, continue?".format(tag),
+            height=10,
+            width=50,
+            title="An Important Question",
+        )
+        if reply == "yes":
+            self.install_drive = tag
+            return True
+        elif reply == "no":
+            self.get_installation_drive()
 
     def get_hostname(self):
         init_str = ""

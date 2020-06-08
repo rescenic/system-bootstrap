@@ -6,3 +6,4 @@ parso==0.7.0
 pydialog==0.1
 pythondialog==3.5.1
 Werkzeug==1.0.1
+tzlocal
