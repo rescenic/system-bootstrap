@@ -8,7 +8,7 @@
 # - [x] run_reflector
 # - [x] user_select_hostname
 # - [x] user_select_timezone
-# - [] ntp_sync
+# - [x] ntp_sync
 # - [] user_select_bootloader
 # - [] user_confirm_bootloader
 # - [] user_select_partition_sizes
@@ -111,8 +111,16 @@ class ArchInstaller(object):
         self.install_drive = None
         self.hostname = None
 
+    def run(self):
+        with self.wizard_context:
+            self.welcome_user()
+            self.run_reflector()
+            self.get_installation_drive()
+            self.get_hostname()
+            self.get_timezone()
+            self.start_ntp_sync()
+
     def setup_debug(self):
-        """setup_debug."""
         if params["debug"]:
             debug_file = open(params["debug_filename"], "w")
             d.setup_debug(
@@ -123,7 +131,6 @@ class ArchInstaller(object):
             return DialogContextManager()
 
     def get_term_size_and_backend_version(self):
-        """get_term_size_and_backend_version."""
         backend_version = d.cached_backend_version
         if not backend_version:
             print(
@@ -159,17 +166,7 @@ class ArchInstaller(object):
             msg, height=15, width=60, title="From Your Faithful Servant",
         )
 
-    def run(self):
-        """run."""
-        with self.wizard_context:
-            self.welcome_user()
-            self.run_reflector()
-            self.get_installation_drive()
-            self.get_hostname()
-            self.get_timezone()
-
     def welcome_user(self):
-        """welcome_user."""
         d.msgbox(
             """
                 Hello, and welcome to the Arch Installer {pydlg_version}.\n
@@ -199,31 +196,7 @@ class ArchInstaller(object):
                     width=30,
                 )
                 reflector_cmd = "reflector --latest 200 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
-                start = time.time()
-                output = subprocess.run(
-                    reflector_cmd, shell=True, check=True, capture_output=False
-                )
-                end = time.time()
-                total_time = round(end - start, 2)
-                if output.returncode != 0:
-                    d.msgbox(
-                        "Reflector failed to run properly...skipping\n{}".format(
-                            output
-                        ),
-                        title="Unsuccessful {0!r} run",
-                        height=7,
-                        width=50,
-                    )
-                else:
-                    d.msgbox(
-                        "Reflector finished successfully in {} seconds...".format(
-                            total_time
-                        ),
-                        title="Successful {0!r} run",
-                        height=7,
-                        width=50,
-                    )
-                    return True
+                self.run_sh_cmd(reflector_cmd, "Reflector")
             elif reply == "no":
                 return
             elif reply == "help":
@@ -235,6 +208,16 @@ class ArchInstaller(object):
                     "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
                     + repr(reply)
                 )
+
+    def start_ntp_sync(self):
+        d.infobox(
+            "Running {0!r}".format("timedatectl set-ntp true"),
+            title="NTP sync",
+            height=7,
+            width=30,
+        )
+        ntp_sync_cmd = "timedatectl set-ntp true"
+        self.run_sh_cmd(ntp_sync_cmd, "NTP sync")
 
     def get_timezone(self):
         current_tz = str(get_localzone())
@@ -253,17 +236,8 @@ class ArchInstaller(object):
             return True
         elif reply == "no":
             d.msgbox("Selecting timezone...", height=10, width=60, title="Tz selection")
-        elif reply == "help":
-            d.msgbox(
-                help_msg, height=15, width=60, title="From Your Faithful Servant",
-            )
-        else:
-            assert (
-                False
-            ), "Unexpected reply from ArchInstallerDialog.yes_no_help(): " + repr(reply)
 
     def get_installation_drive(self):
-        """get_installation_drive."""
         text = "Select a drive to install Arch on"
         Drive = namedtuple("Drive", ["name", "size", "partitions"])
         while True:
@@ -327,9 +301,31 @@ class ArchInstaller(object):
         self.hostname = secure_filename(answer)
         return answer
 
+    def run_sh_cmd(self, sh_cmd, cmd_name):
+        start = time.time()
+        output = subprocess.run(sh_cmd, shell=True, check=True, capture_output=False)
+        end = time.time()
+        total_time = round(end - start, 2)
+        if output.returncode != 0:
+            d.msgbox(
+                "{} failed to run properly...skipping\n{}".format(cmd_name, output),
+                title="Unsuccessful {0!r} run",
+                height=7,
+                width=50,
+            )
+        else:
+            d.msgbox(
+                "{} finished successfully in {} seconds...".format(
+                    cmd_name, total_time
+                ),
+                title="Successful {0!r} run".format(cmd_name),
+                height=7,
+                width=50,
+            )
+            return True
+
 
 def process_command_line():
-    """process_command_line."""
     global params
 
     try:
@@ -382,7 +378,6 @@ def process_command_line():
 
 
 def main():
-    """main."""
     locale.setlocale(locale.LC_ALL, "")
 
     what_to_do, code = process_command_line()
