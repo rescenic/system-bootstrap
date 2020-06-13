@@ -176,7 +176,8 @@ class Wizard:
             )
             if reply == "yes":
                 if tag == "Install Arch Linux":
-                    ArchInstaller().run()
+                    installer = ArchInstaller()
+                    installer.run()
                 return True
             elif reply == "no":
                 self.get_fate()
@@ -194,9 +195,9 @@ You have all my support, be brave!""",
                     title="From Your Faithful Servant",
                 )
             else:
-                assert (
-                    False
-                ), "Unexpected reply from WizardDialog.yes_no_help(): " + repr(reply)
+                assert False, "Unexpected reply from WizardDialog.yes_no_help(): " + repr(
+                    reply
+                )
 
 
 def process_command_line():
@@ -262,9 +263,7 @@ def main():
         app = Wizard()
         app.run()
     except dialog.error as exc_instance:
-        if not isinstance(
-            exc_instance, dialog.PythonDialogErrorBeforeExecInChildProcess
-        ):
+        if not isinstance(exc_instance, dialog.PythonDialogErrorBeforeExecInChildProcess):
             print(traceback.format_exc(), file=sys.stderr)
 
         print(

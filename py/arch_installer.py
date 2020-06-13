@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # arch_installer.py --- dialog program that takes user input and uses it to install Arch Linux
-# - [] preinstall_system_checks
+# - [x] preinstall_system_checks
 # - [x] user_select_install_drive
 # - [x] user_confirm_install
 # - [x] run_reflector
 # - [x] user_select_hostname
-# - [x] user_select_timezone
+# - [x] user_select_timezone - TODO: allow user to select a different timezone
 # - [x] ntp_sync
-# - [] user_select_bootloader
-# - [] user_confirm_bootloader
+# - [x] user_select_bootloader
+# - [x] user_confirm_bootloader
 # - [] user_select_partition_sizes
 # - [] user_confirm_partition_sizes
 # - [] clean_partition_cruft
@@ -28,22 +28,19 @@
 import getopt
 import locale
 import os
-import pprint
-import stat
 import subprocess
 import sys
 import textwrap
 import time
 import traceback
 from collections import namedtuple
-from subprocess import Popen
 from textwrap import dedent, indent
 
 import blkinfo
 import dialog
 from base import BaseDialog, DialogContextManager
 from dialog import DialogBackendVersion
-from humanfriendly import format_size
+from humanfriendly import format_size, parse_size
 from tzlocal import get_localzone
 from werkzeug.utils import secure_filename
 
@@ -89,36 +86,33 @@ tw = textwrap.TextWrapper(width=78, break_long_words=True, break_on_hyphens=True
 
 
 class ArchInstaller(object):
-    """ArchInstaller."""
+    install_drive = ""
+    hostname = ""
+    bootloader = ""
+    timezone = ""
 
     def __init__(self):
-        """__init__."""
         global d
         self.Dialog_instance = dialog.Dialog(dialog="dialog")
         d = BaseDialog(self.Dialog_instance)
-        backtitle = "Arch Installer"
-        d.set_background_title(backtitle)
-        self.max_lines, self.max_cols = d.maxsize(backtitle=backtitle)
+        d.set_background_title("Arch Installer")
+        self.max_lines, self.max_cols = d.maxsize(use_persistent_args=True)
         self.min_rows, self.min_cols = 24, 80
-        self.wizard_context = self.setup_debug()
         (
             self.term_rows,
             self.term_cols,
             self.backend_version,
         ) = self.get_term_size_and_backend_version()
 
-        # User install options
-        self.install_drive = None
-        self.hostname = None
-
     def run(self):
-        with self.wizard_context:
-            self.welcome_user()
-            self.run_reflector()
-            self.get_installation_drive()
-            self.get_hostname()
-            self.get_timezone()
-            self.start_ntp_sync()
+        self.welcome_user()
+        self.set_installation_drive()
+        self.set_bootloader()
+        self.set_hostname()
+        self.set_timezone()
+        self.set_partition_sizes()
+        self.start_ntp_sync()
+        # self.run_reflector()
 
     def setup_debug(self):
         if params["debug"]:
@@ -162,82 +156,60 @@ class ArchInstaller(object):
         return (term_rows, term_cols, backend_version)
 
     def simple_msg(self, msg):
-        d.msgbox(
-            msg, height=15, width=60, title="From Your Faithful Servant",
-        )
+        d.msgbox(msg, height=10, width=40, title="Install Helper")
 
     def welcome_user(self):
         d.msgbox(
             """
-                Hello, and welcome to the Arch Installer {pydlg_version}.\n
-                This script is being run by a Python interpreter identified as follows: {py_version}
-            """.format(
-                pydlg_version=params["progversion"],
-                py_version=indent(sys.version, "  "),
-            ),
-            width=60,
-            height=15,
+                Hello, and welcome to the Arch Installer %s.\n
+                This script is being run by a Python interpreter identified as follows: %s
+            """
+            % (params["progversion"], indent(sys.version, "  "),),
+            title="Welcome to Arch Installer",
+            width=50,
+            height=10,
         )
         return
 
     def run_reflector(self):
+        cmd = "Reflector"
         while True:
             reply = d.yes_no_help(
-                "\nRun {0!r}? It helps speed up package installs".format("reflector"),
-                title="Speed up package downloads",
-                height=10,
-                width=50,
+                "\nRun '%s'? It helps speed up package installs" % cmd,
+                title="Speed up package downloads with %s" % cmd,
+                height=8,
+                width=40,
             )
             if reply == "yes":
                 d.infobox(
-                    "Running {0!r}".format("reflector"),
-                    title="Reflector",
-                    height=7,
-                    width=30,
+                    "Running '%s'" % cmd.lower(), title=cmd, height=7, width=40,
                 )
                 reflector_cmd = "reflector --latest 200 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
-                self.run_sh_cmd(reflector_cmd, "Reflector")
+                self.run_sh_cmd(reflector_cmd, cmd)
             elif reply == "no":
                 return
             elif reply == "help":
                 d.msgbox(
-                    help_msg, height=15, width=60, title="From Your Faithful Servant",
+                    help_msg, height=10, width=40, title="From Your Faithful Servant",
                 )
             else:
-                assert False, (
-                    "Unexpected reply from ArchInstallerDialog.yes_no_help(): "
-                    + repr(reply)
-                )
+                assert False, "Unexpected reply from run_reflector():" + repr(reply)
 
-    def start_ntp_sync(self):
-        d.infobox(
-            "Running {0!r}".format("timedatectl set-ntp true"),
-            title="NTP sync",
-            height=7,
-            width=30,
-        )
-        ntp_sync_cmd = "timedatectl set-ntp true"
-        self.run_sh_cmd(ntp_sync_cmd, "NTP sync")
-
-    def get_timezone(self):
+    def set_timezone(self):
         current_tz = str(get_localzone())
         reply = d.yes_no(
-            """\nYou seem to be in the {0!r} timezone.\nSet it as system timezone?""".format(
-                current_tz
-            ),
-            height=10,
-            width=60,
-            yes_label="Use {}".format(current_tz),
-            no_label="Select differnt timezone",
-            title="What timezone are you in?",
+            "Set '%s' as system timezone?" % current_tz,
+            height=7,
+            width=50,
+            no_label="Use differnt timezone",
+            title="Timezone selection",
         )
-        if reply == "yes":
-            self.timezone = current_tz
-            return True
-        elif reply == "no":
+        if reply == "no":
             d.msgbox("Selecting timezone...", height=10, width=60, title="Tz selection")
+        else:
+            ArchInstaller.timezone = current_tz
 
-    def get_installation_drive(self):
+    def set_installation_drive(self):
         text = "Select a drive to install Arch on"
         Drive = namedtuple("Drive", ["name", "size", "partitions"])
         while True:
@@ -249,11 +221,11 @@ class ArchInstaller(object):
                 )
                 for drive in blkinfo.BlkDiskInfo().get_disks()
             ]
-            code, tag = d.menu(
+            code, drive = d.menu(
                 text,
-                height=15,
+                height=10,
                 width=50,
-                menu_height=7,
+                menu_height=4,
                 choices=[
                     (
                         drive.name,
@@ -263,144 +235,144 @@ class ArchInstaller(object):
                     )
                     for drive in drives
                 ],
-                title="Arch Installer",
+                title="Installation drive selection",
             )
 
             if code:
                 break
         reply = d.yes_no(
-            "\nYou have chosen " "{0!r}, continue?".format(tag),
-            height=10,
-            width=50,
-            title="An Important Question",
+            "Install on '%s'?" % drive, height=7, width=40, title="Confirm selection",
         )
-        if reply == "yes":
-            self.install_drive = tag
-            return True
-        elif reply == "no":
-            self.get_installation_drive()
+        if reply == "no":
+            self.set_installation_drive()
+        else:
+            ArchInstaller.install_drive = drive
 
-    def get_hostname(self):
-        init_str = ""
+    def set_bootloader(self):
         while True:
-            code, answer = d.inputbox(
-                "What should system hostname be?",
+            code, bootloader = d.menu(
+                "Select a bootloader to use",
+                height=10,
+                width=50,
+                choices=[
+                    (
+                        "Systemd-boot",
+                        "A simple UEFI boot loader",
+                        "Systemd-boot (Bootctl) is simple to configure but it can only start EFI executables such as the Linux kernel EFISTUB, UEFI Shell, GRUB, or the Windows Boot Manager.",
+                    ),
+                    (
+                        "Grub2",
+                        "A very powerful boot loader",
+                        "GNU GRUB is a very powerful boot loader, which can load a wide variety of free operating systems, as well as proprietary operating systems with chain-loading. GRUB is designed to address the complexity of booting a personal computer.",
+                    ),
+                ],
+                title="Arch Installer",
+                help_label="More info",
+                help_button=True,
+                help_tags=False,
+                item_help=True,
+            )
+            if code == "help":
+                d.msgbox(bootloader, height=10, width=45)
+            else:
+                break
+
+        reply = d.yes_no(
+            "'%s' will be system bootloader, continue?" % bootloader,
+            height=6,
+            width=40,
+            title="Confirm selection",
+        )
+        if reply == "no":
+            self.set_bootloader()
+        else:
+            ArchInstaller.bootloader = bootloader
+
+    def set_hostname(self, init_str=""):
+        while True:
+            code, hostname = d.inputbox(
+                "Set system hostname",
                 init=init_str,
                 title="Set system hostname",
                 help_button=True,
             )
+            sys_hostname = secure_filename(hostname)
             if code == "help":
                 d.msgbox(
-                    "The hostname entered "
-                    "so far will be {0!r}.".format(secure_filename(answer)),
-                    title="Set system hostname help",
+                    "The hostname will be:\n'%s'" % sys_hostname,
+                    height=8,
+                    width=40,
+                    title="System hostname help",
                 )
-                init_str = answer
+                init_str = hostname
             else:
                 break
-        self.hostname = secure_filename(answer)
-        return answer
+        reply = d.yes_no(
+            "'%s' will be system hostname?" % sys_hostname,
+            height=6,
+            width=40,
+            title="Confirm selection",
+        )
+        if reply == "no":
+            self.set_hostname()
+        else:
+            ArchInstaller.hostname = sys_hostname
 
-    def run_sh_cmd(self, sh_cmd, cmd_name):
+    def set_partition_sizes(self):
+        disk = blkinfo.BlkDiskInfo().get_disks({"name": self.install_drive})[0]
+        disk_size = StorageInput(disk.get("size"))
+        boot, root, swap = (
+            StorageInput("250mib"),
+            StorageInput("30gib"),
+            StorageInput("10gib"),
+        )
+        test = StorageInput(format_size(boot.raw + root.raw + swap.raw, binary=True))
+        home_size = StorageInput(format_size(disk_size.raw - test.raw, binary=True))
+
+        while True:
+            partitions = d.inputmenu(
+                "Edit GPT partition defaults",
+                height=25,
+                width=50,
+                menu_height=7,
+                choices=[
+                    ("/boot", boot.humanized),
+                    ("/", root.humanized),
+                    ("/swap", swap.humanized),
+                    ("/home", home_size.humanized),
+                ],
+            )
+            self.simple_msg(str(partitions))
+
+    def start_ntp_sync(self):
+        ntp_cmd = "timedatectl set-ntp true"
+        d.infobox(
+            "Running '%s'" % ntp_cmd, title="NTP sync", height=7, width=30,
+        )
+        self.run_sh_cmd(ntp_cmd, ntp_cmd)
+
+    def run_sh_cmd(self, sh_cmd, name):
         start = time.time()
         output = subprocess.run(sh_cmd, shell=True, check=True, capture_output=False)
-        end = time.time()
-        total_time = round(end - start, 2)
-        if output.returncode != 0:
+        total_time = round(time.time() - start, 2)
+        if output.returncode == 0:
             d.msgbox(
-                "{} failed to run properly...skipping\n{}".format(cmd_name, output),
-                title="Unsuccessful {0!r} run",
+                "%s finished successfully in %s seconds." % (name, total_time),
+                title="Successful '%s' run" % name,
                 height=7,
-                width=50,
-            )
-        else:
-            d.msgbox(
-                "{} finished successfully in {} seconds...".format(
-                    cmd_name, total_time
-                ),
-                title="Successful {0!r} run".format(cmd_name),
-                height=7,
-                width=50,
+                width=40,
             )
             return True
-
-
-def process_command_line():
-    global params
-
-    try:
-        opts, args = getopt.getopt(
-            sys.argv[1:],
-            "ftE",
-            ["debug", "debug-file=", "debug-expand-file-opt", "help", "version",],
-        )
-    except getopt.GetoptError:
-        print(usage, file=sys.stderr)
-        return ("exit", 1)
-
-    for option, value in opts:
-        if option == "--help":
-            print(usage)
-            return ("exit", 0)
-        elif option == "--version":
-            print("%s %s\n%s" % (progname, progversion, version_blurb))
-            return ("exit", 0)
-
-    # Now, require a correct invocation.
-    if len(args) != 0:
-        print(usage, file=sys.stderr)
-        return ("exit", 1)
-
-    # Default values for parameters
-    params = {
-        "debug": False,
-        "debug_filename": default_debug_filename,
-        "debug_expand_file_opt": False,
-    }
-
-    root_dir = os.sep  # This is OK for Unix-like systems
-    params["home_dir"] = os.getenv("HOME", root_dir)
-
-    # General option processing
-    for option, value in opts:
-        if option == "--debug":
-            params["debug"] = True
-        elif option == "--debug-file":
-            params["debug_filename"] = value
-        elif option in ("-E", "--debug-expand-file-opt"):
-            params["debug_expand_file_opt"] = True
         else:
-            assert False, (
-                "Unexpected option received from the " "getopt module: '%s'" % option
+            d.msgbox(
+                "%s failed to run properly%s" % (name, output),
+                title="Unsuccessful '%s' run" % name,
+                height=7,
+                width=40,
             )
 
-    return ("continue", None)
 
-
-def main():
-    locale.setlocale(locale.LC_ALL, "")
-
-    what_to_do, code = process_command_line()
-    if what_to_do == "exit":
-        sys.exit(code)
-
-    try:
-        app = ArchInstaller()
-        app.run()
-    except dialog.error as exc_instance:
-        if not isinstance(
-            exc_instance, dialog.PythonDialogErrorBeforeExecInChildProcess
-        ):
-            print(traceback.format_exc(), file=sys.stderr)
-
-        print(
-            "Error (see above for a traceback):\n\n{0}".format(exc_instance),
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    sys.exit(0)
-
-
-if __name__ == "__main__":
-    main()
+class StorageInput(object):
+    def __init__(self, val):
+        self.raw = parse_size(val, binary=True)
+        self.humanized = val
